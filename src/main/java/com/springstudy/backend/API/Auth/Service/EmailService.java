@@ -2,6 +2,7 @@ package com.springstudy.backend.API.Auth.Service;
 
 import com.springstudy.backend.API.Auth.Model.Request.EmailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.EmailVerifyRequest;
+import com.springstudy.backend.API.Repoitory.UserRepository;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import com.springstudy.backend.Common.RedisService;
@@ -22,6 +23,7 @@ public class EmailService {
     private static final String senderEmail= "verify0213@gmail.com";
     private int number;
     private final RedisService redisUtil;
+    private final UserRepository userRepository;
 
     // 랜덤으로 숫자 생성
     //@Bean
@@ -70,16 +72,15 @@ public class EmailService {
         String authNum = emailRequest.authnum();
         String email = emailRequest.email();
         String storedEmail = redisUtil.getData(authNum);
+        userRepository.findByEmail(email).ifPresent(user -> {
+            throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
+        });
 
-        if(storedEmail==null){
+        if(storedEmail==null || !storedEmail.equals(email)){
             //인증번호 틀림.
             //todo error
-            return ErrorCode.FAILURE;
-        }
-        else if(!storedEmail.equals(email)){
-            //인증번호에 해당하는 이메일이 아님.
-            //todo error
-            return ErrorCode.FAILURE;
+            //throw new CustomException(ErrorCode.ERROR_VERIFY);
+            return ErrorCode.VERIFY_FAILED;
         }
         return ErrorCode.SUCCESS;
     }
