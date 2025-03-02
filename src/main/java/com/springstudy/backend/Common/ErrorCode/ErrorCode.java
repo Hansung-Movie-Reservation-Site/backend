@@ -25,7 +25,8 @@ public enum ErrorCode implements CodeInterface{
     JWT_EXPIRATE_PASSED(-14, "JWT_EXPIRATE_PASSED"),
     JWT_ACCESS_DENIED(-15, "JWT_ACCESS_DENIED"),
 
-    VERIFY_FAILED(-16, "VERIFY_FAILED");
+    VERIFY_FAILED(-16, "VERIFY_FAILED"),
+    MISMATCH_USERNAME(-17, "MISMATCH_USERNAME");
 
     private final Integer code;
     private final String message;

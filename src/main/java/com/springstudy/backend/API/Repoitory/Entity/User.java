@@ -23,7 +23,17 @@ public class User {
     @OneToOne(mappedBy="user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserCredentional user_credentional;
 
+    public void changeEmail(String email) {
+        this.email = email;
+    }
+    public void changeUsername(String username) {
+        this.username = username;
+    }
     public void setUserCredentional(UserCredentional user_credentional) {
         this.user_credentional = user_credentional;
+    }
+
+    public void changePassword(String password) {
+        getUser_credentional().changePassword(password);
     }
 }
