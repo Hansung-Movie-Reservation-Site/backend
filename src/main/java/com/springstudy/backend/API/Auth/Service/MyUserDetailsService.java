@@ -1,8 +1,8 @@
 package com.springstudy.backend.API.Auth.Service;
 
 import com.springstudy.backend.API.Auth.Model.AuthUser;
-import com.springstudy.backend.API.Repoitory.Entity.User;
-import com.springstudy.backend.API.Repoitory.UserRepository;
+import com.springstudy.backend.API.Repository.Entity.User;
+import com.springstudy.backend.API.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
