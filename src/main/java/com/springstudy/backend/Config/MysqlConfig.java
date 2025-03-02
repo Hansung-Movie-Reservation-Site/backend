@@ -3,6 +3,7 @@ package com.springstudy.backend.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -24,6 +25,7 @@ public class MysqlConfig {
     private String driverClassName;
 
     @Bean // @Bean: 필요한 즉시 사용하도록 컴파일할 때 컨테이너에 만듬.
+    @Primary
     public DataSourceTransactionManager transactionManager(DataSource datasource){ // Datasource: 데베 연결 역할.
         return new DataSourceTransactionManager(datasource);
     } // transactionManager 생성: 기본적인 트랜젝션 설정.
