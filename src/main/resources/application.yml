@@ -2,10 +2,14 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:mysql://localhost:3306/movie?createDatabaseIfNotExist=true
-    # Movie schema create if not exist movie schema
+    url: jdbc:mysql://capstone-database.cbcbn5pgn4g3.ap-northeast-2.rds.amazonaws.com:3306/movie?createDatabaseIfNotExist=true
+    # localhost : jdbc:mysql://localhost:3306/movie?createDatabaseIfNotExist=true
+    # aws : jdbc:mysql://capstone-database.cbcbn5pgn4g3.ap-northeast-2.rds.amazonaws.com:3306/movie?createDatabaseIfNotExist=true
+    # ?createDatabaseIfNotExist=true : Movie schema create if not exist movie schema
     username: root
-    password: 1234
+    password: 03ac6742
+    # localhost : 1234
+    # aws : 03ac6742
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
