@@ -2,8 +2,8 @@ package com.springstudy.backend.API.Auth.Service;
 
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
 import com.springstudy.backend.API.Auth.Model.Response.ChangeDetailResponse;
-import com.springstudy.backend.API.Repoitory.Entity.User;
-import com.springstudy.backend.API.Repoitory.UserRepository;
+import com.springstudy.backend.API.Repository.Entity.User;
+import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import lombok.RequiredArgsConstructor;
