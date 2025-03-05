@@ -113,7 +113,9 @@ public class JWTFilter extends OncePerRequestFilter {
         if(checkURL(request,"/login") || checkURL(request,"/createUser")
                 || checkURL(request, "/swagger-ui")
                 || checkURL(request, "/reservation")
-                || checkURL(request, "/movies")) {
+                || checkURL(request, "/movies")
+                || checkURL(request, "/screening")
+                || checkURL(request, "/tickets")) {
             filterChain.doFilter(request, response);
             return;
         }
