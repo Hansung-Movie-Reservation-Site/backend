@@ -23,9 +23,9 @@ public class MovieService {
     private final MovieRepository movieRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
-    private static final String API_KEY = "65a8c2b9d77ff46a7957c24a83a213a9";
-    private static final String DAILY_BOX_OFFICE_URL = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json";
-    private static final String MOVIE_DETAIL_URL = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json";
+    private static final String API_KEY = "f613772b7ede7a7150acb1592fbb88e0";
+    private static final String DISCOVER_MOVIE_URL = "https://api.themoviedb.org/3/discover/movie?api_key=" + API_KEY + "&language=ko-KR&region=KR&primary_release_date.gte=%s&primary_release_date.lte=%s";
+    private static final String MOVIE_DETAIL_URL = "https://api.themoviedb.org/3/movie/%d?api_key=" + API_KEY + "&language=ko-KR&append_to_response=credits";
 
     public MovieService(MovieRepository movieRepository, RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.movieRepository = movieRepository;
@@ -33,57 +33,82 @@ public class MovieService {
         this.objectMapper = objectMapper;
     }
 
-    @Transactional("transactionManager")
+    @Transactional
     public void fetchAndSaveMovies() {
-        String dateStr = LocalDate.now().minusDays(1).toString().replace("-", "");
-        String requestUrl = DAILY_BOX_OFFICE_URL + "?key=" + API_KEY + "&targetDt=" + dateStr;
+        String startDate = LocalDate.now().minusDays(60).toString();
+        String endDate = LocalDate.now().plusDays(7).toString();
+        String requestUrl = String.format(DISCOVER_MOVIE_URL, startDate, endDate);
 
         ResponseEntity<String> response = restTemplate.getForEntity(requestUrl, String.class);
-
-        JsonNode jsonNode = parseJson(response.getBody());  // ✅ JSON 파싱 예외 처리
-
-        if (jsonNode == null) {
-            System.out.println("❌ JSON 파싱 실패. API 응답을 확인하세요.");
-            return;
+        JsonNode jsonNode = null;
+        try {
+            jsonNode = objectMapper.readTree(response.getBody()).get("results");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
 
-        List<Movie> movies = StreamSupport.stream(jsonNode.get("boxOfficeResult").get("dailyBoxOfficeList").spliterator(), false)
+        List<Movie> movies = StreamSupport.stream(jsonNode.spliterator(), false)
                 .map(node -> objectMapper.convertValue(node, MovieDTO.class))
-                .filter(dto -> dto.getMovieCode() != null && !movieRepository.existsByMovieCode(dto.getMovieCode())) // ✅ 중복 체크
                 .map(this::fetchMovieDetails)
+                .filter(movie -> movie != null)  // ✅ `null` 체크 후 저장
+                .filter(movie -> !isDuplicate(movie))  // ✅ 중복된 영화 제외
                 .collect(Collectors.toList());
 
-        movieRepository.saveAll(movies);
-    }
-
-    private JsonNode parseJson(String jsonString) {
-        try {
-            return objectMapper.readTree(jsonString);
-        } catch (JsonProcessingException e) {
-            System.err.println("❌ JSON 파싱 오류: " + e.getMessage());
-            return null;  // ✅ 예외 발생 시 `null` 반환
+        // ✅ MySQL에 데이터 저장 및 로그 출력
+        if (!movies.isEmpty()) {
+            movieRepository.saveAll(movies);
+            movies.forEach(movie -> System.out.println("✅ 저장 완료: " + movie.getTitle() + " (" + movie.getReleaseDate() + ")"));
+        } else {
+            System.out.println("❌ 저장할 영화가 없음.");
         }
     }
 
     private Movie fetchMovieDetails(MovieDTO dto) {
-        String requestUrl = MOVIE_DETAIL_URL + "?key=" + API_KEY + "&movieCd=" + dto.getMovieCode();
-        ResponseEntity<String> response = restTemplate.getForEntity(requestUrl, String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity(String.format(MOVIE_DETAIL_URL, dto.getMovieId()), String.class);
+        MovieDetailDTO detail = null;
+        try {
+            detail = objectMapper.readValue(response.getBody(), MovieDetailDTO.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-        JsonNode jsonNode = parseJson(response.getBody()); // ✅ JSON 파싱 예외 처리
-
-        if (jsonNode == null) {
-            System.out.println("❌ 영화 상세정보 API 파싱 실패: " + dto.getTitle());
+        // ✅ 제목, 줄거리, 장르, 감독, 나이 제한, 상영 시간 값이 `null` 또는 공백이면 저장하지 않음
+        if (isEmpty(dto.getTitle())
+                || isEmpty(detail.getOverview())
+                || isEmpty(detail.getGenreNames())
+                || isEmpty(detail.getDirectorNames())
+                ) {
+            System.out.println("❌ 필수 데이터가 없거나 공백이어서 저장하지 않음: " + dto.getMovieId());
             return null;
         }
 
-        MovieDetailDTO detail = objectMapper.convertValue(jsonNode.get("movieInfoResult").get("movieInfo"), MovieDetailDTO.class);
-
         return Movie.builder()
+                .movieId(dto.getMovieId())
                 .title(dto.getTitle())
                 .releaseDate(dto.getParsedReleaseDate())
-                .movieCode(dto.getMovieCode())
-                .director(detail.getDirectorNames())
-                .actors(detail.getActorNames())
+                .overview(detail.getOverview())  // ✅ 한국어 개요
+                .director(detail.getDirectorNames())  // ✅ 한국어 감독 이름
+                .genres(detail.getGenreNames())  // ✅ 한국어 장르
+                .posterImage(detail.getFullPosterUrl())
+                .runtime(detail.getRuntime())  // ✅ 상영 시간 추가
                 .build();
+    }
+
+    /**
+     * ✅ `null`이거나 공백 문자열인지 확인하는 유틸리티 메서드
+     */
+    private boolean isEmpty(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+    /**
+     * ✅ 영화가 이미 저장되어 있는지 확인하는 메서드
+     */
+    private boolean isDuplicate(Movie movie) {
+        boolean exists = movieRepository.existsByMovieId(movie.getMovieId());
+        if (exists) {
+            System.out.println("⚠️ 이미 저장된 영화: " + movie.getTitle() + " (" + movie.getReleaseDate() + ")");
+        }
+        return exists;
     }
 }

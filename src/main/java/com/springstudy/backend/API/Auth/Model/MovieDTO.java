@@ -14,22 +14,21 @@ import java.time.format.DateTimeParseException;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MovieDTO {
 
-    @JsonProperty("movieCd")
-    private String movieCode;
+    @JsonProperty("id")
+    private Integer movieId;
 
-    @JsonProperty("movieNm")
+    @JsonProperty("title")
     private String title;
 
-    @JsonProperty("openDt")
+    @JsonProperty("release_date")
     private String releaseDate;
 
     public LocalDate getParsedReleaseDate() {
         if (releaseDate == null || releaseDate.isEmpty()) return null;
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            return LocalDate.parse(releaseDate, formatter);
+            return LocalDate.parse(releaseDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         } catch (DateTimeParseException e) {
-            System.out.println("❌ 날짜 변환 실패: " + releaseDate);
+            System.err.println("❌ 날짜 변환 실패: " + releaseDate);
             return null;
         }
     }
