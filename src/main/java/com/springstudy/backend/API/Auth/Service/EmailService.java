@@ -9,6 +9,7 @@ import com.springstudy.backend.Common.RedisService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailService {
 
     @Autowired
@@ -57,15 +59,17 @@ public class EmailService {
         }
         catch(MessagingException e){
             //todo error
+            log.error(e.getMessage());
             throw new CustomException(ErrorCode.FAILURE);
         }
         catch(MailException e){
             //todo error
+            log.error(e.getMessage());
             throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
         }
 
         return ErrorCode.SUCCESS;
-    }
+    }   
 
     //추가 되었다.
     public ErrorCode CheckAuthNum(EmailVerifyRequest emailRequest){
@@ -79,6 +83,7 @@ public class EmailService {
         if(storedEmail==null || !storedEmail.equals(email)){
             //인증번호 틀림.
             //todo error
+            System.out.println(storedEmail==null+" " + !storedEmail.equals(email));
             //throw new CustomException(ErrorCode.ERROR_VERIFY);
             return ErrorCode.VERIFY_FAILED;
         }
