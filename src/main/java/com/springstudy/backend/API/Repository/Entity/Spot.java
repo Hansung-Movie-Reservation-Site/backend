@@ -1,13 +1,14 @@
 package com.springstudy.backend.API.Repository.Entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "spot")
+@Table(name = "spot",
+        uniqueConstraints = { @UniqueConstraint(name = "unique_region_name", columnNames = { "regionid", "name" }) })
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,7 +19,7 @@ public class Spot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, length = 255)
     private String name;
 
     @ManyToOne

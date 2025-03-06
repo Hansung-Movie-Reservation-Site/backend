@@ -1,5 +1,6 @@
 package com.springstudy.backend.API.Repository.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +22,7 @@ public class User {
     private String email;
 
     @OneToOne(mappedBy="user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore  // ✅ 순환 참조 방지
     private UserCredentional user_credentional;
 
     public void changeEmail(String email) {

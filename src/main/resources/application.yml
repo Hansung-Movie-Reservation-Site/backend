@@ -3,9 +3,13 @@ spring:
     import: optional:file:.env[.properties]
   datasource:
     url: jdbc:mysql://localhost:3306/movie?createDatabaseIfNotExist=true
-    # Movie schema create if not exist movie schema
+    # localhost : jdbc:mysql://localhost:3306/movie?createDatabaseIfNotExist=true
+    # aws : jdbc:mysql://capstone-database.cbcbn5pgn4g3.ap-northeast-2.rds.amazonaws.com:3306/movie?createDatabaseIfNotExist=true
+    # ?createDatabaseIfNotExist=true : Movie schema create if not exist movie schema
     username: root
     password: 1234
+    # localhost : 1234
+    # aws : 03ac6742
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
@@ -14,7 +18,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect  # ??? ??
-        format_sql: true  # Easy to view sql
+        # format_sql: true  # Easy to view sql
   data:
     redis:
       host: localhost
@@ -37,3 +41,7 @@ springdoc:
   swagger-ui:
     enabled: true
     operations-sorter: method
+
+api:
+  kofic: "65a8c2b9d77ff46a7957c24a83a213a9"
+  tmdb: "f613772b7ede7a7150acb1592fbb88e0"
