@@ -53,4 +53,6 @@ public class Ticket {
     @Column(nullable = false)
     private int vertical;
 
+
+
 }
