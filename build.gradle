@@ -45,9 +45,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // mysql
-    implementation 'com.mysql:mysql-connector-j:8.0.31'
+    implementation 'mysql:mysql-connector-java:8.0.31'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'mysql:mysql-connector-java:8.0.28'
 
     //email
     implementation 'org.springframework.boot:spring-boot-starter-mail'
