@@ -35,6 +35,13 @@ jobs:
           --health-timeout=5s
           --health-retries=5
     steps:
+      - name: Wait for MySQL to be ready
+        run: |
+          while ! nc -z mysql 3306; do
+            echo "Waiting for MySQL..."
+            sleep 3
+          done
+
       - name: Github Repository 파일 불러오기1
         uses: actions/checkout@v4
 
