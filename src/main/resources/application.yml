@@ -2,9 +2,12 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:mysql://localhost:3306/movie?createDatabaseIfNotExist=true
-    username: root
-    password: 1234
+#    url: jdbc:mysql://localhost:3306/movie?createDatabaseIfNotExist=true 개발시 코드.
+#    username: root
+#    password: 1234
+    url: jdbc:mysql://localhost:3306/testdb?useSSL=false&allowPublicKeyRetrieval=true # ci/cd 테스트용.
+    username: testuser
+    password: testpass
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
@@ -18,6 +21,7 @@ spring:
     redis:
       host: localhost
       port: 6379
+      password: ""
       timeout: 5000ms
   mail:
     host: smtp.gmail.com
