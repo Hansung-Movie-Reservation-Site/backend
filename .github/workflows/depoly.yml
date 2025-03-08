@@ -19,7 +19,7 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping --host=localhost --user=root --password=root"
+          --health-cmd="mysqladmin ping --host=127.0.0.1 --user=root --password=root || exit 1"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -35,12 +35,12 @@ jobs:
           --health-timeout=5s
           --health-retries=5
     steps:
-      - name: Wait for MySQL to be ready
-        run: |
-          while ! nc -z mysql 3306; do
-            echo "Waiting for MySQL..."
-            sleep 3
-          done
+#      - name: Wait for MySQL to be ready
+#        run: |
+#          while ! nc -z mysql 3306; do
+#            echo "Waiting for MySQL..."
+#            sleep 3
+#          done
 
       - name: Github Repository 파일 불러오기1
         uses: actions/checkout@v4
