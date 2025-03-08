@@ -49,7 +49,9 @@ jobs:
           mysql root password: 1234
 
       - name: 테스트 및 빌드하기
-        run: ./gradlew clean build
+        run: |
+         ./gradlew clean build
+         ls ./build/libs
 
       - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
         uses: aws-actions/configure-aws-credentials@v4
