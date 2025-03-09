@@ -11,6 +11,6 @@ public class EnvConfig {
     @PostConstruct
     public void loadEnv() {
         Dotenv dotenv = Dotenv.load();
-        System.setProperty("RECOMMAND_API_KEY", dotenv.get("RECOMMAND_API_KEY"));
+        System.setProperty("RECOMMEND_API_KEY", dotenv.get("RECOMMEND_API_KEY"));
     }
 }
