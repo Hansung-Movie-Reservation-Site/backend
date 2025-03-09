@@ -41,12 +41,12 @@ jobs:
       - name: .env 파일 만들기
         run: echo "${{ secrets.ENV_PROPERTIES }}" > .env
 
-      - uses: mirromutth/mysql-action@v1.1
-        with:
-          host port: 3306
-          container port: 3306
-          mysql database: 'movie'
-          mysql root password: 1234
+#      - uses: mirromutth/mysql-action@v1.1
+#        with:
+#          host port: 3306
+#          container port: 3306
+#          mysql database: 'movie'
+#          mysql root password: 1234
 
       - name: 테스트 및 빌드하기
         run: |
