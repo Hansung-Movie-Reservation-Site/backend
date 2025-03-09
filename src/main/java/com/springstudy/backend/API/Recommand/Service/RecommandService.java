@@ -37,6 +37,8 @@ public class RecommandService {
         // 1. 추천할 영화 id로 추천 영화를 검색함. sample = 20
         // 2. 5개의 영화를 추천 엔티티에 저장함.
         ResponseEntity<Map> response = null;
+        httpEntity.getHeaders().set("accept", "application/json");
+        httpEntity.getHeaders().set("Authorization", "Bearer "+RECOMMEND_API_KEY);
 
         try{
             String url = "https://api.themoviedb.org/3/movie/"+request.movie_id()+"/similar?language=en-US&page=1";
