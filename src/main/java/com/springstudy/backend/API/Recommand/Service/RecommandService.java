@@ -7,6 +7,7 @@ import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -27,6 +28,12 @@ import java.util.Map;
 public class RecommandService {
     private final RestTemplate restTemplate;
     private final HttpEntity<Map> httpEntity;
+
+    // 생성자 주입은 자동으로 처리됨 (final 필드만 주입)
+    public RecommandService(RestTemplate restTemplate, HttpEntity<Map> httpEntity) {
+        this.restTemplate = restTemplate;
+        this.httpEntity = httpEntity;
+    }
 
 
     @Value("${RECOMMEND_API_KEY}")
