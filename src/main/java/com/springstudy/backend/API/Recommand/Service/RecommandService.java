@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,16 +26,9 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class RecommandService {
     private final RestTemplate restTemplate;
-    private final HttpEntity<Map> httpEntity;
-
-    // 생성자 주입은 자동으로 처리됨 (final 필드만 주입)
-    public RecommandService(RestTemplate restTemplate, @Qualifier("httpEntity") HttpEntity<Map> httpEntity) {
-        this.restTemplate = restTemplate;
-        this.httpEntity = httpEntity;
-    }
-
 
     @Value("${RECOMMEND_API_KEY}")
     String RECOMMEND_API_KEY;
@@ -44,6 +38,8 @@ public class RecommandService {
         // 1. 추천할 영화 id로 추천 영화를 검색함. sample = 20
         // 2. 5개의 영화를 추천 엔티티에 저장함.
         ResponseEntity<Map> response = null;
+        HttpHeaders httpHeaders = new HttpHeaders();
+        HttpEntity<Map>  httpEntity = new HttpEntity(httpHeaders);
         httpEntity.getHeaders().set("accept", "application/json");
         httpEntity.getHeaders().set("Authorization", "Bearer "+RECOMMEND_API_KEY);
 

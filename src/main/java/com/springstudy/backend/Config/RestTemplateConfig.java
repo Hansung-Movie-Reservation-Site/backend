@@ -17,12 +17,4 @@ public class RestTemplateConfig {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
-
-    @Bean(name = "httpEntity")
-    public HttpEntity<Map> getHttpEntity() {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        HttpEntity<Map>  httpEntity = new HttpEntity(httpHeaders);
-        return httpEntity;
-    }
-    // 영화 추천 요청 시.
 }
