@@ -18,7 +18,7 @@ public class RestTemplateConfig {
         return new RestTemplate();
     }
 
-    @Bean
+    @Bean(name = "httpEntity")
     public HttpEntity<Map> getHttpEntity() {
         HttpHeaders httpHeaders = new HttpHeaders();
         HttpEntity<Map>  httpEntity = new HttpEntity(httpHeaders);
