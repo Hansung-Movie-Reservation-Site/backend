@@ -30,7 +30,7 @@ import java.util.Map;
 public class RecommandService {
     private final RestTemplate restTemplate;
 
-    @Value("${RECOMMEND_API_KEY}")
+    @Value("${api.RECOMMEND_API_KEY}")
     String RECOMMEND_API_KEY;
 
     public RecommandResponse recommandMovie(RecommandRequest request) {
