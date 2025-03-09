@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class RecommandService {
     private final RestTemplate restTemplate;
