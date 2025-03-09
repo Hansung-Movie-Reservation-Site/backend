@@ -8,24 +8,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      redis:
-        image: redis:7
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd="redis-cli ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
     steps:
-#      - name: Wait for MySQL to be ready
-#        run: |
-#          while ! nc -z mysql 3306; do
-#            echo "Waiting for MySQL..."
-#            sleep 3
-#          done
-
       - name: Github Repository 파일 불러오기1
         uses: actions/checkout@v4
 
@@ -40,12 +23,6 @@ jobs:
 
       - name: .env 파일 만들기
         run: echo "${{ secrets.ENV_PROPERTIES }}" > .env
-
-#      - uses: mirromutth/mysql-action@v1.1
-#        with:
-#          host port: 3306
-#          container port: 3306
-#          mysql database: 'movie'
 #          mysql root password: 1234
 
       - name: 테스트 및 빌드하기
