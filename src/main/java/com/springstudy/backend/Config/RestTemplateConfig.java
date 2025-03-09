@@ -13,8 +13,8 @@ import java.util.Map;
 @Configuration
 public class RestTemplateConfig {
 
-    @Value("${RECOMMAND_API_KEY}")
-    String RECOMMAND_API_KEY;
+    @Value("${RECOMMEND_API_KEY}")
+    String RECOMMEND_API_KEY;
 
     @Bean
     public RestTemplate restTemplate() {
@@ -25,7 +25,7 @@ public class RestTemplateConfig {
     public HttpEntity<Map> getHttpEntity() {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("accept", "application/json");
-        httpHeaders.set("Authorization", "Bearer "+RECOMMAND_API_KEY);
+        httpHeaders.set("Authorization", "Bearer "+RECOMMEND_API_KEY);
         HttpEntity<Map>  httpEntity = new HttpEntity(httpHeaders);
         return httpEntity;
     }

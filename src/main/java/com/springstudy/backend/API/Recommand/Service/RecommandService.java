@@ -7,6 +7,7 @@ import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,11 @@ import java.util.Map;
 public class RecommandService {
     private final RestTemplate restTemplate;
     private final HttpEntity<Map> httpEntity;
+
+
+    @Value("${RECOMMEND_API_KEY}")
+    String RECOMMEND_API_KEY;
+
     public RecommandResponse recommandMovie(RecommandRequest request) {
         // 영화 추천 기능
         // 1. 추천할 영화 id로 추천 영화를 검색함. sample = 20
