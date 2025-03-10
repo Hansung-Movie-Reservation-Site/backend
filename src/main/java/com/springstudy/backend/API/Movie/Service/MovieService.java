@@ -1,12 +1,13 @@
-package com.springstudy.backend.API.Auth.Service;
+package com.springstudy.backend.API.Movie.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springstudy.backend.API.Auth.Model.MovieDTO;
-import com.springstudy.backend.API.Auth.Model.MovieDetailDTO;
+import com.springstudy.backend.API.Movie.Model.MovieDTO;
+import com.springstudy.backend.API.Movie.Model.MovieDetailDTO;
 import com.springstudy.backend.API.Repository.Entity.Movie;
 import com.springstudy.backend.API.Repository.MovieRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +24,11 @@ public class MovieService {
     private final MovieRepository movieRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
-    private static final String API_KEY = "f613772b7ede7a7150acb1592fbb88e0";
-    private static final String DISCOVER_MOVIE_URL = "https://api.themoviedb.org/3/discover/movie?api_key=" + API_KEY + "&language=ko-KR&region=KR&primary_release_date.gte=%s&primary_release_date.lte=%s";
-    private static final String MOVIE_DETAIL_URL = "https://api.themoviedb.org/3/movie/%d?api_key=" + API_KEY + "&language=ko-KR&append_to_response=credits";
+
+    @Value("${api.TMDB_API_KEY}")
+    private static String TMDB_API_KEY;
+    private static final String DISCOVER_MOVIE_URL = "https://api.themoviedb.org/3/discover/movie?api_key=" + TMDB_API_KEY + "&language=ko-KR&region=KR&primary_release_date.gte=%s&primary_release_date.lte=%s";
+    private static final String MOVIE_DETAIL_URL = "https://api.themoviedb.org/3/movie/%d?api_key=" + TMDB_API_KEY + "&language=ko-KR&append_to_response=credits";
 
     public MovieService(MovieRepository movieRepository, RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.movieRepository = movieRepository;
@@ -92,6 +95,19 @@ public class MovieService {
                 .posterImage(detail.getFullPosterUrl())
                 .runtime(detail.getRuntime())  // ✅ 상영 시간 추가
                 .build();
+    }
+
+    /**
+     * ✅ 영화 제목에 특정 문자열이 포함된 영화 목록 조회
+     */
+    @Transactional(readOnly = true)
+    public List<Movie> searchMoviesByTitle(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            System.out.println(keyword); // 문자열 null 발생
+            throw new IllegalArgumentException("❌ 검색어를 입력하세요.");
+        }
+
+        return movieRepository.findByTitleContainingIgnoreCase(keyword);
     }
 
     /**
