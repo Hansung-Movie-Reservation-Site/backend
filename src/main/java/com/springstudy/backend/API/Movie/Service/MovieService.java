@@ -1,10 +1,10 @@
-package com.springstudy.backend.API.Auth.Service;
+package com.springstudy.backend.API.Movie.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springstudy.backend.API.Auth.Model.MovieDTO;
-import com.springstudy.backend.API.Auth.Model.MovieDetailDTO;
+import com.springstudy.backend.API.Movie.Model.MovieDTO;
+import com.springstudy.backend.API.Movie.Model.MovieDetailDTO;
 import com.springstudy.backend.API.Repository.Entity.Movie;
 import com.springstudy.backend.API.Repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Value;

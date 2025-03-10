@@ -1,4 +1,4 @@
-package com.springstudy.backend.API.Auth.Service;
+package com.springstudy.backend.API.Movie.Service;
 
 import com.springstudy.backend.API.Repository.Entity.Screening;
 import com.springstudy.backend.API.Repository.Entity.Seat;

@@ -1,7 +1,7 @@
-package com.springstudy.backend.API.Auth.Service;
+package com.springstudy.backend.API.Movie.Service;
 
-import com.springstudy.backend.API.Auth.Model.Response.MovieResponseDTO;
-import com.springstudy.backend.API.Auth.Model.Response.SeatResponseDTO;
+import com.springstudy.backend.API.Movie.Model.Response.MovieResponseDTO;
+import com.springstudy.backend.API.Movie.Model.Response.SeatResponseDTO;
 import com.springstudy.backend.API.Repository.Entity.Room;
 import com.springstudy.backend.API.Repository.Entity.Screening;
 import com.springstudy.backend.API.Repository.Entity.Seat;
