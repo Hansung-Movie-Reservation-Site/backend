@@ -1,4 +1,4 @@
-package com.springstudy.backend.API.Auth.Model;
+package com.springstudy.backend.API.Movie.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

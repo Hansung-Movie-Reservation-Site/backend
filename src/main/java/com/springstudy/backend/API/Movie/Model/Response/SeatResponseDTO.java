@@ -1,4 +1,4 @@
-package com.springstudy.backend.API.Auth.Model.Response;
+package com.springstudy.backend.API.Movie.Model.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
