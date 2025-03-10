@@ -1,6 +1,6 @@
-package com.springstudy.backend.API.Auth.Controller;
+package com.springstudy.backend.API.Movie.Controller;
 
-import com.springstudy.backend.API.Auth.Service.TicketService;
+import com.springstudy.backend.API.Movie.Service.TicketService;
 import com.springstudy.backend.API.Repository.Entity.Ticket;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

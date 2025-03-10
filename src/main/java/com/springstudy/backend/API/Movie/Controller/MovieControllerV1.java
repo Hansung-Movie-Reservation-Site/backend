@@ -1,7 +1,7 @@
-package com.springstudy.backend.API.Auth.Controller;
+package com.springstudy.backend.API.Movie.Controller;
 
 
-import com.springstudy.backend.API.Auth.Service.MovieService;
+import com.springstudy.backend.API.Movie.Service.MovieService;
 import com.springstudy.backend.API.Repository.Entity.Movie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
