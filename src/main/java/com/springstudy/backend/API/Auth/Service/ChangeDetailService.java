@@ -1,7 +1,9 @@
 package com.springstudy.backend.API.Auth.Service;
 
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
+import com.springstudy.backend.API.Auth.Model.Request.DeleteAccountRequest;
 import com.springstudy.backend.API.Auth.Model.Response.ChangeDetailResponse;
+import com.springstudy.backend.API.Auth.Model.Response.DeleteAccountResponse;
 import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
@@ -61,5 +63,19 @@ public class ChangeDetailService {
             case "password": user.getUser_credentional().changePassword(passwordEncoder.encode(before));break;
             case "email": user.changeEmail(after);break;
         }
+    }
+
+    private DeleteAccountResponse deleteAccount(DeleteAccountRequest deleteAccountRequest) {
+        String password = deleteAccountRequest.password();
+        Optional<User> userOptional = userRepository.findByEmail(deleteAccountRequest.email());
+        if(userOptional.isEmpty()){
+            throw new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
+        User user = userOptional.get();
+        checkPassword(user, password);
+        userRepository.delete(user);
+
+        return new DeleteAccountResponse();
+
     }
 }
