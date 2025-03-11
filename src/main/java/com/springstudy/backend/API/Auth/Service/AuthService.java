@@ -1,16 +1,19 @@
 package com.springstudy.backend.API.Auth.Service;
 import com.springstudy.backend.API.Auth.Model.Request.CreateUserRequest;
+import com.springstudy.backend.API.Auth.Model.Request.DeleteAccountRequest;
 import com.springstudy.backend.API.Auth.Model.Response.CreateUserResponse;
+import com.springstudy.backend.API.Auth.Model.Response.DeleteAccountResponse;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.API.Auth.Model.AuthUser;
 import com.springstudy.backend.API.Auth.Model.Request.LoginRequest;
 import com.springstudy.backend.API.Auth.Model.Response.LoginResponse;
 import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.Entity.UserCredentional;
+import com.springstudy.backend.Common.CheckPasswordService;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import com.springstudy.backend.Common.Hash.Hasher;
-import com.springstudy.backend.Common.JWTUtil;
+import com.springstudy.backend.Common.JWTCommon.JWTUtil;
 import com.springstudy.backend.Common.RedisService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.Cookie;
@@ -33,6 +36,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisService redisService;
+    private final CheckPasswordService checkPasswordService;
 
     public CreateUserResponse createUser(CreateUserRequest request) {
         // 1. 동일 이메일 있나 확인.
@@ -85,6 +89,7 @@ public class AuthService {
         System.out.println("email: "+request.email()+"user: "+user.isPresent());
         if(user.isEmpty()) {
             //todo error
+            log.error("유저 정보가 존재하지 않습니다.");
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
             authUser(user.get().getUsername(),request.password());
@@ -134,5 +139,18 @@ public class AuthService {
         cookie.setMaxAge(1000000); // 1일
         cookie.setAttribute("SameSite", "None");  // 크로스 사이트 요청 허용
         return cookie;
+    }
+    public DeleteAccountResponse deleteAccount(DeleteAccountRequest deleteAccountRequest) {
+        String password = deleteAccountRequest.password();
+        Optional<User> userOptional = userRepository.findByEmail(deleteAccountRequest.email());
+        if(userOptional.isEmpty()){
+            throw new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
+        User user = userOptional.get();
+        checkPasswordService.checkPassword(user, password);
+        userRepository.delete(user);
+
+        return new DeleteAccountResponse(ErrorCode.SUCCESS);
+
     }
 }

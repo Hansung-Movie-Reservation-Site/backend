@@ -1,11 +1,10 @@
 package com.springstudy.backend.API.Auth.Service;
 
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
-import com.springstudy.backend.API.Auth.Model.Request.DeleteAccountRequest;
 import com.springstudy.backend.API.Auth.Model.Response.ChangeDetailResponse;
-import com.springstudy.backend.API.Auth.Model.Response.DeleteAccountResponse;
 import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.UserRepository;
+import com.springstudy.backend.Common.CheckPasswordService;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +21,7 @@ import java.util.Optional;
 public class ChangeDetailService {
 
     private final UserRepository userRepository;
+    private final CheckPasswordService checkPasswordService;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -42,16 +42,10 @@ public class ChangeDetailService {
         User user = userOptional.get();
 
         String before = changeDetailRequest.password();
-        checkPassword(user, before);
+        checkPasswordService.checkPassword(user, before);
         // 원래 정보가 맞는지 비밀번호로 확인한다.
         change(user, changeDetailRequest);
         return new ChangeDetailResponse(ErrorCode.SUCCESS);
-    }
-
-    private void checkPassword(User user, String password) {
-        if(!passwordEncoder.matches(password,user.getUser_credentional().getPassword())){
-            throw new CustomException(ErrorCode.MISMATCH_PASSWORD);
-        }
     }
     private void change(User user, ChangeDetailRequest changeDetailRequest) {
         String object = changeDetailRequest.object();
@@ -62,19 +56,5 @@ public class ChangeDetailService {
             case "password": user.getUser_credentional().changePassword(passwordEncoder.encode(after));break;
             case "email": user.changeEmail(after);break;
         }
-    }
-
-    private DeleteAccountResponse deleteAccount(DeleteAccountRequest deleteAccountRequest) {
-        String password = deleteAccountRequest.password();
-        Optional<User> userOptional = userRepository.findByEmail(deleteAccountRequest.email());
-        if(userOptional.isEmpty()){
-            throw new CustomException(ErrorCode.NOT_EXIST_USER);
-        }
-        User user = userOptional.get();
-        checkPassword(user, password);
-        userRepository.delete(user);
-
-        return new DeleteAccountResponse();
-
     }
 }
