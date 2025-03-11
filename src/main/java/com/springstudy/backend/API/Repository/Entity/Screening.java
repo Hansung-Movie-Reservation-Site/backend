@@ -14,7 +14,13 @@ import java.time.LocalTime;
         name = "screening",
         uniqueConstraints = @UniqueConstraint(
                 name = "unique_screening_constraint",
-                columnNames = {"movieid", "roomid", "date", "start", "finish", "price"}
+                columnNames = {
+                        "movieid",
+                        "roomid",
+                        "date",
+                        "start",
+                        "finish",
+                        "price"}
         )
 )
 @Getter

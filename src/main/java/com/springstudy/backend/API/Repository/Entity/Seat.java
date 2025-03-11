@@ -8,7 +8,14 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "seat",
-        uniqueConstraints = { @UniqueConstraint(name = "unique_seat_position", columnNames = { "roomid", "horizontal", "vertical" }) })
+        uniqueConstraints = @UniqueConstraint(
+                name = "unique_seat_position",
+                columnNames = {
+                        "roomid",
+                        "horizontal",
+                        "vertical"}
+                )
+)
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
