@@ -25,7 +25,7 @@ public class ChangeDetailService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public ChangeDetailResponse changeDetail(ChangeDetailRequest changeDetailRequest) {
+    public ChangeDetailResponse change(ChangeDetailRequest changeDetailRequest) {
         // 사용자 정보 변경.
         // 1. 사용자 유무 확인.
         // 2. 비밀번호 확인.
@@ -44,7 +44,7 @@ public class ChangeDetailService {
         String before = changeDetailRequest.password();
         checkPassword(user, before);
         // 원래 정보가 맞는지 비밀번호로 확인한다.
-        changeDetail(user, changeDetailRequest);
+        change(user, changeDetailRequest);
         return new ChangeDetailResponse(ErrorCode.SUCCESS);
     }
 
@@ -53,14 +53,13 @@ public class ChangeDetailService {
             throw new CustomException(ErrorCode.MISMATCH_PASSWORD);
         }
     }
-    private void changeDetail(User user, ChangeDetailRequest changeDetailRequest) {
+    private void change(User user, ChangeDetailRequest changeDetailRequest) {
         String object = changeDetailRequest.object();
         String after = changeDetailRequest.after();
-        String before = changeDetailRequest.password();
 
         switch (object) {
             case "username": user.changeUsername(after);break;
-            case "password": user.getUser_credentional().changePassword(passwordEncoder.encode(before));break;
+            case "password": user.getUser_credentional().changePassword(passwordEncoder.encode(after));break;
             case "email": user.changeEmail(after);break;
         }
     }

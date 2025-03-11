@@ -37,7 +37,7 @@ public class AuthControllerV1 {
     }
     @PostMapping("/VerifyEmail")
     public ErrorCode sendEmail(@RequestBody @Valid EmailRequest emailRequest) {
-        return emailService.sendMail(emailRequest, "verifyEmail");
+        return emailService.sendMail(emailRequest, "VerifyEmail");
     }
     @PostMapping("/check")
     public ErrorCode checkEmail(@RequestBody @Valid EmailVerifyRequest emailRequest) {

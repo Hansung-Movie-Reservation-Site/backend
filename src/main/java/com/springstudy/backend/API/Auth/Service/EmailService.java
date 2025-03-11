@@ -17,8 +17,10 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.ConnectException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,6 +35,7 @@ public class EmailService {
     private final PasswordEncoder passwordEncoder;
     private final TemporaryPasswordEmail temporaryPasswordEmail;
     private final VerifyEmail verifyEmail;
+    private final PlatformTransactionManager platformTransactionManager;
 
     public int createVerifyNumber(String mail) throws MessagingException {
         int number = (int)(Math.random() * (90000)) + 100000;
@@ -51,9 +54,12 @@ public class EmailService {
 
         User user = userOptional.get();
         user.getUser_credentional().changePassword(passwordEncoder.encode(temporaryPassword));
+        System.out.println(user.getUser_credentional().getPassword());
+        userRepository.save(user);
 
         return temporaryPassword;
     }
+
 
     public ErrorCode sendMail(EmailRequest emailRequest, String mode) {
         MimeMessage message = null;

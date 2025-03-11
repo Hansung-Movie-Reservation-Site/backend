@@ -3,15 +3,11 @@ package com.springstudy.backend.API.Auth.Controller;
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.DeleteAccountRequest;
 import com.springstudy.backend.API.Auth.Model.Request.EmailRequest;
-import com.springstudy.backend.API.Auth.Model.Request.LoginRequest;
 import com.springstudy.backend.API.Auth.Model.Response.ChangeDetailResponse;
 import com.springstudy.backend.API.Auth.Model.Response.DeleteAccountResponse;
-import com.springstudy.backend.API.Auth.Model.Response.LoginResponse;
 import com.springstudy.backend.API.Auth.Service.ChangeDetailService;
 import com.springstudy.backend.API.Auth.Service.EmailService;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,11 +26,11 @@ public class UserDateilControllerV1 {
     public ChangeDetailResponse changeDetail(
             @RequestBody ChangeDetailRequest changeDetailRequest
     ){
-        return changeDetailService.changeDetail(changeDetailRequest);
+        return changeDetailService.change(changeDetailRequest);
     }
     @PostMapping("/findPassword")
     public ErrorCode sendEmail(@RequestBody @Valid EmailRequest emailRequest) {
-        return emailService.sendMail(emailRequest, "findPassword");
+        return emailService.sendMail(emailRequest, "FindPassword");
     }
     @PostMapping("/DeleteAccount")
     public DeleteAccountResponse DeleteAccount(
