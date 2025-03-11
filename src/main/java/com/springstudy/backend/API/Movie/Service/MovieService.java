@@ -26,9 +26,7 @@ public class MovieService {
     private final ObjectMapper objectMapper;
 
     @Value("${api.TMDB_API_KEY}")
-    private static String TMDB_API_KEY;
-    private static final String DISCOVER_MOVIE_URL = "https://api.themoviedb.org/3/discover/movie?api_key=" + TMDB_API_KEY + "&language=ko-KR&region=KR&primary_release_date.gte=%s&primary_release_date.lte=%s";
-    private static final String MOVIE_DETAIL_URL = "https://api.themoviedb.org/3/movie/%d?api_key=" + TMDB_API_KEY + "&language=ko-KR&append_to_response=credits";
+    String TMDB_API_KEY;
 
     public MovieService(MovieRepository movieRepository, RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.movieRepository = movieRepository;
@@ -38,6 +36,8 @@ public class MovieService {
 
     @Transactional
     public void fetchAndSaveMovies() {
+        String DISCOVER_MOVIE_URL = "https://api.themoviedb.org/3/discover/movie?api_key=" + TMDB_API_KEY + "&language=ko-KR&region=KR&primary_release_date.gte=%s&primary_release_date.lte=%s";
+
         String startDate = LocalDate.now().minusDays(60).toString();
         String endDate = LocalDate.now().plusDays(7).toString();
         String requestUrl = String.format(DISCOVER_MOVIE_URL, startDate, endDate);
@@ -67,6 +67,8 @@ public class MovieService {
     }
 
     private Movie fetchMovieDetails(MovieDTO dto) {
+        String MOVIE_DETAIL_URL = "https://api.themoviedb.org/3/movie/%d?api_key=" + TMDB_API_KEY + "&language=ko-KR&append_to_response=credits";
+
         ResponseEntity<String> response = restTemplate.getForEntity(String.format(MOVIE_DETAIL_URL, dto.getMovieId()), String.class);
         MovieDetailDTO detail = null;
         try {
