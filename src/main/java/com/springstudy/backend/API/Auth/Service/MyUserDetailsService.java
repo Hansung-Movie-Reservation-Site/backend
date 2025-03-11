@@ -3,6 +3,8 @@ package com.springstudy.backend.API.Auth.Service;
 import com.springstudy.backend.API.Auth.Model.AuthUser;
 import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.UserRepository;
+import com.springstudy.backend.Common.ErrorCode.CustomException;
+import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,6 +27,7 @@ public class MyUserDetailsService implements UserDetailsService {
         Optional<User> user = userRepository.findByUsername(username);
         if(user.isEmpty()){
             //todo error
+            throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
         User member = user.get();
         List<GrantedAuthority> authorityList = new ArrayList<>();
