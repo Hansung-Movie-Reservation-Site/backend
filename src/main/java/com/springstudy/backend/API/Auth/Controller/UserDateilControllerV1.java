@@ -32,9 +32,9 @@ public class UserDateilControllerV1 {
     public ErrorCode sendEmail(@RequestBody @Valid EmailRequest emailRequest) {
         return emailService.sendMail(emailRequest, "FindPassword");
     }
-    @PostMapping("/DeleteAccount")
-    public DeleteAccountResponse DeleteAccount(
-            @RequestBody @Valid DeleteAccountRequest deleteAccountRequest) {
-        return new DeleteAccountResponse();
-    }
+//    @PostMapping("/DeleteAccount")
+//    public DeleteAccountResponse DeleteAccount(
+//            @RequestBody @Valid DeleteAccountRequest deleteAccountRequest) {
+//        return changeDetailService.deleteAccount(deleteAccountRequest);
+//    }
 }

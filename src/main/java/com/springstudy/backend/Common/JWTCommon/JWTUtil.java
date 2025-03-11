@@ -1,7 +1,8 @@
-package com.springstudy.backend.Common;
+package com.springstudy.backend.Common.JWTCommon;
 
 import com.google.gson.internal.LinkedTreeMap;
 import com.springstudy.backend.API.Auth.Model.AuthUser;
+import com.springstudy.backend.Common.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;

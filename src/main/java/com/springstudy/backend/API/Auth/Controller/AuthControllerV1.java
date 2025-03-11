@@ -1,10 +1,8 @@
 package com.springstudy.backend.API.Auth.Controller;
 
-import com.springstudy.backend.API.Auth.Model.Request.CreateUserRequest;
-import com.springstudy.backend.API.Auth.Model.Request.EmailRequest;
-import com.springstudy.backend.API.Auth.Model.Request.EmailVerifyRequest;
-import com.springstudy.backend.API.Auth.Model.Request.LoginRequest;
+import com.springstudy.backend.API.Auth.Model.Request.*;
 import com.springstudy.backend.API.Auth.Model.Response.CreateUserResponse;
+import com.springstudy.backend.API.Auth.Model.Response.DeleteAccountResponse;
 import com.springstudy.backend.API.Auth.Model.Response.LoginResponse;
 import com.springstudy.backend.API.Auth.Service.AuthService;
 import com.springstudy.backend.API.Auth.Service.EmailService;
@@ -35,12 +33,17 @@ public class AuthControllerV1 {
         System.out.println(httpServletRequest.getCookies());
         return authService.login(httpServletResponse, loginRequest);
     }
-    @PostMapping("/VerifyEmail")
+    @PostMapping("/verifyEmail")
     public ErrorCode sendEmail(@RequestBody @Valid EmailRequest emailRequest) {
         return emailService.sendMail(emailRequest, "VerifyEmail");
     }
     @PostMapping("/check")
     public ErrorCode checkEmail(@RequestBody @Valid EmailVerifyRequest emailRequest) {
         return emailService.CheckAuthNum(emailRequest);
+    }
+    @PostMapping("/deleteAccount")
+    public DeleteAccountResponse DeleteAccount(
+            @RequestBody @Valid DeleteAccountRequest deleteAccountRequest) {
+        return authService.deleteAccount(deleteAccountRequest);
     }
 }
