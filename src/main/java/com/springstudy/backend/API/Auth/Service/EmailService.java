@@ -2,6 +2,7 @@ package com.springstudy.backend.API.Auth.Service;
 
 import com.springstudy.backend.API.Auth.Model.Request.EmailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.EmailVerifyRequest;
+import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
@@ -13,48 +14,72 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class EmailService {
 
-    @Autowired
     private final JavaMailSender javaMailSender;
     private static final String senderEmail= "verify0213@gmail.com";
-    private int number;
     private final RedisService redisUtil;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    // 랜덤으로 숫자 생성
-    //@Bean
-    public static int createNumber() {
-        return (int)(Math.random() * (90000)) + 100000; //(int) Math.random() * (최댓값-최소값+1) + 최소값
-    }
-
-    public MimeMessage CreateMail(String mail) throws MessagingException {
-        number = createNumber();
+    public int createVerifyNumber(String mail) throws MessagingException {
+        int number = (int)(Math.random() * (90000)) + 100000;
         redisUtil.setDataExpire(Integer.toString(number),mail,60*2);
         System.out.println(redisUtil.getData(Integer.toString(number))+" "+number);
+        return number;
+    }
+
+    @Transactional
+    public String createTemporaryPassword(String mail) throws MessagingException {
+        Optional<User> userOptional = userRepository.findByEmail(mail);
+        if(userOptional.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
+        String temporaryPassword = UUID.randomUUID().toString().replace("-", "").substring(0,8);
+
+        User user = userOptional.get();
+        user.getUser_credentional().changePassword(passwordEncoder.encode(temporaryPassword));
+
+        return temporaryPassword;
+    }
+
+    public MimeMessage createEmail(String mail, String subject, Object object) throws MessagingException {
         MimeMessage message = javaMailSender.createMimeMessage();
 
-            message.setFrom(senderEmail);
-            message.setRecipients(MimeMessage.RecipientType.TO, mail);
-            System.out.println(mail);
-            message.setSubject("이메일 인증");
-            String body = "";
-            body += "<h3>" + "요청하신 인증 번호입니다." + "</h3>";
-            body += "<h1>" + number + "</h1>";
-            body += "<h3>" + "감사합니다." + "</h3>";
-            message.setText(body,"UTF-8", "html");
+        message.setFrom(senderEmail);
+        message.setRecipients(MimeMessage.RecipientType.TO, mail);
+        System.out.println(mail);
+        message.setSubject(subject);
+        String body = "";
+        body += "<h3>" + subject + "</h3>";
+        body += "<h1>" + object + "</h1>";
+        body += "<h3>" + "감사합니다." + "</h3>";
+        message.setText(body,"UTF-8", "html");
 
         return message;
     }
 
-    public ErrorCode sendMail(EmailRequest emailRequest) {
+    public ErrorCode sendMail(EmailRequest emailRequest, String mode) {
+        MimeMessage message = null;
         try{
-            MimeMessage message = CreateMail(emailRequest.email());
+            switch(mode){
+                case "FindPassword":
+                    String temporaryPassword = createTemporaryPassword(emailRequest.email());
+                    message = createEmail(emailRequest.email(),"임시 비밀번호 발급",temporaryPassword); break;
+                case "VerifyEmail":
+                    int verifyNumber = createVerifyNumber(emailRequest.email());
+                    message = createEmail(emailRequest.email(),"이메일 인증번호 발급", verifyNumber); break;
+            }
             javaMailSender.send(message);
         }
         catch(MessagingException e){
@@ -69,7 +94,7 @@ public class EmailService {
         }
 
         return ErrorCode.SUCCESS;
-    }   
+    }
 
     //추가 되었다.
     public ErrorCode CheckAuthNum(EmailVerifyRequest emailRequest){

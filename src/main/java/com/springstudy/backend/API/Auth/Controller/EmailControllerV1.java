@@ -15,7 +15,7 @@ public class EmailControllerV1 {
     public final EmailService emailService;
     @PostMapping("/send")
     public ErrorCode sendEmail(@RequestBody @Valid EmailRequest emailRequest) {
-        return emailService.sendMail(emailRequest);
+        return emailService.sendMail(emailRequest, "verifyEmail");
     }
     @PostMapping("/check")
     public ErrorCode checkEmail(@RequestBody @Valid EmailVerifyRequest emailRequest) {
