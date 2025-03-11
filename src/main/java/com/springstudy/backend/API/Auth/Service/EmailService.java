@@ -2,6 +2,8 @@ package com.springstudy.backend.API.Auth.Service;
 
 import com.springstudy.backend.API.Auth.Model.Request.EmailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.EmailVerifyRequest;
+import com.springstudy.backend.API.Auth.Service.emailTemplate.TemporaryPasswordEmail;
+import com.springstudy.backend.API.Auth.Service.emailTemplate.VerifyEmail;
 import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
@@ -11,7 +13,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,10 +28,11 @@ import java.util.UUID;
 public class EmailService {
 
     private final JavaMailSender javaMailSender;
-    private static final String senderEmail= "verify0213@gmail.com";
     private final RedisService redisUtil;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TemporaryPasswordEmail temporaryPasswordEmail;
+    private final VerifyEmail verifyEmail;
 
     public int createVerifyNumber(String mail) throws MessagingException {
         int number = (int)(Math.random() * (90000)) + 100000;
@@ -53,32 +55,19 @@ public class EmailService {
         return temporaryPassword;
     }
 
-    public MimeMessage createEmail(String mail, String subject, Object object) throws MessagingException {
-        MimeMessage message = javaMailSender.createMimeMessage();
-
-        message.setFrom(senderEmail);
-        message.setRecipients(MimeMessage.RecipientType.TO, mail);
-        System.out.println(mail);
-        message.setSubject(subject);
-        String body = "";
-        body += "<h3>" + subject + "</h3>";
-        body += "<h1>" + object + "</h1>";
-        body += "<h3>" + "감사합니다." + "</h3>";
-        message.setText(body,"UTF-8", "html");
-
-        return message;
-    }
-
     public ErrorCode sendMail(EmailRequest emailRequest, String mode) {
         MimeMessage message = null;
+        String email = emailRequest.email();
         try{
             switch(mode){
                 case "FindPassword":
-                    String temporaryPassword = createTemporaryPassword(emailRequest.email());
-                    message = createEmail(emailRequest.email(),"임시 비밀번호 발급",temporaryPassword); break;
+                    String temporaryPassword = createTemporaryPassword(email);
+                    message = temporaryPasswordEmail.createEmail(email,"임시 비밀번호 발급",temporaryPassword);
+                    break;
                 case "VerifyEmail":
                     int verifyNumber = createVerifyNumber(emailRequest.email());
-                    message = createEmail(emailRequest.email(),"이메일 인증번호 발급", verifyNumber); break;
+                    message = verifyEmail.createEmail(email,"이메일 인증번호 발급",verifyNumber);
+                    break;
             }
             javaMailSender.send(message);
         }
