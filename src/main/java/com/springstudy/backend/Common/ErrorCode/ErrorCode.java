@@ -33,7 +33,9 @@ public enum ErrorCode implements CodeInterface{
     API_RESPONSE_NULL(-19, "API_RESPONSE_NULL"),
     API_REQUEST_ERROR(-20, "REQUEST_ERROR_CLIENT"),
     API_RESPONSE_ERROR(-21, "API_RESPONSE_ERROR"),
-    RESTAPI_ERROR(-22, "RESTAPI_ERROR");
+    RESTAPI_ERROR(-22, "RESTAPI_ERROR"),
+    NOT_EXIST_MOVIE(-23, "NOT_EXIST_MOVIE"),
+    INVALID_RATING(-24, "INVALID_RATING"),;
 
     private final Integer code;
     private final String message;
