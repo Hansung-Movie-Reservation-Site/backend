@@ -6,9 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 @Schema(description = "회원 정보 변경 비밀번호, 이메일, 유저이름 중 요청")
 public record ChangeDetailRequest(
         @NotBlank
-        @Schema(description = "변경할 컬럼(이메일 제외)")
-        String object,
-        @NotBlank
         @Schema(description = "유저 이메일")
         String email,
         @NotBlank

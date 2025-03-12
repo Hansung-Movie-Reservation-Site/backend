@@ -1,10 +1,10 @@
 package com.springstudy.backend.API.Auth.Controller;
 
+import com.springstudy.backend.API.Auth.Service.DetailType;
+import com.springstudy.backend.API.Auth.Service.emailTemplate.EmailType;
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
-import com.springstudy.backend.API.Auth.Model.Request.DeleteAccountRequest;
 import com.springstudy.backend.API.Auth.Model.Request.EmailRequest;
 import com.springstudy.backend.API.Auth.Model.Response.ChangeDetailResponse;
-import com.springstudy.backend.API.Auth.Model.Response.DeleteAccountResponse;
 import com.springstudy.backend.API.Auth.Service.ChangeDetailService;
 import com.springstudy.backend.API.Auth.Service.EmailService;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
@@ -22,19 +22,26 @@ public class UserDateilControllerV1 {
     private final EmailService emailService;
     private final ChangeDetailService changeDetailService;
 
-    @PostMapping("/change")
-    public ChangeDetailResponse changeDetail(
-            @RequestBody ChangeDetailRequest changeDetailRequest
-    ){
-        return changeDetailService.change(changeDetailRequest);
-    }
     @PostMapping("/findPassword")
     public ErrorCode sendEmail(@RequestBody @Valid EmailRequest emailRequest) {
-        return emailService.sendMail(emailRequest, "FindPassword");
+        return emailService.sendMail(emailRequest, EmailType.findPassword);
     }
-//    @PostMapping("/DeleteAccount")
-//    public DeleteAccountResponse DeleteAccount(
-//            @RequestBody @Valid DeleteAccountRequest deleteAccountRequest) {
-//        return changeDetailService.deleteAccount(deleteAccountRequest);
-//    }
+    @PostMapping("/change/email")
+    public ChangeDetailResponse changeEmail(
+            @RequestBody ChangeDetailRequest changeDetailRequest
+    ){
+        return changeDetailService.changeDetail(changeDetailRequest, DetailType.EMAIL);
+    }
+    @PostMapping("/change/password")
+    public ChangeDetailResponse changePassword(
+            @RequestBody ChangeDetailRequest changeDetailRequest
+    ){
+        return changeDetailService.changeDetail(changeDetailRequest,DetailType.PASSWORD);
+    }
+    @PostMapping("/change/username")
+    public ChangeDetailResponse changeUsername(
+            @RequestBody ChangeDetailRequest changeDetailRequest
+    ){
+        return changeDetailService.changeDetail(changeDetailRequest, DetailType.USERNAME);
+    }
 }
