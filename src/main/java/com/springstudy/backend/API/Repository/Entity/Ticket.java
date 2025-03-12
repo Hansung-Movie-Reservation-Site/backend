@@ -3,6 +3,8 @@ package com.springstudy.backend.API.Repository.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(
         name = "ticket",
@@ -16,7 +18,8 @@ import lombok.*;
                         "vertical",
                         "price",
                         "userid",
-                        "ordersid"}
+                        "ordersid",
+                        "recommand_movie"}
         )
 )
 @Getter
@@ -58,5 +61,12 @@ public class Ticket {
     @JoinColumn(name = "ordersid", referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "FK_ticket_TO_orders"))
     private Order order;
+
+    @OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Recommand> recommand_movie;
+
+    public void changeRecommandMovie(List<Recommand> recommand_movie){
+        this.recommand_movie = recommand_movie;
+    }
 
 }
