@@ -1,5 +1,6 @@
 package com.springstudy.backend.API.Auth.Controller;
 
+import com.springstudy.backend.API.Auth.Model.EmailType;
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.DeleteAccountRequest;
 import com.springstudy.backend.API.Auth.Model.Request.EmailRequest;
@@ -30,11 +31,6 @@ public class UserDateilControllerV1 {
     }
     @PostMapping("/findPassword")
     public ErrorCode sendEmail(@RequestBody @Valid EmailRequest emailRequest) {
-        return emailService.sendMail(emailRequest, "FindPassword");
+        return emailService.sendMail(emailRequest, EmailType.findPassword);
     }
-//    @PostMapping("/DeleteAccount")
-//    public DeleteAccountResponse DeleteAccount(
-//            @RequestBody @Valid DeleteAccountRequest deleteAccountRequest) {
-//        return changeDetailService.deleteAccount(deleteAccountRequest);
-//    }
 }
