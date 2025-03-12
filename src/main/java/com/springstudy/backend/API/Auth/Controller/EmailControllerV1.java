@@ -1,6 +1,6 @@
 package com.springstudy.backend.API.Auth.Controller;
 
-import com.springstudy.backend.API.Auth.Model.EmailType;
+import com.springstudy.backend.API.Auth.Service.emailTemplate.EmailType;
 import com.springstudy.backend.API.Auth.Model.Request.EmailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.EmailVerifyRequest;
 import com.springstudy.backend.API.Auth.Service.EmailService;
@@ -16,7 +16,7 @@ public class EmailControllerV1 {
     public final EmailService emailService;
     @PostMapping("/send")
     public ErrorCode sendEmail(@RequestBody @Valid EmailRequest emailRequest) {
-        return emailService.sendMail(emailRequest, EmailType.verifyEmail);
+        return emailService.sendMail(emailRequest, EmailType.VERIFYEMAIL);
     }
     @PostMapping("/check")
     public ErrorCode checkEmail(@RequestBody @Valid EmailVerifyRequest emailRequest) {

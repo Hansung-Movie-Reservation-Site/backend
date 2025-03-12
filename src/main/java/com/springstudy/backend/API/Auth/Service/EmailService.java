@@ -1,8 +1,8 @@
 package com.springstudy.backend.API.Auth.Service;
 
-import com.springstudy.backend.API.Auth.Model.EmailType;
 import com.springstudy.backend.API.Auth.Model.Request.EmailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.EmailVerifyRequest;
+import com.springstudy.backend.API.Auth.Service.emailTemplate.EmailType;
 import com.springstudy.backend.API.Auth.Service.emailTemplate.TemporaryPasswordEmail;
 import com.springstudy.backend.API.Auth.Service.emailTemplate.VerifyEmail;
 import com.springstudy.backend.API.Repository.Entity.User;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.ConnectException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -71,7 +70,7 @@ public class EmailService {
                     String temporaryPassword = createTemporaryPassword(email);
                     message = temporaryPasswordEmail.createEmail(email,"임시 비밀번호 발급",temporaryPassword);
                     break;
-                case verifyEmail:
+                case VERIFYEMAIL:
                     int verifyNumber = createVerifyNumber(emailRequest.email());
                     message = verifyEmail.createEmail(email,"이메일 인증번호 발급",verifyNumber);
                     break;

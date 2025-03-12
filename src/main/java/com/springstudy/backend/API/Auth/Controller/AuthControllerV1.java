@@ -1,6 +1,6 @@
 package com.springstudy.backend.API.Auth.Controller;
 
-import com.springstudy.backend.API.Auth.Model.EmailType;
+import com.springstudy.backend.API.Auth.Service.emailTemplate.EmailType;
 import com.springstudy.backend.API.Auth.Model.Request.*;
 import com.springstudy.backend.API.Auth.Model.Response.CreateUserResponse;
 import com.springstudy.backend.API.Auth.Model.Response.DeleteAccountResponse;
@@ -36,7 +36,7 @@ public class AuthControllerV1 {
     }
     @PostMapping("/verifyEmail")
     public ErrorCode sendEmail(@RequestBody @Valid EmailRequest emailRequest) {
-        return emailService.sendMail(emailRequest, EmailType.verifyEmail);
+        return emailService.sendMail(emailRequest, EmailType.VERIFYEMAIL);
     }
     @PostMapping("/check")
     public ErrorCode checkEmail(@RequestBody @Valid EmailVerifyRequest emailRequest) {
