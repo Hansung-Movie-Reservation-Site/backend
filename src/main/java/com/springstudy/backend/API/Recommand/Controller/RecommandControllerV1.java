@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/recommand")
 @RequiredArgsConstructor
-public class RecommandController {
+public class RecommandControllerV1 {
     private final RecommandService recommandService;
 
     @PostMapping("/movie")
