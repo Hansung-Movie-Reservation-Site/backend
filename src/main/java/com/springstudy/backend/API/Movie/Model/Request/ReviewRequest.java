@@ -5,7 +5,6 @@ import java.util.List;
 
 @Getter
 public class ReviewRequest {
-    private Long id;
     private Float rating;
     private String review;
     private Long userId;
