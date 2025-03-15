@@ -31,7 +31,12 @@ public class User {
     @Column
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Ticket> ticketList = null;
+    private List<Ticket> ticketList = new ArrayList<>();
+
+    @Column
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Recommand> recommandList = new ArrayList<>();
 
     public void changeEmail(String email) {
         this.email = email;
@@ -46,7 +51,14 @@ public class User {
     public void changePassword(String password) {
         getUser_credentional().changePassword(password);
     }
-    public void setTicketList(List<Ticket> ticketList) {
-        this.ticketList = ticketList;
+    public void addTicketList(List<Ticket> ticketList) {
+        for(Ticket ticket : ticketList) {
+            this.ticketList.add(ticket);
+        }
+    }
+    public void addRecommandList(List<Recommand> recommandList) {
+        for(Recommand recommand : recommandList) {
+            this.recommandList.add(recommand);
+        }
     }
 }

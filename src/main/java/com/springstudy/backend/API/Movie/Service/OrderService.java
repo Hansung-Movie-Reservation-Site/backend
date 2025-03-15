@@ -113,6 +113,7 @@ public class OrderService {
                     nRecommandList.add(recommandList.get(i));
                 }
 //                newTicket.changeRecommandMovie(nRecommandList);
+                user.addRecommandList(nRecommandList);
                 tickets.add(newTicket);
             }
         }
@@ -121,7 +122,7 @@ public class OrderService {
          *
          */
         ticketRepository.saveAll(tickets); // ✅ 티켓 저장
-        user.setTicketList(tickets);
+        user.addTicketList(tickets);
 
         // ✅ `Order`에 티켓 추가 후 다시 저장 (연관관계 설정)
         order.setTickets(tickets);
