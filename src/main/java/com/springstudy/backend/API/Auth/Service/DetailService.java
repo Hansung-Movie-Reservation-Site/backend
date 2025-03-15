@@ -81,4 +81,8 @@ public class DetailService {
 
         return new LookupTicketResponse(ErrorCode.SUCCESS, ticketList);
     }
+
+    public LookupTicketResponse lookupRecommand(LookupTicketRequest lookupTicketRequest) {
+        return new LookupTicketResponse(ErrorCode.SUCCESS, null);
+    }
 }

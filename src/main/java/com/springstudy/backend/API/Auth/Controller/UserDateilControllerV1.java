@@ -1,6 +1,8 @@
 package com.springstudy.backend.API.Auth.Controller;
 
+import com.springstudy.backend.API.Auth.Model.Request.LookupRecommandRequest;
 import com.springstudy.backend.API.Auth.Model.Request.LookupTicketRequest;
+import com.springstudy.backend.API.Auth.Model.Response.LookupRecommandResponse;
 import com.springstudy.backend.API.Auth.Model.Response.LookupTicketResponse;
 import com.springstudy.backend.API.Auth.Service.DetailType;
 import com.springstudy.backend.API.Auth.Service.emailTemplate.EmailType;
@@ -51,5 +53,10 @@ public class UserDateilControllerV1 {
     @PostMapping("lookup/ticket")
     public LookupTicketResponse lookupTicket(LookupTicketRequest lookupTicketRequest) {
         return detailService.lookupTicket(lookupTicketRequest);
+    }
+
+    @PostMapping("lookup/recommand")
+    public LookupRecommandResponse lookupRecommand(LookupRecommandRequest lookupRecommandRequest) {
+        return detailService.lookupRecommand(lookupRecommandRequest);
     }
 }
