@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/orders")
 public class OrderControllerV1 {
 
-    private final OrderService orderService;
+    private OrderService orderService;
 
     public OrderControllerV1(OrderService orderService) {
         this.orderService = orderService;

@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -25,6 +28,10 @@ public class User {
     @JsonIgnore  // ✅ 순환 참조 방지
     private UserCredentional user_credentional;
 
+    @Column
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Ticket> ticketList = null;
+
     public void changeEmail(String email) {
         this.email = email;
     }
@@ -37,5 +44,8 @@ public class User {
 
     public void changePassword(String password) {
         getUser_credentional().changePassword(password);
+    }
+    public void setTicketList(List<Ticket> ticketList) {
+        this.ticketList = ticketList;
     }
 }
