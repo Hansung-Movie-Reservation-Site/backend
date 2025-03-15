@@ -61,11 +61,11 @@ public class Ticket {
             foreignKey = @ForeignKey(name = "FK_ticket_TO_orders"))
     private Order order;
 
-    @OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Recommand> recommand_movie;
+//    @OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    private List<Recommand> recommand_movie;
 
-    public void changeRecommandMovie(List<Recommand> recommand_movie){
-        this.recommand_movie = recommand_movie;
-    }
+//    public void changeRecommandMovie(List<Recommand> recommand_movie){
+//        this.recommand_movie = recommand_movie;
+//    }
 
 }

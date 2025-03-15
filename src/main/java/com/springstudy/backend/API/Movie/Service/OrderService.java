@@ -94,7 +94,7 @@ public class OrderService {
                 existingTicket.setOrder(order);
                 existingTicket.setUser(user);
                 List<Recommand> recommandList = recommandMovie(100);
-                existingTicket.changeRecommandMovie(recommandList);
+//                existingTicket.changeRecommandMovie(recommandList);
                 tickets.add(existingTicket);
             } else {
                 // ✅ 기존 티켓이 없으면 새롭게 생성
@@ -112,7 +112,7 @@ public class OrderService {
                 for(int i=0; i<4; i++) {
                     nRecommandList.add(recommandList.get(i));
                 }
-                newTicket.changeRecommandMovie(nRecommandList);
+//                newTicket.changeRecommandMovie(nRecommandList);
                 tickets.add(newTicket);
             }
         }
