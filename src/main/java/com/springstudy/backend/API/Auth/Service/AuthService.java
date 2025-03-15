@@ -3,6 +3,7 @@ import com.springstudy.backend.API.Auth.Model.Request.CreateUserRequest;
 import com.springstudy.backend.API.Auth.Model.Request.DeleteAccountRequest;
 import com.springstudy.backend.API.Auth.Model.Response.CreateUserResponse;
 import com.springstudy.backend.API.Auth.Model.Response.DeleteAccountResponse;
+import com.springstudy.backend.API.Auth.Model.UserDetailDTO;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.API.Auth.Model.AuthUser;
 import com.springstudy.backend.API.Auth.Model.Request.LoginRequest;
@@ -85,14 +86,14 @@ public class AuthService {
         // 4. SecurityContextHolder에 로그인 정보 저장.
         // 5. SecurityContextHolder에서 정보 가져와서 jwt 발급.
 
-        Optional<User> user = userRepository.findByEmail(request.email());
-        System.out.println("email: "+request.email()+"user: "+user.isPresent());
-        if(user.isEmpty()) {
+        Optional<User> userOptional = userRepository.findByEmail(request.email());
+        System.out.println("email: "+request.email()+"user: "+userOptional.isPresent());
+        if(userOptional.isEmpty()) {
             //todo error
             log.error("유저 정보가 존재하지 않습니다.");
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
-            authUser(user.get().getUsername(),request.password());
+            authUser(userOptional.get().getUsername(),request.password());
 
         try{
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -114,7 +115,13 @@ public class AuthService {
             throw new CustomException(ErrorCode.JWT_CREATE_ERROR);
         }
 
-        return new LoginResponse(ErrorCode.SUCCESS);
+        User user = userOptional.get();
+        UserDetailDTO userDetailDTO = UserDetailDTO.builder()
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .user_id(user.getId())
+                .build();
+        return new LoginResponse(ErrorCode.SUCCESS,userDetailDTO);
     }
     private void authUser(String username, String password){
         try{

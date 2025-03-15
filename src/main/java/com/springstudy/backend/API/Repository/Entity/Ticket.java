@@ -13,7 +13,6 @@ import java.util.List;
                 columnNames = {
                         "screeningid",
                         "seatid",
-                        "userid",
                         "horizontal",
                         "vertical",
                         "price",

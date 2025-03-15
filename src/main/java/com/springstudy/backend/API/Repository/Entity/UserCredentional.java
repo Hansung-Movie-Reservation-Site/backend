@@ -8,8 +8,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Getter
-@Table(name = "userCredentional")
+@Table(name = "user_credentional")
 public class UserCredentional {
+//    @Id
+//    private Long id;
 
     @Id
     @OneToOne

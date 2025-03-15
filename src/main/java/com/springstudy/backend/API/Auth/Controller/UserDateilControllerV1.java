@@ -1,11 +1,13 @@
 package com.springstudy.backend.API.Auth.Controller;
 
+import com.springstudy.backend.API.Auth.Model.Request.LookupTicketRequest;
+import com.springstudy.backend.API.Auth.Model.Response.LookupTicketResponse;
 import com.springstudy.backend.API.Auth.Service.DetailType;
 import com.springstudy.backend.API.Auth.Service.emailTemplate.EmailType;
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.EmailRequest;
 import com.springstudy.backend.API.Auth.Model.Response.ChangeDetailResponse;
-import com.springstudy.backend.API.Auth.Service.ChangeDetailService;
+import com.springstudy.backend.API.Auth.Service.DetailService;
 import com.springstudy.backend.API.Auth.Service.EmailService;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import jakarta.validation.Valid;
@@ -20,7 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserDateilControllerV1 {
     private final EmailService emailService;
-    private final ChangeDetailService changeDetailService;
+    private final DetailService DetailService;
+    private final DetailService detailService;
 
     @PostMapping("/findPassword")
     public ErrorCode sendEmail(@RequestBody @Valid EmailRequest emailRequest) {
@@ -30,18 +33,23 @@ public class UserDateilControllerV1 {
     public ChangeDetailResponse changeEmail(
             @RequestBody ChangeDetailRequest changeDetailRequest
     ){
-        return changeDetailService.changeDetail(changeDetailRequest, DetailType.EMAIL);
+        return DetailService.changeDetail(changeDetailRequest, DetailType.EMAIL);
     }
     @PostMapping("/change/password")
     public ChangeDetailResponse changePassword(
             @RequestBody ChangeDetailRequest changeDetailRequest
     ){
-        return changeDetailService.changeDetail(changeDetailRequest,DetailType.PASSWORD);
+        return DetailService.changeDetail(changeDetailRequest,DetailType.PASSWORD);
     }
     @PostMapping("/change/username")
     public ChangeDetailResponse changeUsername(
             @RequestBody ChangeDetailRequest changeDetailRequest
     ){
-        return changeDetailService.changeDetail(changeDetailRequest, DetailType.USERNAME);
+        return DetailService.changeDetail(changeDetailRequest, DetailType.USERNAME);
+    }
+
+    @PostMapping("lookup/ticket")
+    public LookupTicketResponse lookupTicket(LookupTicketRequest lookupTicketRequest) {
+        return detailService.lookupTicket(lookupTicketRequest);
     }
 }
