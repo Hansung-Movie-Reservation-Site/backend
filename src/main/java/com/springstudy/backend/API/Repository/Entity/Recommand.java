@@ -16,9 +16,9 @@ public class Recommand {
     @Column(nullable = false)
     private Integer recommand_movie_id;
 
-    @ManyToOne
-    @JoinColumn(nullable = true, name = "ticket_id", foreignKey = @ForeignKey(name = "FK_ticket_TO_recommand"))
-    private Ticket ticket;
+//    @ManyToOne
+//    @JoinColumn(nullable = true, name = "ticket_id", foreignKey = @ForeignKey(name = "FK_ticket_TO_recommand"))
+//    private Ticket ticket;
     // movie와 OneToOne 할까 생각했으나
     // 복잡해지고 성능 생각해서 id만 저장하고 필요할 때 검색될 때 id로 그때그때 조회하는 걸로.
 

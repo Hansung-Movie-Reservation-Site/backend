@@ -30,6 +30,7 @@ public class User {
 
     @Column
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Ticket> ticketList = null;
 
     public void changeEmail(String email) {
