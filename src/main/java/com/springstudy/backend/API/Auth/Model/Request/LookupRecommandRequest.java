@@ -7,6 +7,6 @@ import jakarta.validation.constraints.NotBlank;
 public record LookupRecommandRequest (
         @Schema(description = "조회할 회원 id")
         @NotBlank
-        long id
+        long user_id
 ){
 }

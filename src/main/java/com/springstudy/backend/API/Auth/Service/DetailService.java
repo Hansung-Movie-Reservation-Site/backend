@@ -1,8 +1,10 @@
 package com.springstudy.backend.API.Auth.Service;
 
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
+import com.springstudy.backend.API.Auth.Model.Request.LookupRecommandRequest;
 import com.springstudy.backend.API.Auth.Model.Request.LookupTicketRequest;
 import com.springstudy.backend.API.Auth.Model.Response.ChangeDetailResponse;
+import com.springstudy.backend.API.Auth.Model.Response.LookupRecommandResponse;
 import com.springstudy.backend.API.Auth.Model.Response.LookupTicketResponse;
 import com.springstudy.backend.API.Movie.Service.OrderService;
 import com.springstudy.backend.API.Repository.Entity.Order;
@@ -30,7 +32,6 @@ public class DetailService {
     private final UserRepository userRepository;
     private final CheckPasswordService checkPasswordService;
     private final PasswordEncoder passwordEncoder;
-    private final TicketRepository ticketRepository;
 
     @Transactional
     public ChangeDetailResponse changeDetail(ChangeDetailRequest changeDetailRequest, DetailType detailType) {
@@ -72,17 +73,18 @@ public class DetailService {
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
          List<Ticket> ticketList= userOptional.get().getTicketList();
-//        Optional<Ticket> ticketOptional = ticketRepository.findById(user_id);
-//        if(ticketOptional.isEmpty()){
-//            log.error("Ticket not found");
-//            return new LookupTicketResponse(ErrorCode.SUCCESS, null);
-//        }
-//        List<Ticket> ticketList = ticketOptional.get();
 
         return new LookupTicketResponse(ErrorCode.SUCCESS, ticketList);
     }
 
-    public LookupTicketResponse lookupRecommand(LookupTicketRequest lookupTicketRequest) {
-        return new LookupTicketResponse(ErrorCode.SUCCESS, null);
+    public LookupRecommandResponse lookupRecommand(LookupRecommandRequest lookupRecommandRequest) {
+        Long id = lookupRecommandRequest.user_id();
+        Optional<User> userOptional = userRepository.findById(id);
+        if(userOptional.isEmpty()){
+            throw new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
+        User user = userOptional.get();
+
+        return new LookupRecommandResponse(ErrorCode.SUCCESS, user.getRecommandList());
     }
 }
