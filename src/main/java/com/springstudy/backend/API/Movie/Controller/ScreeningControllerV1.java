@@ -1,6 +1,7 @@
 package com.springstudy.backend.API.Movie.Controller;
 
 import com.springstudy.backend.API.Movie.Model.Response.MovieResponseDTO;
+import com.springstudy.backend.API.Movie.Model.Response.MovieResponseIdDTO;
 import com.springstudy.backend.API.Movie.Model.Response.SeatResponseDTO;
 import com.springstudy.backend.API.Movie.Service.ScreeningService;
 import com.springstudy.backend.API.Repository.Entity.Screening;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/screening")
@@ -76,6 +78,29 @@ public class ScreeningControllerV1 {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    /**
+     * ✅ 현재 상영 중인 모든 영화 목록 반환 (movieId 포함)
+     */
+    @GetMapping("/allmovies")
+    public ResponseEntity<List<MovieResponseIdDTO>> getAllScreeningMovies() {
+        return ResponseEntity.ok(screeningService.getAllScreeningMovies());
+    }
+
+    /**
+     * ✅ 특정 문자열을 포함하는 영화 제목의 상영 정보 조회
+     */
+    @GetMapping("/search")
+    public ResponseEntity<?> getScreeningsByMovieTitle(@RequestParam String title) {
+        try {
+            List<Screening> screenings = screeningService.getScreeningsByMovieTitle(title);
+            return ResponseEntity.ok(screenings);
+        } catch (Exception e) {
+            // return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
 
     /**
      * ✅ Screening ID를 이용하여 Seat 목록 조회 (예약 여부 포함)

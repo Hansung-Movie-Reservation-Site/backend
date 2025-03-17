@@ -1,11 +1,9 @@
 package com.springstudy.backend.API.Movie.Service;
 
 import com.springstudy.backend.API.Movie.Model.Response.MovieResponseDTO;
+import com.springstudy.backend.API.Movie.Model.Response.MovieResponseIdDTO;
 import com.springstudy.backend.API.Movie.Model.Response.SeatResponseDTO;
-import com.springstudy.backend.API.Repository.Entity.Room;
-import com.springstudy.backend.API.Repository.Entity.Screening;
-import com.springstudy.backend.API.Repository.Entity.Seat;
-import com.springstudy.backend.API.Repository.Entity.Spot;
+import com.springstudy.backend.API.Repository.Entity.*;
 import com.springstudy.backend.API.Repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -154,8 +152,36 @@ public class ScreeningService {
                         seat.getId(),
                         seat.getHorizontal(),
                         seat.getVertical(),
-                        ticketRepository.existsBySeat(seat) // ✅ 예약 여부 확인
+                        ticketRepository.existsBySeatAndOrderIsNotNull(seat) // ✅ 예약 여부 확인
                 ))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * ✅ 현재 상영 중인 모든 영화 목록 조회 (movieId 포함)
+     */
+    @Transactional(readOnly = true)
+    public List<MovieResponseIdDTO> getAllScreeningMovies() {
+        List<Movie> movies = screeningRepository.findAllMoviesFromScreenings();
+        return movies.stream()
+                .map(movie -> new MovieResponseIdDTO(
+                        movie.getId(),       // ✅ movieId 추가
+                        movie.getTitle(),
+                        movie.getPosterImage()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * ✅ 특정 문자열을 포함하는 영화 제목의 상영 정보 조회 (입력 검증 포함)
+     */
+    @Transactional(readOnly = true)
+    public List<Screening> getScreeningsByMovieTitle(String title) {
+        // ✅ 입력 검증: title이 null이거나 공백인지 확인
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("❌ 검색할 영화 제목을 입력해주세요.");
+        }
+
+        return screeningRepository.findByMovieTitleContaining(title);
     }
 }
