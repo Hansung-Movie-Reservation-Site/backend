@@ -162,7 +162,7 @@ public class KakaoPayService {
         List<Ticket> tickets = order.getTickets();
         for (Ticket ticket : tickets) {
             ticket.setOrder(null);  // ✅ 주문 정보 제거
-            ticket.setUser(null);   // ✅ 사용자 정보 제거
+            // ticket.setUser(null);   // ✅ 사용자 정보 제거
         }
 
         order.updateStatus("CANCELLED");

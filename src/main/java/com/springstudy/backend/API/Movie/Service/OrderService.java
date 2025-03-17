@@ -76,6 +76,7 @@ public class OrderService {
         Order order = Order.builder()
                 .uuid(UUID.randomUUID().toString())  // 고유 주문 번호 생성
                 .user(user)
+                .screening(screening)
                 .status("PENDING")  // ✅ 주문 상태 초기화 (결제 대기)
                 .totalAmount(screening.getPrice() * seats.size()) // 총 가격 계산
                 .createdAt(LocalDateTime.now())
@@ -92,7 +93,7 @@ public class OrderService {
             if (existingTicket != null) {
                 // ✅ 기존 티켓이 존재하면 Order ID와 User ID 업데이트
                 existingTicket.setOrder(order);
-                existingTicket.setUser(user);
+                // existingTicket.setUser(user);
                 List<Recommand> recommandList = recommandMovie(100);
 //                existingTicket.changeRecommandMovie(recommandList);
                 tickets.add(existingTicket);
@@ -100,7 +101,7 @@ public class OrderService {
                 // ✅ 기존 티켓이 없으면 새롭게 생성
                 Ticket newTicket = Ticket.builder()
                         .order(order)  // ✅ 주문과 연결
-                        .user(user)
+                        // .user(user)
                         .screening(screening)
                         .seat(seat)
                         .price(screening.getPrice())
@@ -117,11 +118,8 @@ public class OrderService {
             }
         }
 
-        /**
-         *
-         */
         ticketRepository.saveAll(tickets); // ✅ 티켓 저장
-        user.setTicketList(tickets);
+        // user.setTicketList(tickets);
 
         // ✅ `Order`에 티켓 추가 후 다시 저장 (연관관계 설정)
         order.setTickets(tickets);

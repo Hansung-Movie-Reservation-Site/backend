@@ -8,6 +8,7 @@ import com.springstudy.backend.API.Movie.Service.OrderService;
 import com.springstudy.backend.API.Repository.Entity.Order;
 import com.springstudy.backend.API.Repository.Entity.Ticket;
 import com.springstudy.backend.API.Repository.Entity.User;
+import com.springstudy.backend.API.Repository.OrderRepository;
 import com.springstudy.backend.API.Repository.TicketRepository;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.Common.CheckPasswordService;
@@ -31,6 +32,7 @@ public class DetailService {
     private final CheckPasswordService checkPasswordService;
     private final PasswordEncoder passwordEncoder;
     private final TicketRepository ticketRepository;
+    private final OrderRepository orderRepository;
 
     @Transactional
     public ChangeDetailResponse changeDetail(ChangeDetailRequest changeDetailRequest, DetailType detailType) {
@@ -71,13 +73,24 @@ public class DetailService {
             log.error("User not found");
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
-         List<Ticket> ticketList= userOptional.get().getTicketList();
+
+        /**--------------------------------------------------
+         * 기존 코드 주석 처리
+         * List<Ticket> ticketList= userOptional.get().getTicketList();
+         -------------------------------------------------*/
 //        Optional<Ticket> ticketOptional = ticketRepository.findById(user_id);
 //        if(ticketOptional.isEmpty()){
 //            log.error("Ticket not found");
 //            return new LookupTicketResponse(ErrorCode.SUCCESS, null);
 //        }
 //        List<Ticket> ticketList = ticketOptional.get();
+
+        /**
+         * 새 코드 추가
+         */
+        //--------------------------------------------------
+        List<Ticket> ticketList = userOptional.get().getUserTickets();
+        //-------------------------------------------------
 
         return new LookupTicketResponse(ErrorCode.SUCCESS, ticketList);
     }
