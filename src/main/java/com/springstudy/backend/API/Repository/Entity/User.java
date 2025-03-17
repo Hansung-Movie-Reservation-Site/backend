@@ -1,6 +1,7 @@
 package com.springstudy.backend.API.Repository.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @Builder
 @Getter
 @Table(name = "user")
+@JsonIgnoreProperties({"ordersList", "userTickets"}) // 🚨 추가: Order 리스트 무시
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,10 +30,10 @@ public class User {
     @JsonIgnore  // ✅ 순환 참조 방지
     private UserCredentional user_credentional;
 
-    @Column
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Ticket> ticketList = null;
+    // ✅ Order와 1:N 관계 설정
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("user") // 🚨 추가: Order에서 User 직렬화 무시
+    private List<Order> ordersList = null;
 
     public void changeEmail(String email) {
         this.email = email;
@@ -46,7 +48,33 @@ public class User {
     public void changePassword(String password) {
         getUser_credentional().changePassword(password);
     }
-    public void setTicketList(List<Ticket> ticketList) {
-        this.ticketList = ticketList;
+
+    /**
+     * 추가
+     * ✅ 사용자의 모든 주문에서 티켓 리스트 반환
+     */
+    public List<Ticket> getUserTickets() {
+        List<Ticket> ticketList = new ArrayList<>();
+
+        if (ordersList != null) {
+            for (Order order : ordersList) {
+                if (order.getTickets() != null) {
+                    ticketList.addAll(order.getTickets());
+                }
+            }
+        }
+        return ticketList;
     }
+
+    /**
+     * 주석 처리
+     */
+//    @Column
+//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @JsonIgnore
+//    private List<Ticket> ticketList = null;
+
+//    public void setTicketList(List<Ticket> ticketList) {
+//        this.ticketList = ticketList;
+//    }
 }
