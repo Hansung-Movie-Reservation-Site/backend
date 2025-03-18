@@ -35,12 +35,12 @@ public class Screening {
 
     @ManyToOne
     @JoinColumn(name = "movieid", referencedColumnName = "id", nullable = false,
-            foreignKey = @ForeignKey(name = "screening_ibfk_1"))
+            foreignKey = @ForeignKey(name = "FK_screening_TO_movie_1"))
     private Movie movie;
 
     @ManyToOne
     @JoinColumn(name = "roomid", referencedColumnName = "id", nullable = false,
-            foreignKey = @ForeignKey(name = "FK_room_TO_screening_1"))
+            foreignKey = @ForeignKey(name = "FK_screening_TO_room_1"))
     private Room room;
 
     @Column(nullable = false)

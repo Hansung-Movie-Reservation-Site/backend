@@ -52,7 +52,7 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name = "ordersid", referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "FK_ticket_TO_orders"))
+            foreignKey = @ForeignKey(name = "FK_ticket_TO_orders_1"))
     @JsonIgnoreProperties("tickets") // 🚨 추가: Order에서 티켓 직렬화 방지
     private Order order;
 

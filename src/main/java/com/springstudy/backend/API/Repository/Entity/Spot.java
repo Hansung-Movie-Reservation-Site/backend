@@ -30,6 +30,6 @@ public class Spot {
 
     @ManyToOne
     @JoinColumn(name = "regionid", referencedColumnName = "id", nullable = false,
-            foreignKey = @ForeignKey(name = "spot_ibfk_1"))
+            foreignKey = @ForeignKey(name = "FK_spot_TO_region_1"))
     private Region region;
 }
