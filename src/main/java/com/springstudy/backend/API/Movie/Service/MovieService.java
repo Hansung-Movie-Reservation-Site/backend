@@ -14,7 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -25,8 +29,16 @@ public class MovieService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
+    @Value("${api.KOBIS_API_KEY}")
+    private String KOBIS_API_KEY;
+
     @Value("${api.TMDB_API_KEY}")
-    String TMDB_API_KEY;
+    private String TMDB_API_KEY;
+
+    private static final String KOBIS_BOX_OFFICE_URL = "http://kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json";
+    private static final String KOBIS_MOVIE_DETAIL_URL = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json";
+    private static final String TMDB_SEARCH_URL = "https://api.themoviedb.org/3/search/movie?api_key=";
+    private static final String TMDB_DISCOVER_URL = "https://api.themoviedb.org/3/discover/movie?api_key=";
 
     public MovieService(MovieRepository movieRepository, RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.movieRepository = movieRepository;
@@ -34,13 +46,28 @@ public class MovieService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * TMDB API만 이용하여 영화 정보 가져오기
+     */
     @Transactional
-    public void fetchAndSaveMovies() {
-        String DISCOVER_MOVIE_URL = "https://api.themoviedb.org/3/discover/movie?api_key=" + TMDB_API_KEY + "&language=ko-KR&region=KR&primary_release_date.gte=%s&primary_release_date.lte=%s";
+    public List<Movie> fetchAndSaveMoviesByTMDB() {
+        String DISCOVER_MOVIE_URL = TMDB_DISCOVER_URL + TMDB_API_KEY +
+                "&language=ko-KR" +
+                "&region=KR" +
+                "&with_original_language=ko" +
+                "&primary_release_date.gte=%s" +
+                "&primary_release_date.lte=%s" +
+                "&sort_by=release_date.desc";
 
-        String startDate = LocalDate.now().minusDays(60).toString();
+
+        String startDate = LocalDate.now().minusDays(40).toString();
         String endDate = LocalDate.now().plusDays(7).toString();
+
+        System.out.println(startDate);
+        System.out.println(endDate);
         String requestUrl = String.format(DISCOVER_MOVIE_URL, startDate, endDate);
+
+        System.out.println(requestUrl);
 
         ResponseEntity<String> response = restTemplate.getForEntity(requestUrl, String.class);
         JsonNode jsonNode = null;
@@ -50,26 +77,57 @@ public class MovieService {
             throw new RuntimeException(e);
         }
 
-        List<Movie> movies = StreamSupport.stream(jsonNode.spliterator(), false)
-                .map(node -> objectMapper.convertValue(node, MovieDTO.class))
-                .map(this::fetchMovieDetails)
-                .filter(movie -> movie != null)  // ✅ `null` 체크 후 저장
-                .filter(movie -> !isDuplicate(movie))  // ✅ 중복된 영화 제외
-                .collect(Collectors.toList());
+        // ✅ 최종 저장할 영화 리스트
+        List<Movie> finalMovies = new ArrayList<>();
 
-        // ✅ MySQL에 데이터 저장 및 로그 출력
-        if (!movies.isEmpty()) {
-            movieRepository.saveAll(movies);
-            movies.forEach(movie -> System.out.println("✅ 저장 완료: " + movie.getTitle() + " (" + movie.getReleaseDate() + ")"));
-        } else {
-            System.out.println("❌ 저장할 영화가 없음.");
+        for (JsonNode node : jsonNode) {
+            MovieDTO dto = objectMapper.convertValue(node, MovieDTO.class);
+
+            // ✅ 1. TMDB movieId 기준으로 DB에서 영화 조회
+            Optional<Movie> existingMovie = movieRepository.findByTmdbMovieId(dto.getTmdbMovieId());
+
+            if (existingMovie.isPresent()) {
+                System.out.println("✅ 이미 존재하는 영화 (TMDB 기준): " + existingMovie.get().getTitle());
+                finalMovies.add(existingMovie.get());
+                continue;
+            }
+
+            // ✅ 2. 존재하지 않는 경우, TMDB 상세 정보 조회 후 새로운 영화 생성
+            Movie newMovie = fetchMovieDetailsTMDB(dto);
+
+            // ✅ 3. `newMovie`가 `null`인 경우 저장하지 않고 건너뛰기
+            if (newMovie == null) {
+                continue;
+            }
+
+            // ✅ 3. 새 영화 저장 후 반환 리스트에 추가
+            movieRepository.save(newMovie);
+            System.out.println("✅ 새롭게 저장된 영화: " + newMovie.getTitle());
+            finalMovies.add(newMovie);
         }
+
+        return finalMovies; // ✅ 최종 저장된 영화 리스트 반환
+
+//        List<Movie> movies = StreamSupport.stream(jsonNode.spliterator(), false)
+//                .map(node -> objectMapper.convertValue(node, MovieDTO.class))
+//                .map(this::fetchMovieDetailsTMDB)
+//                .filter(movie -> movie != null)  // ✅ `null` 체크 후 저장
+//                .filter(movie -> !isDuplicate(movie))  // ✅ 중복된 영화 제외
+//                .collect(Collectors.toList());
+//
+//        // ✅ MySQL에 데이터 저장 및 로그 출력
+//        if (!movies.isEmpty()) {
+//            movieRepository.saveAll(movies);
+//            movies.forEach(movie -> System.out.println("✅ 저장 완료: " + movie.getTitle() + " (" + movie.getReleaseDate() + ")"));
+//        } else {
+//            System.out.println("❌ 저장할 영화가 없음.");
+//        }
     }
 
-    private Movie fetchMovieDetails(MovieDTO dto) {
+    private Movie fetchMovieDetailsTMDB(MovieDTO dto) {
         String MOVIE_DETAIL_URL = "https://api.themoviedb.org/3/movie/%d?api_key=" + TMDB_API_KEY + "&language=ko-KR&append_to_response=credits";
 
-        ResponseEntity<String> response = restTemplate.getForEntity(String.format(MOVIE_DETAIL_URL, dto.getMovieId()), String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity(String.format(MOVIE_DETAIL_URL, dto.getTmdbMovieId()), String.class);
         MovieDetailDTO detail = null;
         try {
             detail = objectMapper.readValue(response.getBody(), MovieDetailDTO.class);
@@ -82,13 +140,19 @@ public class MovieService {
                 || isEmpty(detail.getOverview())
                 || isEmpty(detail.getGenreNames())
                 || isEmpty(detail.getDirectorNames())
+                || isEmpty(detail.getFullPosterUrl())
                 ) {
-            System.out.println("❌ 필수 데이터가 없거나 공백이어서 저장하지 않음: " + dto.getMovieId());
+            System.out.println("❌ 필수 데이터가 없거나 공백이어서 저장하지 않음\n"
+                    + "제목 : " + dto.getTitle() + "\n"
+                    + "개요 : " + detail.getOverview() + "\n"
+                    + "장르 : " + detail.getGenreNames() + "\n"
+                    + "감독 : " + detail.getDirectorNames() + "\n"
+                    + "포스터 : " + detail.getFullPosterUrl());
             return null;
         }
 
         return Movie.builder()
-                .movieId(dto.getMovieId())
+                .tmdbMovieId(dto.getTmdbMovieId())
                 .title(dto.getTitle())
                 .releaseDate(dto.getParsedReleaseDate())
                 .overview(detail.getOverview())  // ✅ 한국어 개요
@@ -97,6 +161,192 @@ public class MovieService {
                 .posterImage(detail.getFullPosterUrl())
                 .runtime(detail.getRuntime())  // ✅ 상영 시간 추가
                 .build();
+    }
+
+
+    /**
+     * ✅ KOBIS API에서 일간 박스오피스 영화 목록 가져오기 & TMDB API에서 포스터 검색 후 저장
+     */
+    @Transactional
+    public List<Movie> fetchAndSaveDailyBoxOfficeMovies() {
+
+        // ✅ 어제 날짜 구하기 (YYYYMMDD 형식)
+        String targetDate = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+        String url = KOBIS_BOX_OFFICE_URL + "?key=" + KOBIS_API_KEY + "&targetDt=" + targetDate;
+
+        ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+
+        if (response.getBody() == null) {
+            throw new RuntimeException("KOBIS API 응답이 비어 있습니다.");
+        }
+
+        List<Map<String, Object>> movieList = (List<Map<String, Object>>) ((Map<String, Object>) response.getBody().get("boxOfficeResult")).get("dailyBoxOfficeList");
+
+
+        System.out.println(movieList);
+//        List<Movie> movies = movieList.stream()
+//                .map(movieData -> fetchMovieDetailsAndConvert(movieData))
+//                .filter(movie -> movieRepository.findByKobisMovieCd(movie.getKobisMovieCd()).isEmpty())  // 중복 제거
+//                .collect(Collectors.toList());
+//
+//        return movieRepository.saveAll(movies);  // 저장 후 반환
+
+        // ✅ 결과를 저장할 리스트
+        List<Movie> finalMovies = new ArrayList<>();
+
+        for (Map<String, Object> movieData : movieList) {
+            String kobisMovieCd = (String) movieData.get("movieCd");
+
+            System.out.println(kobisMovieCd);
+            // ✅ 1. KOBIS movieCd 기준으로 조회
+            Optional<Movie> existingMovieByKobis = movieRepository.findByKobisMovieCd(kobisMovieCd);
+
+
+
+            if (existingMovieByKobis.isPresent()) {
+                System.out.println("✅ 이미 존재하는 영화 (KOBIS 기준): " + existingMovieByKobis.get().getTitle());
+                finalMovies.add(existingMovieByKobis.get());
+                continue;
+            }
+
+            // ✅ 2. 존재하지 않는 경우, TMDB 정보 조회 후 새로운 영화 생성
+            Movie newMovie = fetchMovieDetailsAndConvert(movieData);
+
+            // ✅ 3. TMDB movieId 기준으로 중복된 영화 조회
+            Optional<Movie> existingMovieByTmdb = movieRepository.findByTmdbMovieId(newMovie.getTmdbMovieId());
+
+            if (existingMovieByTmdb.isPresent()) {
+                // ✅ 기존 데이터의 kobisMovieCd 값만 업데이트
+                movieRepository.updateKobisMovieCdByTmdbMovieId(kobisMovieCd, newMovie.getTmdbMovieId());
+                System.out.println("✅ 기존 영화 업데이트 (KOBIS 코드 변경): " + existingMovieByTmdb.get().getTitle());
+
+                // ✅ 변경 사항 반영 후 다시 조회
+                Movie updatedMovie = movieRepository.findByTmdbMovieId(newMovie.getTmdbMovieId()).get();
+                finalMovies.add(updatedMovie);
+            } else {
+                // ✅ 4. 새롭게 영화 저장
+                movieRepository.save(newMovie);
+                System.out.println("✅ 새롭게 저장된 영화: " + newMovie.getTitle());
+                finalMovies.add(newMovie);
+            }
+        }
+
+        return finalMovies;  // ✅ 최종 10개 영화 반환
+    }
+
+    /**
+     * ✅ KOBIS 상세 영화 정보를 가져오고 TMDB API 호출 후 Movie 엔티티로 변환
+     */
+    private Movie fetchMovieDetailsAndConvert(Map<String, Object> movieData) {
+        String kobisMovieCd = (String) movieData.get("movieCd");
+
+        String detailUrl = KOBIS_MOVIE_DETAIL_URL + "?key=" + KOBIS_API_KEY + "&movieCd=" + kobisMovieCd;
+        ResponseEntity<Map> detailResponse = restTemplate.getForEntity(detailUrl, Map.class);
+
+
+        if (detailResponse.getBody() == null || !detailResponse.getBody().containsKey("movieInfoResult")) {
+            throw new RuntimeException("KOBIS 상세 정보 API 응답이 비어 있습니다.");
+        }
+
+        Map<String, Object> movieInfo = (Map<String, Object>) ((Map<String, Object>) detailResponse.getBody().get("movieInfoResult")).get("movieInfo");
+
+        System.out.println(movieInfo);
+
+        String movieNmEn = (String) movieInfo.getOrDefault("movieNmEn", "");  // 영어 제목
+
+        System.out.println(movieNmEn);
+
+        /**
+         * 국문 영화 제목
+         * 영문 영화 제목으로 영화를 구분할 수 없을 때 필요
+         */
+        String movieNm = (String) movieInfo.getOrDefault("movieNm", "");  // 영어 제목
+
+        String director = movieInfo.containsKey("directors") && !((List) movieInfo.get("directors")).isEmpty()
+                ? (String) ((Map<String, Object>) ((List) movieInfo.get("directors")).get(0)).get("peopleNm")
+                : "";
+        String genres = movieInfo.containsKey("genres") && !((List) movieInfo.get("genres")).isEmpty()
+                ? (String) ((Map<String, Object>) ((List) movieInfo.get("genres")).get(0)).get("genreNm")
+                : "";
+        String releaseDate = (String) movieInfo.getOrDefault("openDt", "");
+
+
+        // TMDB API를 통해 추가 정보 조회
+        Map<String, Object> tmdbData = fetchTmdbMovieInfo(movieNm, movieNmEn, releaseDate);
+
+        System.out.println(tmdbData);
+
+        Movie a = Movie.builder()
+                .kobisMovieCd(kobisMovieCd)
+                .title((String) movieData.get("movieNm"))
+                .releaseDate(releaseDate.isEmpty() ? null : LocalDate.parse(releaseDate, DateTimeFormatter.ofPattern("yyyyMMdd")))
+                .tmdbMovieId((Integer) tmdbData.getOrDefault("id", null))
+                .posterImage((String) tmdbData.getOrDefault("poster_path", null))
+                .overview((String) tmdbData.getOrDefault("overview", null))
+                .director(director)
+                .genres(genres)
+                .runtime((Integer) tmdbData.getOrDefault("runtime", null))  // ✅ 상영 시간 추가
+                .build();
+
+        return a;
+    }
+
+    /**
+     * ✅ KOBIS 영화 정보에 있는 movieNmEn 속성과 TMDB API를 이용해 영화 정보 가져오기
+     */
+    private Map<String, Object> fetchTmdbMovieInfo(String movieNm, String movieNmEn, String releaseDate) {
+        String searchUrl = TMDB_SEARCH_URL + TMDB_API_KEY + "&query=" + movieNmEn + "&year=" + (releaseDate.isEmpty() ? "" : releaseDate.substring(0, 4)) + "&language=ko-KR";
+
+        System.out.println(searchUrl);
+
+        ResponseEntity<Map> response = restTemplate.getForEntity(searchUrl, Map.class);
+
+        if (response.getBody() == null || !response.getBody().containsKey("results")) {
+            return Map.of();
+        }
+
+        List<Map<String, Object>> results = (List<Map<String, Object>>) response.getBody().get("results");
+
+        if (results.isEmpty()) {
+            return Map.of();
+        }
+
+        // ✅ `origin_title`이 `movieNmEn`과 일치하는 영화 찾기
+        Map<String, Object> matchedMovie = results.stream()
+                .filter(movie -> movieNm.equalsIgnoreCase((String) movie.getOrDefault("original_title", "")))  // 🔥 정확한 영화 찾기
+                .findFirst()
+                .orElse(results.get(0));  // 🎯 없으면 첫 번째 결과 사용
+
+        Integer movieId = (Integer) matchedMovie.get("id");
+
+        // ✅ TMDB API에서 추가 정보 (runtime) 가져오기
+        Integer runtime = fetchTmdbMovieRuntime(movieId);
+
+        return Map.of(
+                "id", matchedMovie.get("id"),
+                "poster_path", "https://image.tmdb.org/t/p/w500" + matchedMovie.get("poster_path"),
+                "overview", matchedMovie.get("overview"),
+                "runtime", runtime  // ✅ 상영 시간 추가
+        );
+
+    }
+
+    /**
+     * ✅ TMDB API에서 영화 ID를 기반으로 상영 시간 가져오기
+     */
+    private Integer fetchTmdbMovieRuntime(Integer movieId) {
+        if (movieId == null) return null;
+
+        String movieDetailUrl = "https://api.themoviedb.org/3/movie/" + movieId + "?api_key=" + TMDB_API_KEY + "&language=ko-KR";
+
+        ResponseEntity<Map> response = restTemplate.getForEntity(movieDetailUrl, Map.class);
+
+        if (response.getBody() == null || !response.getBody().containsKey("runtime")) {
+            return null;
+        }
+
+        return (Integer) response.getBody().get("runtime");
     }
 
     /**
@@ -123,7 +373,7 @@ public class MovieService {
      * ✅ 영화가 이미 저장되어 있는지 확인하는 메서드
      */
     private boolean isDuplicate(Movie movie) {
-        boolean exists = movieRepository.existsByMovieId(movie.getMovieId());
+        boolean exists = movieRepository.existsByTmdbMovieId(movie.getTmdbMovieId());
         if (exists) {
             System.out.println("⚠️ 이미 저장된 영화: " + movie.getTitle() + " (" + movie.getReleaseDate() + ")");
         }

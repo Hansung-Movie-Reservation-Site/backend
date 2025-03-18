@@ -1,16 +1,14 @@
 package com.springstudy.backend.API.Repository.Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "movie")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -21,7 +19,10 @@ public class Movie {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private Integer movieId;  // TMDB 영화 ID
+    private Integer tmdbMovieId;  // TMDB 영화 ID
+
+    @Column(unique = true)
+    private String kobisMovieCd;  // kobis 영화 ID
 
     @Column(nullable = false)
     private String title;  // 영화 제목
