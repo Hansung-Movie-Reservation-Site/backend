@@ -165,7 +165,7 @@ public class KakaoPayService {
             // ticket.setUser(null);   // ✅ 사용자 정보 제거
         }
 
-        order.updateStatus("CANCELLED");
+        order.updateStatus("CANCELED");
         order.setTid(null);
         orderRepository.save(order);
     }

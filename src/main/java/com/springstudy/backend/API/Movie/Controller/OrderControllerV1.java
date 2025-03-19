@@ -5,10 +5,9 @@ import com.springstudy.backend.API.Movie.Model.Request.OrderRequest;
 import com.springstudy.backend.API.Movie.Service.OrderService;
 import com.springstudy.backend.API.Repository.Entity.Order;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/orders")
@@ -36,5 +35,28 @@ public class OrderControllerV1 {
         return ResponseEntity.ok(order);
     }
 
-    // 주문 조회 작성 필요
+    /**
+     * ✅ 특정 사용자의 주문 목록 조회 API (CANCELED 상태 주문 제외)
+     */
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Order>> getUserOrders(@PathVariable Long userId) {
+        List<Order> orders = orderService.getUserOrders(userId);
+        return ResponseEntity.ok(orders);
+    }
+
+    /**
+     * ✅ 주문 취소 API (ID 기반)
+     */
+    @PutMapping("/cancel/{orderId}")
+    public ResponseEntity<String> cancelOrder(@PathVariable Long orderId) {
+        try {
+            orderService.cancelOrder(orderId);
+            return ResponseEntity.ok("주문이 성공적으로 취소되었습니다. : " + orderId);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

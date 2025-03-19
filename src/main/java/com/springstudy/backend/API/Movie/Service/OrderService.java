@@ -176,4 +176,42 @@ public class OrderService {
         }
         return recommandList;
     }
+
+    /**
+     * ✅ 사용자 ID를 기반으로 주문 목록 조회 (단, CANCELED 상태 주문 제외)
+     */
+    @Transactional(readOnly = true)
+    public List<Order> getUserOrders(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
+
+        return orderRepository.findByUserAndStatusNot(user, "CANCELED");
+    }
+
+    /**
+     * ✅ 주문 취소 (돈 지불하지 않고 주문 취소)
+     */
+    @Transactional
+    public void cancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 주문 ID가 존재하지 않습니다: " + orderId));
+
+        // ✅ 이미 취소된 주문인지 확인
+        if ("CANCELED".equals(order.getStatus())) {
+            throw new IllegalStateException("이미 취소된 주문입니다.");
+        }
+
+        /**
+         * ✅ 주문과 연결된 티켓 정보 삭제 처리
+         */
+        List<Ticket> tickets = order.getTickets();
+        for (Ticket ticket : tickets) {
+            ticket.setOrder(null);  // ✅ 주문 정보 제거
+            // ticket.setUser(null);   // ✅ 사용자 정보 제거
+        }
+
+        order.updateStatus("CANCELED");
+        order.setTid(null);
+        orderRepository.save(order);
+    }
 }

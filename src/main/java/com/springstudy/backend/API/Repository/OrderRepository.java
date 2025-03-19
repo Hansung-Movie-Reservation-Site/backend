@@ -1,9 +1,11 @@
 package com.springstudy.backend.API.Repository;
 
 import com.springstudy.backend.API.Repository.Entity.Order;
+import com.springstudy.backend.API.Repository.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,6 +21,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * ✅ 주문 ID(uuid)로 주문 정보 조회
      */
     Optional<Order> findByUuid(String uuid);
+
+    /**
+     * 특정 사용자의 주문 정보 조회
+     */
+    List<Order> findByUserAndStatusNot(User user, String status);  // ✅ CANCELED 제외
+
 
     /**
      * ✅ 특정 주문 상태인 주문이 존재하는지 확인 (PENDING, PAID)
