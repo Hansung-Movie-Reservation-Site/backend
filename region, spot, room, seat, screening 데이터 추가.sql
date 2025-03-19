@@ -67,6 +67,3 @@ INSERT INTO movie.screening (id, date, finish, price, start, movieid, roomid) VA
 INSERT INTO movie.screening (id, date, finish, price, start, movieid, roomid) VALUES (9, '2025-03-08', '10:00:00', 10000, '09:00:00', 5, 4);
 INSERT INTO movie.screening (id, date, finish, price, start, movieid, roomid) VALUES (10, '2025-03-08', '11:00:00', 10000, '09:00:00', 5, 5);
 INSERT INTO movie.screening (id, date, finish, price, start, movieid, roomid) VALUES (11, '2025-03-04', '13:00:00', 10000, '09:00:00', 2, 2);
-
-INSERT INTO movie.ticket (id, horizontal, price, purchase_time, vertical, screeningid, userid, seatid) VALUES (1, 'a', 10000, '2025-03-05', 1, 1, 1, 1);
-INSERT INTO movie.ticket (id, horizontal, price, purchase_time, vertical, screeningid, userid, seatid) VALUES (2, 'a', 10000, '2025-03-05', 2, 1, 1, 2);
