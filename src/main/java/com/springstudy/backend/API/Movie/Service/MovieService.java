@@ -127,7 +127,10 @@ public class MovieService {
     private Movie fetchMovieDetailsTMDB(MovieDTO dto) {
         String MOVIE_DETAIL_URL = "https://api.themoviedb.org/3/movie/%d?api_key=" + TMDB_API_KEY + "&language=ko-KR&append_to_response=credits";
 
-        ResponseEntity<String> response = restTemplate.getForEntity(String.format(MOVIE_DETAIL_URL, dto.getTmdbMovieId()), String.class);
+        String realUrl = String.format(MOVIE_DETAIL_URL, dto.getTmdbMovieId());
+        System.out.println(realUrl);
+
+        ResponseEntity<String> response = restTemplate.getForEntity(realUrl, String.class);
         MovieDetailDTO detail = null;
         try {
             detail = objectMapper.readValue(response.getBody(), MovieDetailDTO.class);
@@ -255,7 +258,7 @@ public class MovieService {
 
         String movieNmEn = (String) movieInfo.getOrDefault("movieNmEn", "");  // 영어 제목
 
-        System.out.println(movieNmEn);
+        // System.out.println("movieNmEn : " + movieNmEn);
 
         /**
          * 국문 영화 제목
@@ -263,31 +266,60 @@ public class MovieService {
          */
         String movieNm = (String) movieInfo.getOrDefault("movieNm", "");  // 영어 제목
 
+        System.out.println("movieNm : " + movieNm);
+
         String director = movieInfo.containsKey("directors") && !((List) movieInfo.get("directors")).isEmpty()
                 ? (String) ((Map<String, Object>) ((List) movieInfo.get("directors")).get(0)).get("peopleNm")
                 : "";
+
+        System.out.println("director : " + director);
+
         String genres = movieInfo.containsKey("genres") && !((List) movieInfo.get("genres")).isEmpty()
                 ? (String) ((Map<String, Object>) ((List) movieInfo.get("genres")).get(0)).get("genreNm")
                 : "";
+
+        System.out.println("genres : " + genres);
+
         String releaseDate = (String) movieInfo.getOrDefault("openDt", "");
 
+        System.out.println("openDt : " + releaseDate);
 
         // TMDB API를 통해 추가 정보 조회
         Map<String, Object> tmdbData = fetchTmdbMovieInfo(movieNm, movieNmEn, releaseDate);
 
-        System.out.println(tmdbData);
+        // System.out.println(tmdbData);
+
+        // System.out.println("--------------------------------");
 
         Movie a = Movie.builder()
                 .kobisMovieCd(kobisMovieCd)
                 .title((String) movieData.get("movieNm"))
-                .releaseDate(releaseDate.isEmpty() ? null : LocalDate.parse(releaseDate, DateTimeFormatter.ofPattern("yyyyMMdd")))
+                .releaseDate(releaseDate.isEmpty() ?
+                        LocalDate.parse((String) tmdbData.getOrDefault("release_date", null), DateTimeFormatter.ofPattern("yyyy-MM-dd")) :
+                        LocalDate.parse(releaseDate, DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .tmdbMovieId((Integer) tmdbData.getOrDefault("id", null))
                 .posterImage((String) tmdbData.getOrDefault("poster_path", null))
                 .overview((String) tmdbData.getOrDefault("overview", null))
-                .director(director)
-                .genres(genres)
+                .director(director.isEmpty() ?
+                        (String) tmdbData.getOrDefault("director", null)
+                        : director)
                 .runtime((Integer) tmdbData.getOrDefault("runtime", null))  // ✅ 상영 시간 추가
+                .genres(genres)
                 .build();
+
+
+        System.out.println("🎬 영화 정보 =====================");
+        System.out.println("✅ 제목: " + a.getTitle());
+        System.out.println("🆔 TMDB ID: " + a.getTmdbMovieId());
+        System.out.println("🎞️ KOBIS 영화 코드: " + a.getKobisMovieCd());
+        System.out.println("📆 개봉일: " + a.getReleaseDate());
+        System.out.println("🕒 러닝타임: " + a.getRuntime() + "분");
+        System.out.println("🎭 장르: " + a.getGenres());
+        System.out.println("👨‍🎬 감독: " + a.getDirector());
+        System.out.println("🖼️ 포스터: " + a.getPosterImage());
+        System.out.println("📝 줄거리: " + a.getOverview());
+        System.out.println("=================================");
+
 
         return a;
     }
@@ -296,7 +328,14 @@ public class MovieService {
      * ✅ KOBIS 영화 정보에 있는 movieNmEn 속성과 TMDB API를 이용해 영화 정보 가져오기
      */
     private Map<String, Object> fetchTmdbMovieInfo(String movieNm, String movieNmEn, String releaseDate) {
-        String searchUrl = TMDB_SEARCH_URL + TMDB_API_KEY + "&query=" + movieNmEn + "&year=" + (releaseDate.isEmpty() ? "" : releaseDate.substring(0, 4)) + "&language=ko-KR";
+
+        // 🔧 movieNmEn이 null 또는 공백일 경우 movieNm 사용
+        String query = (movieNmEn == null || movieNmEn.trim().isEmpty()) ? movieNm : movieNmEn;
+
+        String searchUrl = TMDB_SEARCH_URL + TMDB_API_KEY + "&query=" + query + "&year="
+                + (releaseDate.isEmpty() ? "" : releaseDate.substring(0, 4))
+                + "&language=ko-KR"
+                + "&append_to_response=credits";
 
         System.out.println(searchUrl);
 
@@ -323,11 +362,28 @@ public class MovieService {
         // ✅ TMDB API에서 추가 정보 (runtime) 가져오기
         Integer runtime = fetchTmdbMovieRuntime(movieId);
 
+//        return Map.of(
+//                "id", matchedMovie.get("id"),
+//                "poster_path", "https://image.tmdb.org/t/p/w500" + matchedMovie.get("poster_path"),
+//                "overview", matchedMovie.get("overview"),
+//                "runtime", runtime   // ✅ 상영 시간 추가
+//
+//        );
+
+        String director = fetchTmdbMovieDirector(movieId);
+        System.out.println("director : " + director);
+
+        /**
+         *  ✅ 상영 시간 추가
+         *  ✅ 감독 이름 추가
+         */
         return Map.of(
                 "id", matchedMovie.get("id"),
                 "poster_path", "https://image.tmdb.org/t/p/w500" + matchedMovie.get("poster_path"),
                 "overview", matchedMovie.get("overview"),
-                "runtime", runtime  // ✅ 상영 시간 추가
+                "release_date", matchedMovie.get("release_date"),
+                "runtime", runtime,
+                "director", director
         );
 
     }
@@ -338,7 +394,12 @@ public class MovieService {
     private Integer fetchTmdbMovieRuntime(Integer movieId) {
         if (movieId == null) return null;
 
-        String movieDetailUrl = "https://api.themoviedb.org/3/movie/" + movieId + "?api_key=" + TMDB_API_KEY + "&language=ko-KR";
+        String movieDetailUrl = "https://api.themoviedb.org/3/movie/"
+                + movieId + "?api_key="
+                + TMDB_API_KEY
+                + "&language=ko-KR";
+
+        // System.out.println(movieDetailUrl);
 
         ResponseEntity<Map> response = restTemplate.getForEntity(movieDetailUrl, Map.class);
 
@@ -347,6 +408,38 @@ public class MovieService {
         }
 
         return (Integer) response.getBody().get("runtime");
+    }
+
+    private String fetchTmdbMovieDirector(Integer movieId) {
+        if (movieId == null) return "";
+
+        String movieDetailUrl = "https://api.themoviedb.org/3/movie/"
+                + movieId + "?api_key="
+                + TMDB_API_KEY
+                + "&language=ko-KR&append_to_response=credits";
+
+        System.out.println("🔍 TMDB 감독 검색 URL: " + movieDetailUrl);
+
+        ResponseEntity<Map> response = restTemplate.getForEntity(movieDetailUrl, Map.class);
+
+        if (response.getBody() == null || !response.getBody().containsKey("credits")) {
+            System.out.println("❌ credits 정보 없음");
+            return "";
+        }
+
+        Map<String, Object> credits = (Map<String, Object>) response.getBody().get("credits");
+        List<Map<String, Object>> crewList = (List<Map<String, Object>>) credits.get("crew");
+
+        if (crewList == null) {
+            System.out.println("❌ crew 정보 없음");
+            return "";
+        }
+
+        return crewList.stream()
+                .filter(crew -> "Director".equalsIgnoreCase((String) crew.get("job")))
+                .map(crew -> (String) crew.getOrDefault("name", ""))
+                .findFirst()
+                .orElse("");
     }
 
     /**
