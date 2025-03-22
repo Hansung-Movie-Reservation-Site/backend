@@ -1,8 +1,8 @@
-package com.springstudy.backend.API.Movie.Controller;
+package com.springstudy.backend.API.Review.Controller;
 
-import com.springstudy.backend.API.Movie.Model.Request.ReviewRequest;
-import com.springstudy.backend.API.Movie.Model.Response.ReviewResponse;
-import com.springstudy.backend.API.Movie.Service.ReviewService;
+import com.springstudy.backend.API.Review.Model.Request.ReviewRequest;
+import com.springstudy.backend.API.Review.Model.Response.ReviewResponse;
+import com.springstudy.backend.API.Review.Service.ReviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,7 +1,7 @@
-package com.springstudy.backend.API.Movie.Service;
+package com.springstudy.backend.API.Review.Service;
 
-import com.springstudy.backend.API.Movie.Model.Request.ReviewRequest;
-import com.springstudy.backend.API.Movie.Model.Response.ReviewResponse;
+import com.springstudy.backend.API.Review.Model.Request.ReviewRequest;
+import com.springstudy.backend.API.Review.Model.Response.ReviewResponse;
 import com.springstudy.backend.API.Repository.Entity.Movie;
 import com.springstudy.backend.API.Repository.Entity.Review;
 import com.springstudy.backend.API.Repository.Entity.User;

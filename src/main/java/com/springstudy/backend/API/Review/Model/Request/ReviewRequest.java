@@ -1,7 +1,6 @@
-package com.springstudy.backend.API.Movie.Model.Request;
+package com.springstudy.backend.API.Review.Model.Request;
 
 import lombok.Getter;
-import java.util.List;
 
 @Getter
 public class ReviewRequest {
