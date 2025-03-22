@@ -26,7 +26,7 @@ public class Room {
     private Long id;
 
     @ManyToOne
-    @MapsId("spotId")
+    // @MapsId("spotId")
     @JoinColumn(name = "spotid", referencedColumnName = "id", nullable = false,
             foreignKey = @ForeignKey(name = "FK_room_TO_spot_1"))
     private Spot spot;
