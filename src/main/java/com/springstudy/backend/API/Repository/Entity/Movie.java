@@ -44,4 +44,10 @@ public class Movie {
 
     @Column(nullable = true)
     private Integer runtime;  // ✅ 상영 시간 (단위: 분)
+
+    /**
+     * rank가 예약어라서 변수명을 다르게 설정
+     */
+    @Column(nullable = true)
+    private Integer boxOfficeRank;  // ✅ 박스오피스 순위
 }

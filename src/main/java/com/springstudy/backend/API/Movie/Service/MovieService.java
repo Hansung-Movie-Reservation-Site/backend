@@ -200,16 +200,26 @@ public class MovieService {
 
         for (Map<String, Object> movieData : movieList) {
             String kobisMovieCd = (String) movieData.get("movieCd");
+            Integer rank = Integer.parseInt((String) movieData.get("rank"));
 
-            System.out.println(kobisMovieCd);
+
+            System.out.println("kobisMovieCd : " + kobisMovieCd);
+            System.out.println("rank : " + rank);
             // ✅ 1. KOBIS movieCd 기준으로 조회
             Optional<Movie> existingMovieByKobis = movieRepository.findByKobisMovieCd(kobisMovieCd);
 
 
 
             if (existingMovieByKobis.isPresent()) {
-                System.out.println("✅ 이미 존재하는 영화 (KOBIS 기준): " + existingMovieByKobis.get().getTitle());
-                finalMovies.add(existingMovieByKobis.get());
+                // System.out.println("✅ 이미 존재하는 영화 (KOBIS 기준): " + existingMovieByKobis.get().getTitle());
+                //finalMovies.add(existingMovieByKobis.get());
+
+                Movie movie = existingMovieByKobis.get();
+                movie.setBoxOfficeRank(rank); // ✅ rank 업데이트
+                movieRepository.save(movie); // ✅ 업데이트 반영
+                System.out.println("✅ 기존 영화 rank 업데이트: " + movie.getTitle() + " → " + rank + "위");
+                finalMovies.add(movie);
+
                 continue;
             }
 
