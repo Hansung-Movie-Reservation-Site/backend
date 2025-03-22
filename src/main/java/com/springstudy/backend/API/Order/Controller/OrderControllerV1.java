@@ -1,8 +1,8 @@
-package com.springstudy.backend.API.Movie.Controller;
+package com.springstudy.backend.API.Order.Controller;
 
 
-import com.springstudy.backend.API.Movie.Model.Request.OrderRequest;
-import com.springstudy.backend.API.Movie.Service.OrderService;
+import com.springstudy.backend.API.Order.Request.OrderRequest;
+import com.springstudy.backend.API.Order.Service.OrderService;
 import com.springstudy.backend.API.Repository.Entity.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,8 +1,8 @@
-package com.springstudy.backend.API.Movie.Service;
+package com.springstudy.backend.API.Screening.Service;
 
 import com.springstudy.backend.API.Movie.Model.Response.MovieResponseDTO;
 import com.springstudy.backend.API.Movie.Model.Response.MovieResponseIdDTO;
-import com.springstudy.backend.API.Movie.Model.Response.SeatResponseDTO;
+import com.springstudy.backend.API.Screening.Response.SeatResponseDTO;
 import com.springstudy.backend.API.Repository.Entity.*;
 import com.springstudy.backend.API.Repository.*;
 import org.springframework.stereotype.Service;

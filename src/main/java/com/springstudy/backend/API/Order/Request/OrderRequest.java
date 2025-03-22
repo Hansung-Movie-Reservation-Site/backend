@@ -1,4 +1,4 @@
-package com.springstudy.backend.API.Movie.Model.Request;
+package com.springstudy.backend.API.Order.Request;
 
 import lombok.Getter;
 import java.util.List;

@@ -1,8 +1,8 @@
-package com.springstudy.backend.API.Movie.Service;
+package com.springstudy.backend.API.Payment.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springstudy.backend.API.Movie.Model.Response.KakaoReadyResponse;
+import com.springstudy.backend.API.Payment.Response.KakaoReadyResponse;
 import com.springstudy.backend.API.Repository.Entity.Order;
 import com.springstudy.backend.API.Repository.Entity.Ticket;
 import com.springstudy.backend.API.Repository.OrderRepository;

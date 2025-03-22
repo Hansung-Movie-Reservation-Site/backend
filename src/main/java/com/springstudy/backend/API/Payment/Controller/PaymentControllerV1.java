@@ -1,8 +1,8 @@
-package com.springstudy.backend.API.Movie.Controller;
+package com.springstudy.backend.API.Payment.Controller;
 
-import com.springstudy.backend.API.Movie.Model.Request.PaymentCancelRequest;
-import com.springstudy.backend.API.Movie.Model.Request.PaymentRequest;
-import com.springstudy.backend.API.Movie.Service.KakaoPayService;
+import com.springstudy.backend.API.Payment.Request.PaymentCancelRequest;
+import com.springstudy.backend.API.Payment.Request.PaymentRequest;
+import com.springstudy.backend.API.Payment.Service.KakaoPayService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,9 +1,9 @@
-package com.springstudy.backend.API.Movie.Controller;
+package com.springstudy.backend.API.Screening.Controller;
 
 import com.springstudy.backend.API.Movie.Model.Response.MovieResponseDTO;
 import com.springstudy.backend.API.Movie.Model.Response.MovieResponseIdDTO;
-import com.springstudy.backend.API.Movie.Model.Response.SeatResponseDTO;
-import com.springstudy.backend.API.Movie.Service.ScreeningService;
+import com.springstudy.backend.API.Screening.Response.SeatResponseDTO;
+import com.springstudy.backend.API.Screening.Service.ScreeningService;
 import com.springstudy.backend.API.Repository.Entity.Screening;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

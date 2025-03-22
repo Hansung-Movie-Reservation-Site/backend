@@ -4,8 +4,6 @@ import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.LookupTicketRequest;
 import com.springstudy.backend.API.Auth.Model.Response.ChangeDetailResponse;
 import com.springstudy.backend.API.Auth.Model.Response.LookupTicketResponse;
-import com.springstudy.backend.API.Movie.Service.OrderService;
-import com.springstudy.backend.API.Repository.Entity.Order;
 import com.springstudy.backend.API.Repository.Entity.Ticket;
 import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.OrderRepository;

@@ -1,4 +1,4 @@
-package com.springstudy.backend.API.Movie.Model.Request;
+package com.springstudy.backend.API.Payment.Request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

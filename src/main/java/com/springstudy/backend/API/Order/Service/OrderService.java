@@ -1,4 +1,4 @@
-package com.springstudy.backend.API.Movie.Service;
+package com.springstudy.backend.API.Order.Service;
 
 import com.springstudy.backend.API.Repository.Entity.*;
 import com.springstudy.backend.API.Repository.*;
