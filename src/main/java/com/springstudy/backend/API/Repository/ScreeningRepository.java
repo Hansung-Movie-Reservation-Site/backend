@@ -1,6 +1,7 @@
 package com.springstudy.backend.API.Repository;
 
 import com.springstudy.backend.API.Repository.Entity.Movie;
+import com.springstudy.backend.API.Repository.Entity.Room;
 import com.springstudy.backend.API.Repository.Entity.Screening;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -8,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Repository
@@ -26,4 +28,15 @@ public interface ScreeningRepository extends JpaRepository<Screening, Long> {
     // ✅ 특정 문자열을 포함하는 영화 제목의 상영 정보 조회
     @Query("SELECT s FROM Screening s WHERE LOWER(s.movie.title) LIKE LOWER(CONCAT('%', :title, '%'))")
     List<Screening> findByMovieTitleContaining(@Param("title") String title);
+
+    List<Screening> findByRoomIdAndDate(Long roomId, LocalDate date);
+
+    boolean existsByMovieAndRoomAndDateAndStartAndFinishAndPrice(
+            Movie movie,
+            Room room,
+            LocalDate date,
+            LocalTime start,
+            LocalTime finish,
+            int price
+    );
 }

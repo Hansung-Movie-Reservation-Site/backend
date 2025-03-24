@@ -2,17 +2,19 @@ package com.springstudy.backend.API.Screening.Service;
 
 import com.springstudy.backend.API.Movie.Model.Response.MovieResponseDTO;
 import com.springstudy.backend.API.Movie.Model.Response.MovieResponseIdDTO;
+import com.springstudy.backend.API.Screening.Response.ScreeningAddDTO;
 import com.springstudy.backend.API.Screening.Response.SeatResponseDTO;
 import com.springstudy.backend.API.Repository.Entity.*;
 import com.springstudy.backend.API.Repository.*;
+import com.springstudy.backend.API.Screening.Response.SimpleScreeningResponseDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.time.LocalTime;
+import java.time.format.TextStyle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,14 +25,16 @@ public class ScreeningService {
     private final ScreeningRepository screeningRepository;
     private final SeatRepository seatRepository;
     private final TicketRepository ticketRepository;
+    private final MovieRepository movieRepository;
 
 
-    public ScreeningService(SpotRepository spotRepository, RoomRepository roomRepository, ScreeningRepository screeningRepository, SeatRepository seatRepository, TicketRepository ticketRepository) {
+    public ScreeningService(SpotRepository spotRepository, RoomRepository roomRepository, ScreeningRepository screeningRepository, SeatRepository seatRepository, TicketRepository ticketRepository, MovieRepository movieRepository) {
         this.spotRepository = spotRepository;
         this.roomRepository = roomRepository;
         this.screeningRepository = screeningRepository;
         this.seatRepository = seatRepository;
         this.ticketRepository = ticketRepository;
+        this.movieRepository = movieRepository;
     }
 
     /**
@@ -130,6 +134,44 @@ public class ScreeningService {
         return screeningRepository.findByRoomIdInAndDateAndMovieId(roomIds, date, movieId);
     }
 
+    @Transactional(readOnly = true)
+    public List<SimpleScreeningResponseDTO> getSimplifiedScreeningsBySpotDateAndMovieId(String spotName, LocalDate date, Long movieId) {
+
+        // spot 조회
+        Long spotId = spotRepository.findByName(spotName)
+                .map(Spot::getId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 Spot이 존재하지 않습니다: " + spotName));
+
+        // room 조회
+        List<Long> roomIds = roomRepository.findBySpotId(spotId)
+                .stream()
+                .map(Room::getId)
+                .toList();
+
+        if (roomIds.isEmpty()) {
+            throw new IllegalArgumentException("❌ 해당 Spot에 등록된 Room이 없습니다.");
+        }
+
+        List<Screening> screenings = screeningRepository.findByRoomIdInAndDateAndMovieId(roomIds, date, movieId);
+
+        if (screenings.isEmpty()) {
+            return List.of();
+        }
+
+        // 같은 영화이므로 하나만 가져도 됨
+        Movie movie = screenings.get(0).getMovie();
+
+        return List.of(
+                SimpleScreeningResponseDTO.builder()
+                        .tmdbMovieId(movie.getTmdbMovieId())
+                        .kobisMovieCd(movie.getKobisMovieCd())
+                        .screeningIds(screenings.stream().map(Screening::getId).toList())
+                        .roomIds(screenings.stream().map(s -> s.getRoom().getId()).toList())
+                        .startTimes(screenings.stream().map(Screening::getStart).toList())  // ✅ 추가
+                        .build()
+        );
+    }
+
     /**
      * ✅ Screening ID로 Seat 목록 조회 (예약 여부 포함)
      */
@@ -184,4 +226,158 @@ public class ScreeningService {
 
         return screeningRepository.findByMovieTitleContaining(title);
     }
+
+
+    /**
+     * 코드 작성 중, 에러 발생
+     */
+
+//    @Transactional(readOnly = true)
+//    public Map<String, List<ScreeningAddDTO>> generateScreeningsGroupedByDay(LocalDate startDate, int count, int price) {
+//        Map<String, List<ScreeningAddDTO>> grouped = new LinkedHashMap<>();
+//
+//
+//        LocalDate currentDate = startDate.plusDays(0);
+//
+//        List<ScreeningAddDTO> dtoList = generateScreeningsForDate(currentDate, count, price);
+//
+//        dtoList.sort(
+//                    Comparator
+//                            .comparing(ScreeningAddDTO::getRoomNumber) // 1️⃣ 방 번호 기준 정렬
+//                            .thenComparing(ScreeningAddDTO::getStart)  // 2️⃣ 같은 방이면 상영 시작 시간 정렬
+//        );
+//
+//        String dayOfWeek = currentDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN);
+//
+//        grouped.put(dayOfWeek, dtoList);
+//
+//
+//        return grouped;
+//    }
+//
+//    public Map<String, List<ScreeningAddDTO>> generateScreeningsGroupedByDayOfWeek(LocalDate startDate, int count, int price) {
+//        Map<String, List<ScreeningAddDTO>> grouped = new LinkedHashMap<>();
+//
+//        for (int i = 0; i < 7; i++) {
+//            LocalDate currentDate = startDate.plusDays(i);
+//
+//            List<ScreeningAddDTO> dtoList = generateScreeningsForDate(currentDate, count, price);
+//
+//            dtoList.sort(
+//                    Comparator
+//                            .comparing(ScreeningAddDTO::getRoomNumber) // 1️⃣ 방 번호 기준 정렬
+//                            .thenComparing(ScreeningAddDTO::getStart)  // 2️⃣ 같은 방이면 상영 시작 시간 정렬
+//            );
+//
+//            String dayOfWeek = currentDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN);
+//
+//            grouped.put(dayOfWeek, dtoList);
+//        }
+//
+//        return grouped;
+//    }
+//
+//
+//    @Transactional
+//    public List<ScreeningAddDTO> generateScreeningsForDate(LocalDate date, int count, int price) {
+//
+//        List<Movie> movies = movieRepository.findAll();
+//        List<Room> rooms = roomRepository.findAll();
+//        Random random = new Random();
+//        List<ScreeningAddDTO> createdDTOs = new ArrayList<>();
+//
+//        LocalTime startTime = LocalTime.of(9, 0);
+//        LocalTime endTime = LocalTime.of(23, 59);
+//
+//        for (Room room : rooms) {
+//            List<LocalTime[]> timeSlots = new ArrayList<>();
+//
+//            // LocalTime roomStartTime = LocalTime.of(9, 0);
+//            // LocalTime roomEndTime = LocalTime.of(23, 59);
+//
+//            int generated = 0;
+//
+//            while (generated < count) {
+//
+//                Movie movie = movies.get(random.nextInt(movies.size()));
+//                int runtime = movie.getRuntime() != null ? movie.getRuntime() : 100;
+//                int buffer = 30;
+//
+//                // 랜덤 시작 시간
+//                int availableMinutes = (int) Duration.between(startTime, endTime).toMinutes() - runtime - buffer;
+//
+//                if (availableMinutes <= 0) break;
+//
+//                int randomMinutes = random.nextInt(availableMinutes);
+//
+//                LocalTime potentialStart = startTime.plusMinutes(randomMinutes);
+//
+//                // 5분 단위로 정렬
+//                int startMod = potentialStart.getMinute() % 5;
+//                final LocalTime adjustedStart = potentialStart.plusMinutes(startMod == 0 ? 0 : 5 - startMod);
+//                LocalTime potentialFinish = adjustedStart.plusMinutes(runtime + buffer);
+//                int finishMod = potentialFinish.getMinute() % 5;
+//                final LocalTime adjustedFinish = potentialFinish.plusMinutes(finishMod == 0 ? 0 : 5 - finishMod);
+//
+//                if (adjustedFinish.isAfter(endTime)) continue;
+//
+//                // timeSlot 정렬 후 겹침 확인
+//                timeSlots.sort(Comparator.comparing(slot -> slot[0]));
+//
+//                boolean overlaps = timeSlots.stream().anyMatch(slot ->
+//                        !(adjustedFinish.isBefore(slot[0]) || adjustedStart.isAfter(slot[1]))
+//                );
+//                if (overlaps) continue;
+//
+//                timeSlots.add(new LocalTime[]{adjustedStart, adjustedFinish});
+//                // roomStartTime = adjustedFinish;
+//
+//
+//                // Screening 저장
+//                Screening screening = Screening.builder()
+//                        .movie(movie)
+//                        .room(room)
+//                        .date(date)
+//                        .start(adjustedStart)
+//                        .finish(adjustedFinish)
+//                        .price(price)
+//                        .build();
+//
+//                System.out.println("8$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//                System.out.println("date : " + screening.getDate());
+//                System.out.println("room : " + screening.getRoom());
+//                System.out.println("start : " + screening.getStart());
+//                System.out.println("finish : " + screening.getFinish());
+//                System.out.println("generated : " + generated);
+//                System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//
+//                screeningRepository.save(screening);
+//
+//                // DTO 반환용
+//                ScreeningAddDTO dto = new ScreeningAddDTO(
+//                        date,
+//                        room.getRoomnumber(),
+//                        movie.getTitle(),
+//                        adjustedStart,
+//                        adjustedFinish
+//                );
+//                createdDTOs.add(dto);
+//                generated++;
+//
+//
+//
+//                System.out.println("----------------------------------------");
+//                System.out.println("date : " + dto.getDate());
+//                System.out.println("room : " + dto.getRoomNumber());
+//                System.out.println("start : " + dto.getStart());
+//                System.out.println("finish : " + dto.getFinish());
+//                System.out.println("generated : " + generated);
+//                System.out.println("---------------------------------------");
+//            }
+//
+//        }
+//
+//        return createdDTOs;
+//    }
+
 }

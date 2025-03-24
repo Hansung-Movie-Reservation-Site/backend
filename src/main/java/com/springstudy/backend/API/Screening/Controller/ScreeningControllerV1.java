@@ -2,9 +2,12 @@ package com.springstudy.backend.API.Screening.Controller;
 
 import com.springstudy.backend.API.Movie.Model.Response.MovieResponseDTO;
 import com.springstudy.backend.API.Movie.Model.Response.MovieResponseIdDTO;
+import com.springstudy.backend.API.Screening.Response.ScreeningAddDTO;
 import com.springstudy.backend.API.Screening.Response.SeatResponseDTO;
+import com.springstudy.backend.API.Screening.Response.SimpleScreeningResponseDTO;
 import com.springstudy.backend.API.Screening.Service.ScreeningService;
 import com.springstudy.backend.API.Repository.Entity.Screening;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,6 +52,25 @@ public class ScreeningControllerV1 {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    /**
+     * ✅ 날짜, Spot 이름, 영화 ID를 이용하여 Screening 데이터 조회
+     * GET /api/v1/screening/simple?spotName=강남&date=2025-02-20&movieId=1
+     */
+    @GetMapping("/simple")
+    public ResponseEntity<List<SimpleScreeningResponseDTO>> getSimpleScreenings(
+            @RequestParam String spotName,
+            @RequestParam LocalDate date,
+            @RequestParam Long movieId
+    ) {
+        try {
+            List<SimpleScreeningResponseDTO> result = screeningService.getSimplifiedScreeningsBySpotDateAndMovieId(spotName, date, movieId);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
 
     /**
      * ✅ 특정 날짜와 Spot 이름을 이용하여 Screening 데이터 중 영화 제목만 반환
@@ -115,5 +137,29 @@ public class ScreeningControllerV1 {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+
+    /**
+     *  코드 작성 중, 에러 발생
+     */
+//    /**
+//     * ✅ 특정 날짜부터 7일 동안 Screening 생성 후 요일별 그룹화 반환
+//     * count는 방 당 생성되는 Screening 데이터의 개수
+//     * 예: /api/v1/screenings/generate/grouped?startDate=2025-03-20&count=3&price=12000
+//     */
+//    @PostMapping("/generate/grouped")
+//    public ResponseEntity<Map<String, List<ScreeningAddDTO>>> generateScreeningsGrouped(
+//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+//            @RequestParam(defaultValue = "3") int count,
+//            @RequestParam(defaultValue = "12000") int price
+//    ) {
+//        // ✅ startDate가 null이면 오늘 날짜로 설정
+//        if (startDate == null) {
+//            startDate = LocalDate.now();
+//        }
+//
+//        Map<String, List<ScreeningAddDTO>> groupedScreenings = screeningService.generateScreeningsGroupedByDay(startDate, count, price);
+//        return ResponseEntity.ok(groupedScreenings);
+//    }
 
 }
