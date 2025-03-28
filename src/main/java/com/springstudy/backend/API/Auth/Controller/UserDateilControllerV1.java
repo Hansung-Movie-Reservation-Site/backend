@@ -48,7 +48,7 @@ public class UserDateilControllerV1 {
         return DetailService.changeDetail(changeDetailRequest, DetailType.USERNAME);
     }
 
-    @PostMapping("lookup/ticket")
+    @PostMapping("/lookup/ticket")
     public LookupTicketResponse lookupTicket(LookupTicketRequest lookupTicketRequest) {
         return detailService.lookupTicket(lookupTicketRequest);
     }
