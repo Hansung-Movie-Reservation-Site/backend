@@ -187,7 +187,9 @@ public class MovieService {
         List<Map<String, Object>> movieList = (List<Map<String, Object>>) ((Map<String, Object>) response.getBody().get("boxOfficeResult")).get("dailyBoxOfficeList");
 
 
-        System.out.println(movieList);
+        System.out.println("---------------------------------------------------");
+        System.out.println("movieList : " + movieList);
+        System.out.println("---------------------------------------------------");
 //        List<Movie> movies = movieList.stream()
 //                .map(movieData -> fetchMovieDetailsAndConvert(movieData))
 //                .filter(movie -> movieRepository.findByKobisMovieCd(movie.getKobisMovieCd()).isEmpty())  // 중복 제거
@@ -301,9 +303,14 @@ public class MovieService {
 
         // System.out.println("--------------------------------");
 
+        System.out.println("--------------------------------------------");
+        System.out.println("boxofficeRank : " + movieData.get("rank"));
+        System.out.println("---------------------------------------------");
+
         Movie a = Movie.builder()
                 .kobisMovieCd(kobisMovieCd)
                 .title((String) movieData.get("movieNm"))
+                .boxOfficeRank(Integer.parseInt((String) movieData.get("rank")))
                 .releaseDate(releaseDate.isEmpty() ?
                         LocalDate.parse((String) tmdbData.getOrDefault("release_date", null), DateTimeFormatter.ofPattern("yyyy-MM-dd")) :
                         LocalDate.parse(releaseDate, DateTimeFormatter.ofPattern("yyyyMMdd")))
@@ -328,6 +335,7 @@ public class MovieService {
         System.out.println("👨‍🎬 감독: " + a.getDirector());
         System.out.println("🖼️ 포스터: " + a.getPosterImage());
         System.out.println("📝 줄거리: " + a.getOverview());
+        System.out.println("박스오피스 순위 : " + a.getBoxOfficeRank());
         System.out.println("=================================");
 
 
