@@ -66,8 +66,20 @@ public class OrderService {
             throw new IllegalArgumentException("❌ 유효한 좌석 ID가 없습니다.");
         }
 
+        /**
         // ✅ 이미 예약된 좌석 확인
         boolean seatsAlreadyOrdered = ticketRepository.existsBySeatIdsAndOrderStatuses(seatIds, List.of("PENDING", "PAID"));
+        if (seatsAlreadyOrdered) {
+            throw new IllegalStateException("❌ 선택한 좌석 중 이미 예약된 좌석이 있습니다.");
+        }
+        */
+
+        // ✅ 이미 예약된 좌석 확인 (상영 ID + 좌석 ID + 상태)
+        boolean seatsAlreadyOrdered = ticketRepository.existsBySeatIdsAndScreeningIdAndOrderStatuses(
+                seatIds,
+                screeningId,
+                List.of("PENDING", "PAID")
+        );
         if (seatsAlreadyOrdered) {
             throw new IllegalStateException("❌ 선택한 좌석 중 이미 예약된 좌석이 있습니다.");
         }
