@@ -1,10 +1,12 @@
 package com.springstudy.backend.Config;
 
+import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -24,11 +26,17 @@ public class MysqlConfig {
     @Value("${spring.datasource.driver-class-name}")
     private String driverClassName;
 
+    /**
+     * DataSourceTransactionManager 사용 시 @Scheduled에서 트랜잭션 오류 발생
+     */
+    /**
     @Bean // @Bean: 필요한 즉시 사용하도록 컴파일할 때 컨테이너에 만듬.
     @Primary
     public DataSourceTransactionManager transactionManager(DataSource datasource){ // Datasource: 데베 연결 역할.
         return new DataSourceTransactionManager(datasource);
     } // transactionManager 생성: 기본적인 트랜젝션 설정.
+    */
+
     @Bean
     public TransactionTemplate transactionTemplate(PlatformTransactionManager transactionManager){
         return new TransactionTemplate(transactionManager);
@@ -41,5 +49,10 @@ public class MysqlConfig {
         return transactionManager;
     } // 커스텀 트랜잭션 매니저.
 
+    @Primary
+    @Bean
+    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+        return new JpaTransactionManager(entityManagerFactory);
+    }
 }
 
