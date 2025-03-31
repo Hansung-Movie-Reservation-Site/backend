@@ -14,6 +14,8 @@ import java.util.Optional;
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
+    Optional<Movie> findByTitle(String title);
+
     // tmdb movie id로 데이터 존재 확인
     boolean existsByTmdbMovieId(Integer tmdbMovieId);
 

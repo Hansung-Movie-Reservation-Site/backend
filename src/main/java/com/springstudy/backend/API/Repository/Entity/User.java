@@ -33,7 +33,7 @@ public class User {
     // ✅ Order와 1:N 관계 설정
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("user") // 🚨 추가: Order에서 User 직렬화 무시
-    private List<Order> ordersList = null;
+    private List<Order> ordersList = new ArrayList<>(); // ✅ 초기값 설정
 
     public void changeEmail(String email) {
         this.email = email;

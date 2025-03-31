@@ -28,6 +28,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -58,6 +59,7 @@ public class AuthService {
             User newUser = User.builder()
                     .email(request.email())
                     .username(request.username())
+                    .ordersList(new ArrayList<>()) // ✅ 기본값 설정
                     .build();
             UserCredentional userCredentional = UserCredentional.builder()
                     .user(newUser)

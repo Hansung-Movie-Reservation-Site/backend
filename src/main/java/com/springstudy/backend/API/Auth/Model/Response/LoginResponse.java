@@ -17,5 +17,5 @@ public record LoginResponse (
         @Schema(description = "user 정보")
         UserDetailDTO userDetailDTO
 
-){
+)implements Response {
 }
