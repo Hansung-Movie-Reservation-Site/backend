@@ -48,6 +48,9 @@ public class OrderService {
     }
 
     /**
+     * 여기서 웹소켓으로 통신 구현 필요
+     */
+    /**
      * ✅ Screening ID, Seat ID 리스트, User ID로 주문 생성
      */
     @Transactional

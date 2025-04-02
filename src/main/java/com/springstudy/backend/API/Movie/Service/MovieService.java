@@ -193,6 +193,10 @@ public class MovieService {
     @Transactional
     public List<Movie> fetchAndSaveDailyBoxOfficeMovies() {
 
+        System.out.println("\n\n============================================================");
+        System.out.println("박스오피스 날짜 : " + LocalDate.now().minusDays(1));
+        System.out.println("============================================================");
+
         // ✅ 어제 날짜 구하기 (YYYYMMDD 형식)
         String targetDate = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
