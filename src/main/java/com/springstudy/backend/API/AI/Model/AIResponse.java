@@ -14,7 +14,7 @@ public record AIResponse(
 
         @Schema(description = "추천 영화 id")
         @NotNull
-        int movie_id,
+        Long movie_id,
 
         @Schema(description = "추천 이유")
         String aiResponse

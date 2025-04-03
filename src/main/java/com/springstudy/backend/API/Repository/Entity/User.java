@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @Getter
 @Table(name = "user")
-@JsonIgnoreProperties({"ordersList", "userTickets"}) // 🚨 추가: Order 리스트 무시
+@JsonIgnoreProperties({"ordersList", "userTickets", "aiList"}) // 🚨 추가: Order 리스트 무시
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -77,4 +77,8 @@ public class User {
 //    public void setTicketList(List<Ticket> ticketList) {
 //        this.ticketList = ticketList;
 //    }
+
+    @Column
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    List<AI> aiList = new ArrayList<>();
 }

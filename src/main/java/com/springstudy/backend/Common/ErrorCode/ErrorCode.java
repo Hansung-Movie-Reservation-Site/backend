@@ -36,7 +36,8 @@ public enum ErrorCode implements CodeInterface{
     RESTAPI_ERROR(-22, "RESTAPI_ERROR"),
     EMAIL_FORM_ERROR(-23, "EMAIL_FORM_ERROR"),
     NOT_EXIST_MOVIE(-24, "NOT_EXIST_MOVIE"),
-    INVALID_RATING(-25, "INVALID_RATING");
+    INVALID_RATING(-25, "INVALID_RATING"),
+    GPT_PATH_ERROR(-26, "GPT_PATH_ERROR");
 
     private final Integer code;
     private final String message;

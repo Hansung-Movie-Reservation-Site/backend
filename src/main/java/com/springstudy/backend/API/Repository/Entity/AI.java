@@ -12,12 +12,16 @@ import lombok.*;
 public class AI {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(nullable = false)
     private Long movieId;
 
-    @Column(columnDefinition = "text")
+    @Column(columnDefinition = "text", nullable = false)
     private String reason;
+
+    @JoinColumn(nullable = false,name = "userid")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    User user;
 
 }
