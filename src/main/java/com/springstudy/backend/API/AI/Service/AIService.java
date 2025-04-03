@@ -42,6 +42,8 @@ public class AIService {
     @Value(" ${api.GPT_API_KEY}")
     private String apikey;
 
+    private final ObjectMapper objectMapper;
+
     private String getLikeMovies(Long id){
         List<Review> reviewList = reviewRepository.findByUserId(id);
         if(reviewList.isEmpty()){throw new CustomException(ErrorCode.NOT_EXIST_USER);}
@@ -69,6 +71,7 @@ public class AIService {
         }
         return movieData;
     }
+
     private HttpEntity<Map<String, Object>> makeHttpEntity(String likeMovies, String movieData){
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", "gpt-4o");
@@ -83,24 +86,22 @@ public class AIService {
         headers.setBearerAuth(apikey);
         return new HttpEntity<Map<String, Object>>(requestBody, headers);
     }
+
     private String[] responseToString(ResponseEntity<String> gptResponse){
         String[] content = null;
-        ObjectMapper objectMapper = new ObjectMapper();
         try{
             JsonNode rootNode = objectMapper.readTree(gptResponse.getBody());
             content = rootNode.path("choices").get(0).path("message").path("content").asText().split(":");
 
-            if(content == null)throw new CustomException(ErrorCode.GPT_PATH_ERROR);
+            if(content.length == 0)throw new CustomException(ErrorCode.GPT_PATH_ERROR);
             for(int i= 0;i<content.length;i++) {System.out.println(content[i]);}
         }
-        catch(JsonMappingException e){
-
-        }
         catch(JsonProcessingException e){
-
+            throw new CustomException(ErrorCode.JSON_PATH_ERROR);
         }
         return content;
     }
+
     private AI saveResponse(User user, String title, String reason){
         Optional<Movie> recommandMovieOptional = movieRepository.findByTitle(title);
         if(recommandMovieOptional.isEmpty()){throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);}
@@ -110,39 +111,38 @@ public class AIService {
                 .movieId(recommandMovieOptional.get().getId())
                 .reason(reason)
                 .build();
-        //return aiRepository.save(ai);
-        return         aiRepository.save(ai);
+        return aiRepository.save(ai);
     }
 
     public AIResponse synopsis(AIRequest aiRequest){
 
         Long id = aiRequest.user_id();
-        Optional<User> userOptional = userRepository.findById(aiRequest.user_id());
+        Optional<User> userOptional = userRepository.findById(id);
         if(userOptional.isEmpty()){throw new CustomException(ErrorCode.NOT_EXIST_USER);}
         User user = userOptional.get();
         // 1. 사용자 조회
 
         String likeMovies = getLikeMovies(id);
         System.out.println("likemovies: "+likeMovies);
-        //2. 사용자 4.0 이상 리뷰 영화 조회.
+        // 2. 사용자 4.0 이상 리뷰 영화 조회.
 
         String movieData = getBoxoffice(id);
         System.out.println("\nmoviedata: "+movieData);
-        //3. 박스오피스 영화 조회.
+        // 3. 박스오피스 영화 조회.
 
         HttpEntity<Map<String, Object>> requestEntity = makeHttpEntity(likeMovies, movieData);
         ResponseEntity<String> gptResponse = restTemplate.postForEntity(url, requestEntity, String.class);
         System.out.println(gptResponse.getBody());
-        //4. 영화 내용 + api key로 요청 데이터 만들고 gpt 통신.
+        // 4. 영화 내용 + api key로 요청 데이터 만들고 gpt 통신.
 
         String[] content= responseToString(gptResponse);
-        //5. 통신 결과를 string으로 맵핑.
+        // 5. 통신 결과를 string으로 맵핑.
 
         String title = content[1].split("\n")[0].trim();
         String reason = content[2].trim();
         AI result = saveResponse(user, title, reason);
         System.out.println(result.toString());
-        //6. 추천 결과를 저장.
+        // 6. 추천 결과를 저장.
         if(result == null){throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);}
 
         return new AIResponse(ErrorCode.SUCCESS, result.getMovieId(), result.getReason());

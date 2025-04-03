@@ -37,7 +37,10 @@ public enum ErrorCode implements CodeInterface{
     EMAIL_FORM_ERROR(-23, "EMAIL_FORM_ERROR"),
     NOT_EXIST_MOVIE(-24, "NOT_EXIST_MOVIE"),
     INVALID_RATING(-25, "INVALID_RATING"),
-    GPT_PATH_ERROR(-26, "GPT_PATH_ERROR");
+    GPT_PATH_ERROR(-26, "GPT_PATH_ERROR"),
+
+
+    JSON_PATH_ERROR(-27, "JSON_PATH_ERROR");
 
     private final Integer code;
     private final String message;

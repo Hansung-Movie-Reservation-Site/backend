@@ -22,10 +22,8 @@ public class RestTemplateConfig {
         restTemplate.getInterceptors().add((request,body,execution)->{
             request.getHeaders().add("Authorization","Bearer "+openAiKey);
             request.getHeaders().add("Content-Type","application/json");
-            return execution.execute(request, body);
+            return execution.execute(request, body); // ❌ 이 코드는 바로 실행되지 않음
         });
         return restTemplate;
-
-
     }
 }
