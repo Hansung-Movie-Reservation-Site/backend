@@ -18,11 +18,33 @@ public class MovieControllerV1 {
         this.movieService = movieService;
     }
 
-    // 📌 API 실행 트리거 (수동 실행)
+    /**
+     * ✅ TMDB API를 이용하여 영화 정보 가져와 저장
+     * GET /api/v1/movies/fetch
+     */
     @PostMapping("/fetch")
-    public ResponseEntity<String> fetchMovies() {
-        movieService.fetchAndSaveMovies();
-        return ResponseEntity.ok("✅ 영화 데이터가 업데이트되었습니다.");
+    public ResponseEntity<List<Movie>> fetchTMDBMovies() {
+        try {
+            List<Movie> movies = movieService.fetchAndSaveMoviesByTMDB();
+            return ResponseEntity.ok(movies);
+            // return ResponseEntity.ok("✅ 영화 데이터가 업데이트되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    /**
+     * ✅ KOBIS API를 이용하여 일간 박스오피스 영화 정보 가져와 저장
+     * GET /api/v1/movies/daily?date=YYYYMMDD
+     */
+    @GetMapping("/daily")
+    public ResponseEntity<List<Movie>> fetchAndSaveDailyMovies() {
+        try {
+            List<Movie> movies = movieService.fetchAndSaveDailyBoxOfficeMovies();
+            return ResponseEntity.ok(movies);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     /**

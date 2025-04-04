@@ -31,12 +31,12 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "userid", referencedColumnName = "id", nullable = false,
-            foreignKey = @ForeignKey(name = "FK_user_TO_review_1"))
+            foreignKey = @ForeignKey(name = "FK_review_TO_user_1"))
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "movieid", referencedColumnName = "id", nullable = false,
-            foreignKey = @ForeignKey(name = "FK_movie_TO_review_1"))
+            foreignKey = @ForeignKey(name = "FK_review_TO_movie_1"))
     private Movie movie;
 
     public void setRating(Float rating) {

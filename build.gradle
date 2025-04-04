@@ -54,8 +54,9 @@ dependencies {
     //redis 추가
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    //env 환경변수 사용 목적.
-    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
 
 }
 

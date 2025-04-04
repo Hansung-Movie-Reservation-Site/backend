@@ -25,8 +25,14 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "userid", nullable = false,
-            foreignKey = @ForeignKey(name = "FK_order_user"))
+            foreignKey = @ForeignKey(name = "FK_orders_TO_user_1"))
+    @JsonIgnoreProperties("ordersList") // 🚨 추가: User에서 Orders 직렬화 무시
     private User user;  // 주문한 사용자
+
+    @ManyToOne
+    @JoinColumn(name = "screeningid", referencedColumnName = "id", nullable = false,
+            foreignKey = @ForeignKey(name = "FK_orders_TO_screening_1"))
+    private Screening screening;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("order")  // ✅ 직렬화 문제 방지 (무한 루프 방지)

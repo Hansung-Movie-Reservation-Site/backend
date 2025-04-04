@@ -28,7 +28,7 @@ public class Seat {
 
     @ManyToOne
     @JoinColumn(name = "roomid", referencedColumnName = "id", nullable = false,
-            foreignKey = @ForeignKey(name = "FK_room_TO_seat_1"))
+            foreignKey = @ForeignKey(name = "FK_seat_TO_room_1"))
     private Room room;
 
     @Column(nullable = false, length = 1)

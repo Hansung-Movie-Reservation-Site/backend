@@ -1,9 +1,10 @@
 package com.springstudy.backend.API.Auth.Controller;
 
-import com.springstudy.backend.API.Auth.Model.Request.LookupRecommandRequest;
-import com.springstudy.backend.API.Auth.Model.Request.LookupTicketRequest;
-import com.springstudy.backend.API.Auth.Model.Response.LookupRecommandResponse;
-import com.springstudy.backend.API.Auth.Model.Response.LookupTicketResponse;
+import com.springstudy.backend.API.Auth.Model.Request.RetrieveRequest;
+import com.springstudy.backend.API.Auth.Model.Response.RetrieveAIResponse;
+import com.springstudy.backend.API.Auth.Model.Response.RetrieveTicketResponse;
+import com.springstudy.backend.API.Auth.Model.RetrieveResponse;
+import com.springstudy.backend.API.Auth.Model.RetrieveType;
 import com.springstudy.backend.API.Auth.Service.DetailType;
 import com.springstudy.backend.API.Auth.Service.emailTemplate.EmailType;
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
@@ -50,13 +51,12 @@ public class UserDateilControllerV1 {
         return DetailService.changeDetail(changeDetailRequest, DetailType.USERNAME);
     }
 
-    @PostMapping("lookup/ticket")
-    public LookupTicketResponse lookupTicket(LookupTicketRequest lookupTicketRequest) {
-        return detailService.lookupTicket(lookupTicketRequest);
+    @PostMapping("/retrieve/ticket")
+    public RetrieveResponse retrieveTicket(RetrieveRequest lookupTicketRequest) {
+        return detailService.retrieve(lookupTicketRequest, RetrieveType.TICKET);
     }
-
-    @PostMapping("lookup/recommand")
-    public LookupRecommandResponse lookupRecommand(LookupRecommandRequest lookupRecommandRequest) {
-        return detailService.lookupRecommand(lookupRecommandRequest);
+    @PostMapping("/retrieve/AI")
+    public RetrieveResponse retrieveAI(RetrieveRequest lookupTicketRequest) {
+        return detailService.retrieve(lookupTicketRequest, RetrieveType.AI);
     }
 }

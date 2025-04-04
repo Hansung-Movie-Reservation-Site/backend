@@ -1,16 +1,14 @@
 package com.springstudy.backend.API.Repository.Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "movie")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -21,7 +19,10 @@ public class Movie {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private Integer movieId;  // TMDB 영화 ID
+    private Integer tmdbMovieId;  // TMDB 영화 ID
+
+    @Column(unique = true)
+    private String kobisMovieCd;  // kobis 영화 ID
 
     @Column(nullable = false)
     private String title;  // 영화 제목
@@ -43,4 +44,10 @@ public class Movie {
 
     @Column(nullable = true)
     private Integer runtime;  // ✅ 상영 시간 (단위: 분)
+
+    /**
+     * rank가 예약어라서 변수명을 다르게 설정
+     */
+    @Column(nullable = true)
+    private Integer boxOfficeRank;  // ✅ 박스오피스 순위
 }

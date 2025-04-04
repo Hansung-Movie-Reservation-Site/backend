@@ -15,7 +15,7 @@ import java.time.format.DateTimeParseException;
 public class MovieDTO {
 
     @JsonProperty("id")
-    private Integer movieId;
+    private Integer tmdbMovieId;
 
     @JsonProperty("title")
     private String title;

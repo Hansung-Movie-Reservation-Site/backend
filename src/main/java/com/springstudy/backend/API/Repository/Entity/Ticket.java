@@ -1,9 +1,8 @@
 package com.springstudy.backend.API.Repository.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
 
 @Entity
 @Table(
@@ -16,7 +15,6 @@ import java.util.List;
                         "horizontal",
                         "vertical",
                         "price",
-                        "userid",
                         "ordersid",
                         "recommand_movie"}
         )
@@ -26,6 +24,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"order", "user"}) // 🚨 추가: Order, User 직렬화 방지
 public class Ticket {
 
     @Id
@@ -52,14 +51,16 @@ public class Ticket {
     private int price;
 
     @ManyToOne
-    @JoinColumn(name = "userid", referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "FK_ticket_TO_user"))
-    private User user; // ✅ 구매한 사용자 ID를 외래키로 참조
-
-    @ManyToOne
     @JoinColumn(name = "ordersid", referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "FK_ticket_TO_orders"))
+            foreignKey = @ForeignKey(name = "FK_ticket_TO_orders_1"))
+    @JsonIgnoreProperties("tickets") // 🚨 추가: Order에서 티켓 직렬화 방지
     private Order order;
+
+//    @ManyToOne
+//    @JoinColumn(name = "userid", referencedColumnName = "id",
+//            foreignKey = @ForeignKey(name = "FK_ticket_TO_user"))
+//    @JsonIgnoreProperties("userTickets") // 🚨 추가: User에서 티켓 직렬화 방지
+//    private User user; // ✅ 구매한 사용자 ID를 외래키로 참조
 
 //    @OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //    private List<Recommand> recommand_movie;

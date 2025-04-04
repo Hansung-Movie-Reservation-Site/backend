@@ -1,16 +1,16 @@
 package com.springstudy.backend.API.Auth.Service;
 
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
-import com.springstudy.backend.API.Auth.Model.Request.LookupRecommandRequest;
-import com.springstudy.backend.API.Auth.Model.Request.LookupTicketRequest;
+import com.springstudy.backend.API.Auth.Model.Request.RetrieveRequest;
 import com.springstudy.backend.API.Auth.Model.Response.ChangeDetailResponse;
-import com.springstudy.backend.API.Auth.Model.Response.LookupRecommandResponse;
-import com.springstudy.backend.API.Auth.Model.Response.LookupTicketResponse;
-import com.springstudy.backend.API.Movie.Service.OrderService;
-import com.springstudy.backend.API.Repository.Entity.Order;
+import com.springstudy.backend.API.Auth.Model.Response.RetrieveAIResponse;
+import com.springstudy.backend.API.Auth.Model.Response.RetrieveTicketResponse;
+import com.springstudy.backend.API.Auth.Model.RetrieveResponse;
+import com.springstudy.backend.API.Auth.Model.RetrieveType;
+import com.springstudy.backend.API.Repository.AIRepository;
+import com.springstudy.backend.API.Repository.Entity.AI;
 import com.springstudy.backend.API.Repository.Entity.Ticket;
 import com.springstudy.backend.API.Repository.Entity.User;
-import com.springstudy.backend.API.Repository.TicketRepository;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.Common.CheckPasswordService;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
@@ -33,6 +33,8 @@ public class DetailService {
     private final CheckPasswordService checkPasswordService;
     private final PasswordEncoder passwordEncoder;
 
+    private final AIRepository aiRepository;
+
     @Transactional
     public ChangeDetailResponse changeDetail(ChangeDetailRequest changeDetailRequest, DetailType detailType) {
         // 사용자 정보 변경.
@@ -40,9 +42,9 @@ public class DetailService {
         // 2. 비밀번호 확인.
         // 3. change 함수로 변경.
 
-        String email = changeDetailRequest.email();
+        Long user_id = changeDetailRequest.user_id();
 
-        Optional<User> userOptional = userRepository.findByEmail(email);
+        Optional<User> userOptional = userRepository.findById(user_id);
         if(userOptional.isEmpty()){
             //todo
             log.error("User not found");
@@ -51,10 +53,14 @@ public class DetailService {
         User user = userOptional.get();
 
         String before = changeDetailRequest.password();
-        checkPasswordService.checkPassword(user, before);
+        checkPassword(user, before, detailType);
         // 원래 정보가 맞는지 비밀번호로 확인한다.
         change(user, changeDetailRequest, detailType);
         return new ChangeDetailResponse(ErrorCode.SUCCESS);
+    }
+    private void checkPassword(User user, String before, DetailType detailType) {
+        if(detailType == DetailType.EMAIL)return;
+        checkPasswordService.checkPassword(user, before);
     }
     private void change(User user, ChangeDetailRequest changeDetailRequest, DetailType detailType) {
         String after = changeDetailRequest.after();
@@ -65,26 +71,30 @@ public class DetailService {
             case EMAIL: user.changeEmail(after);break;
         }
     }
-    public LookupTicketResponse lookupTicket(LookupTicketRequest lookupTicketRequest) {
-        Long user_id = lookupTicketRequest.user_id();
+
+    public RetrieveResponse retrieve(RetrieveRequest retrieveRequest, RetrieveType retrieveType) {
+        Long user_id = retrieveRequest.user_id();
         Optional<User> userOptional = userRepository.findById(user_id);
         if(userOptional.isEmpty()){
             log.error("User not found");
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
-         List<Ticket> ticketList= userOptional.get().getTicketList();
-
-        return new LookupTicketResponse(ErrorCode.SUCCESS, ticketList);
-    }
-
-    public LookupRecommandResponse lookupRecommand(LookupRecommandRequest lookupRecommandRequest) {
-        Long id = lookupRecommandRequest.user_id();
-        Optional<User> userOptional = userRepository.findById(id);
-        if(userOptional.isEmpty()){
-            throw new CustomException(ErrorCode.NOT_EXIST_USER);
-        }
         User user = userOptional.get();
+        RetrieveResponse response = makeResponse(user, retrieveType);
 
-        return new LookupRecommandResponse(ErrorCode.SUCCESS, user.getRecommandList());
+        return response;
     }
+    public RetrieveResponse makeResponse(User user, RetrieveType retrieveType) {
+        switch(retrieveType){
+            case TICKET: List<Ticket> ticketList = user.getUserTickets();
+                return new RetrieveTicketResponse(ErrorCode.SUCCESS, ticketList);
+            case AI: List<AI> aiList = user.getAiList();
+
+                System.out.println(aiRepository.findByUserId(user.getId()).get().toString());
+                return new RetrieveAIResponse(ErrorCode.SUCCESS, aiList);
+            default: throw new CustomException(ErrorCode.ERROR_RETRIEVE_TYPE);
+        }
+    }
+
+
 }
