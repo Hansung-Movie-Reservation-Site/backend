@@ -33,8 +33,6 @@ public class DetailService {
     private final CheckPasswordService checkPasswordService;
     private final PasswordEncoder passwordEncoder;
 
-    private final AIRepository aiRepository;
-
     @Transactional
     public ChangeDetailResponse changeDetail(ChangeDetailRequest changeDetailRequest, DetailType detailType) {
         // 사용자 정보 변경.
@@ -89,8 +87,6 @@ public class DetailService {
             case TICKET: List<Ticket> ticketList = user.getUserTickets();
                 return new RetrieveTicketResponse(ErrorCode.SUCCESS, ticketList);
             case AI: List<AI> aiList = user.getAiList();
-
-                System.out.println(aiRepository.findByUserId(user.getId()).get().toString());
                 return new RetrieveAIResponse(ErrorCode.SUCCESS, aiList);
             default: throw new CustomException(ErrorCode.ERROR_RETRIEVE_TYPE);
         }
