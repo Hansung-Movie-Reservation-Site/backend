@@ -3,6 +3,7 @@ package com.springstudy.backend.API.Auth.Controller;
 import com.springstudy.backend.API.Auth.Model.Request.RetrieveRequest;
 import com.springstudy.backend.API.Auth.Model.Response.RetrieveAIResponse;
 import com.springstudy.backend.API.Auth.Model.Response.RetrieveTicketResponse;
+import com.springstudy.backend.API.Auth.Model.RetrieveResponse;
 import com.springstudy.backend.API.Auth.Model.RetrieveType;
 import com.springstudy.backend.API.Auth.Service.DetailType;
 import com.springstudy.backend.API.Auth.Service.emailTemplate.EmailType;
@@ -51,11 +52,11 @@ public class UserDateilControllerV1 {
     }
 
     @PostMapping("/retrieve/ticket")
-    public RetrieveTicketResponse retrieveTicket(RetrieveRequest lookupTicketRequest) {
+    public RetrieveResponse retrieveTicket(RetrieveRequest lookupTicketRequest) {
         return detailService.retrieve(lookupTicketRequest, RetrieveType.TICKET);
     }
     @PostMapping("/retrieve/AI")
-    public RetrieveAIResponse retrieveTicket(RetrieveRequest lookupTicketRequest) {
+    public RetrieveResponse retrieveAI(RetrieveRequest lookupTicketRequest) {
         return detailService.retrieve(lookupTicketRequest, RetrieveType.AI);
     }
 }

@@ -7,6 +7,7 @@ import com.springstudy.backend.API.Auth.Model.Response.RetrieveAIResponse;
 import com.springstudy.backend.API.Auth.Model.Response.RetrieveTicketResponse;
 import com.springstudy.backend.API.Auth.Model.RetrieveResponse;
 import com.springstudy.backend.API.Auth.Model.RetrieveType;
+import com.springstudy.backend.API.Repository.AIRepository;
 import com.springstudy.backend.API.Repository.Entity.AI;
 import com.springstudy.backend.API.Repository.Entity.Ticket;
 import com.springstudy.backend.API.Repository.Entity.User;
@@ -31,6 +32,8 @@ public class DetailService {
     private final UserRepository userRepository;
     private final CheckPasswordService checkPasswordService;
     private final PasswordEncoder passwordEncoder;
+
+    private final AIRepository aiRepository;
 
     @Transactional
     public ChangeDetailResponse changeDetail(ChangeDetailRequest changeDetailRequest, DetailType detailType) {
@@ -86,6 +89,8 @@ public class DetailService {
             case TICKET: List<Ticket> ticketList = user.getUserTickets();
                 return new RetrieveTicketResponse(ErrorCode.SUCCESS, ticketList);
             case AI: List<AI> aiList = user.getAiList();
+
+                System.out.println(aiRepository.findByUserId(user.getId()).get().toString());
                 return new RetrieveAIResponse(ErrorCode.SUCCESS, aiList);
             default: throw new CustomException(ErrorCode.ERROR_RETRIEVE_TYPE);
         }

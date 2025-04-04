@@ -79,6 +79,7 @@ public class User {
 //    }
 
     @Column
+    @JsonIgnoreProperties("user")
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<AI> aiList = new ArrayList<>();
 
