@@ -3,8 +3,11 @@ package com.springstudy.backend.API.Repository;
 import com.springstudy.backend.API.Repository.Entity.Order;
 import com.springstudy.backend.API.Repository.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +30,15 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      */
     List<Order> findByUserAndStatusNot(User user, String status);  // ✅ CANCELED 제외
 
+    @Query("""
+    SELECT o FROM Order o
+    JOIN FETCH o.user
+    JOIN FETCH o.screening s
+    WHERE o.status = 'PAID'
+      AND o.notified = false
+      AND FUNCTION('TIMESTAMP', s.date, s.start) BETWEEN :now AND :cutoff
+""")
+    List<Order> findPaidOrdersToNotify(@Param("now") LocalDateTime now, @Param("cutoff") LocalDateTime cutoff);
 
     /**
      * ✅ 특정 주문 상태인 주문이 존재하는지 확인 (PENDING, PAID)

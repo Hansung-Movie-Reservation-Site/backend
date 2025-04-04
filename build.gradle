@@ -58,6 +58,9 @@ dependencies {
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
 
+    // 이메일 전송을 위한 스타터
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 }
 
 tasks.named('test') {
