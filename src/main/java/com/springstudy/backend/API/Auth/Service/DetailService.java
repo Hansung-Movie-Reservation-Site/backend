@@ -1,6 +1,7 @@
 package com.springstudy.backend.API.Auth.Service;
 
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
+import com.springstudy.backend.API.Auth.Model.Request.ChangeEmailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.RetrieveRequest;
 import com.springstudy.backend.API.Auth.Model.Response.ChangeDetailResponse;
 import com.springstudy.backend.API.Auth.Model.Response.RetrieveAIResponse;
@@ -66,8 +67,23 @@ public class DetailService {
         switch (detailType) {
             case USERNAME: user.changeUsername(after);break;
             case PASSWORD: user.getUser_credentional().changePassword(passwordEncoder.encode(after));break;
-            case EMAIL: user.changeEmail(after);break;
+            default: throw new CustomException(ErrorCode.ERROR_CHANGE_TYPE);
         }
+    }
+
+    @Transactional
+    public ChangeDetailResponse changeEmail(ChangeEmailRequest changeEmailRequest) {
+        Long user_id = changeEmailRequest.user_id();
+
+        Optional<User> userOptional = userRepository.findById(user_id);
+        if(userOptional.isEmpty()){
+            //todo
+            log.error("User not found");
+            throw new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
+        User user = userOptional.get();
+        user.changeEmail(changeEmailRequest.after());
+        return new ChangeDetailResponse(ErrorCode.SUCCESS);
     }
 
     public RetrieveResponse retrieve(RetrieveRequest retrieveRequest, RetrieveType retrieveType) {
