@@ -40,7 +40,9 @@ public enum ErrorCode implements CodeInterface{
     GPT_PATH_ERROR(-26, "GPT_PATH_ERROR"),
 
 
-    JSON_PATH_ERROR(-27, "JSON_PATH_ERROR");
+    JSON_PATH_ERROR(-27, "JSON_PATH_ERROR"),
+
+    ERROR_RETRIEVE_TYPE(-28, "ERROR_RETRIEVE_TYPE");
 
     private final Integer code;
     private final String message;

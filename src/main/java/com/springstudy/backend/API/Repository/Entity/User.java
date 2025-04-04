@@ -81,4 +81,6 @@ public class User {
     @Column
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<AI> aiList = new ArrayList<>();
+
+
 }
