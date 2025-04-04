@@ -16,6 +16,10 @@ public class Recommand {
     @Column(nullable = false)
     private Integer recommand_movie_id;
 
+    @ManyToOne
+    @JoinColumn(nullable = true, name = "user_id", foreignKey = @ForeignKey(name = "FK_recommand_TO_user"))
+    private User user;
+
 //    @ManyToOne
 //    @JoinColumn(nullable = true, name = "ticket_id", foreignKey = @ForeignKey(name = "FK_ticket_TO_recommand"))
 //    private Ticket ticket;
