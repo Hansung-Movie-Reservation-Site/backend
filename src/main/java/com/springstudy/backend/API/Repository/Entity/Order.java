@@ -50,6 +50,17 @@ public class Order {
     @Column()
     private String tid;  // 카카오페이 결제 고유 번호 (결제 승인 시 저장)
 
+    @Column(nullable = false)
+    private boolean notified = false;
+
+    public boolean isNotified() {
+        return notified;
+    }
+
+    public void setNotified(boolean notified) {
+        this.notified = notified;
+    }
+
     /**
      * ✅ 주문 상태 변경
      */

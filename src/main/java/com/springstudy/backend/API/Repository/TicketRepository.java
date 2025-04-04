@@ -30,5 +30,17 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     boolean existsBySeatIdsAndOrderStatuses(@Param("seatIds") List<Long> seatIds,
                                             @Param("statuses") List<String> statuses);
 
+    /**
+     * ✅ 주어진 상영 ID, 좌석 ID 리스트, 주문 상태 리스트로 예약 여부 확인
+     */
+    @Query("""
+        SELECT CASE WHEN COUNT(t) > 0 THEN TRUE ELSE FALSE END
+        FROM Ticket t
+        WHERE t.seat.id IN :seatIds
+          AND t.screening.id = :screeningId
+          AND t.order.status IN :statuses
+    """)
+    boolean existsBySeatIdsAndScreeningIdAndOrderStatuses(List<Long> seatIds, Long screeningId, List<String> statuses);
+
     Ticket findByScreeningAndSeat(Screening screening, Seat seat); // ✅ 기존 티켓 조회 메소드 추가
 }

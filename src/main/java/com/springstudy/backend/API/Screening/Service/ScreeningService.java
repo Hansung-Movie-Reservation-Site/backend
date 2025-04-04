@@ -111,7 +111,7 @@ public class ScreeningService {
      */
     @Transactional(readOnly = true)
     public List<Screening> getScreeningsBySpotDateAndMovieId(String spotName, LocalDate date, Long movieId) {
-        System.out.println("----------------------------------");
+        // System.out.println("----------------------------------");
 
         // 1️⃣ Spot name으로 spot ID 찾기
         Optional<Spot> optionalSpot = spotRepository.findByName(spotName);
