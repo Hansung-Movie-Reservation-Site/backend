@@ -1,5 +1,6 @@
 package com.springstudy.backend.API.Auth.Controller;
 
+import com.springstudy.backend.API.Auth.Model.Request.ChangeEmailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.RetrieveRequest;
 import com.springstudy.backend.API.Auth.Model.Response.RetrieveAIResponse;
 import com.springstudy.backend.API.Auth.Model.Response.RetrieveTicketResponse;
@@ -34,20 +35,17 @@ public class UserDateilControllerV1 {
     }
     @PostMapping("/change/email")
     public ChangeDetailResponse changeEmail(
-            @RequestBody ChangeDetailRequest changeDetailRequest
-    ){
-        return DetailService.changeDetail(changeDetailRequest, DetailType.EMAIL);
+            @RequestBody ChangeEmailRequest changeEmailRequest){
+        return DetailService.changeEmail(changeEmailRequest);
     }
     @PostMapping("/change/password")
     public ChangeDetailResponse changePassword(
-            @RequestBody ChangeDetailRequest changeDetailRequest
-    ){
+            @RequestBody ChangeDetailRequest changeDetailRequest){
         return DetailService.changeDetail(changeDetailRequest,DetailType.PASSWORD);
     }
     @PostMapping("/change/username")
     public ChangeDetailResponse changeUsername(
-            @RequestBody ChangeDetailRequest changeDetailRequest
-    ){
+            @RequestBody ChangeDetailRequest changeDetailRequest){
         return DetailService.changeDetail(changeDetailRequest, DetailType.USERNAME);
     }
 
