@@ -138,6 +138,19 @@ public class ScreeningControllerV1 {
         }
     }
 
+    /**
+     * ✅ 특정 날짜에 모든 Room에 상영 일정 생성
+     * 요청 예시: POST /api/screenings/generate?date=2025-04-10&count=3&price=12000
+     */
+    @PostMapping("/generate")
+    public List<ScreeningAddDTO> generateScreenings(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(defaultValue = "3") int count,
+            @RequestParam(defaultValue = "10000") int price
+    ) {
+        return screeningService.createScreeningsForDateV3(date, count, price);
+    }
+
 
     /**
      *  코드 작성 중, 에러 발생

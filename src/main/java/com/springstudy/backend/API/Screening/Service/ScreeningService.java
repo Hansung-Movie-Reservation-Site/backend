@@ -227,6 +227,283 @@ public class ScreeningService {
         return screeningRepository.findByMovieTitleContaining(title);
     }
 
+    /**
+     *
+     * 예시 : 2025-04-07, 3, 10000으로 요청하면
+     * 모든 방에 각각 3개의 상영 데이터가 추가됨
+     * 상영 데이터에서 날짜는 2025-04-07이고 가격은 10000으로 설정됨
+     *
+     */
+    @Transactional
+    public List<ScreeningAddDTO> createScreeningsForDate(LocalDate date, int screeningsPerRoom, int price) {
+
+        if (screeningsPerRoom < 1 || screeningsPerRoom > 3) {
+            throw new IllegalArgumentException("screeningsPerRoom 값은 1에서 3 사이여야 합니다.");
+        }
+
+        List<Movie> movies = movieRepository.findAll();
+        List<Room> rooms = roomRepository.findAll();
+        List<ScreeningAddDTO> createdDTOs = new ArrayList<>();
+        Random random = new Random();
+
+        LocalTime dayStartTime = LocalTime.of(9, 0);   // 09:00 시작
+        LocalTime dayEndTime = LocalTime.of(23, 0);    // 23:00 시작까지 가능
+
+        for (Room room : rooms) {
+            List<LocalTime[]> occupiedSlots = new ArrayList<>();
+            int generated = 0;
+
+            while (generated < screeningsPerRoom) {
+                Movie movie = movies.get(random.nextInt(movies.size()));
+                int runtime = Optional.ofNullable(movie.getRuntime()).orElse(100);
+                int buffer = 10;
+
+                // 총 소요 시간
+                int totalMinutes = runtime + buffer;
+
+                // 시작 시간 랜덤으로 선택
+                int availableMinutes = (int) Duration.between(dayStartTime, dayEndTime).toMinutes() - totalMinutes;
+                if (availableMinutes <= 0) break;
+
+                int randomMinutes = random.nextInt(availableMinutes);
+                LocalTime rawStart = dayStartTime.plusMinutes(randomMinutes);
+
+                // 시작 시간 5 or 10분 단위로 정렬
+                int modStart = rawStart.getMinute() % 5;
+                LocalTime adjustedStart = rawStart.plusMinutes(modStart == 0 ? 0 : 5 - modStart);
+
+                // 종료 시간 계산
+                LocalTime rawFinish = adjustedStart.plusMinutes(runtime);
+                int modFinish = rawFinish.getMinute() % 5;
+                LocalTime adjustedFinish = rawFinish.plusMinutes(modFinish == 0 ? 0 : 5 - modFinish);
+
+                if (adjustedFinish.isAfter(LocalTime.of(23, 59))) continue;
+
+                // 겹침 검사
+                boolean overlaps = occupiedSlots.stream().anyMatch(slot ->
+                        !(adjustedFinish.isBefore(slot[0]) || adjustedStart.isAfter(slot[1]))
+                );
+                if (overlaps) continue;
+
+                // 상영 정보 저장
+                Screening screening = Screening.builder()
+                        .movie(movie)
+                        .room(room)
+                        .date(date)
+                        .start(adjustedStart)
+                        .finish(adjustedFinish)
+                        .price(price)
+                        .build();
+
+                screeningRepository.save(screening);
+
+                occupiedSlots.add(new LocalTime[]{adjustedStart, adjustedFinish});
+                createdDTOs.add(new ScreeningAddDTO(
+                        date,
+                        room.getRoomnumber(),
+                        movie.getTitle(),
+                        adjustedStart,
+                        adjustedFinish
+                ));
+
+                generated++;
+            }
+        }
+
+        return createdDTOs;
+    }
+
+
+    @Transactional
+    public List<ScreeningAddDTO> createScreeningsForDateV2(LocalDate date, int screeningsPerRoom, int price) {
+
+        if (screeningsPerRoom < 1 || screeningsPerRoom > 3) {
+            throw new IllegalArgumentException("screeningsPerRoom 값은 1에서 3 사이여야 합니다.");
+        }
+
+        List<Movie> movies = movieRepository.findAll();
+        List<Room> rooms = roomRepository.findAll();
+        List<ScreeningAddDTO> createdDTOs = new ArrayList<>();
+        Random random = new Random();
+
+        LocalTime dayStartTime = LocalTime.of(9, 0);   // 09:00 시작
+        LocalTime dayEndTime = LocalTime.of(23, 0);    // 23:00 시작까지 가능
+
+        for (Room room : rooms) {
+            // ✅ DB에서 이미 저장된 Screening 정보 조회
+            List<Screening> existingScreenings = screeningRepository.findByRoomAndDate(room, date);
+
+            // ✅ 기존 상영 시간대를 occupiedSlots에 포함
+            List<LocalTime[]> occupiedSlots = existingScreenings.stream()
+                    .map(s -> new LocalTime[]{s.getStart(), s.getFinish()})
+                    .collect(Collectors.toList());
+
+            int generated = 0;
+
+            while (generated < screeningsPerRoom) {
+                Movie movie = movies.get(random.nextInt(movies.size()));
+                int runtime = Optional.ofNullable(movie.getRuntime()).orElse(100);
+                int buffer = 10;
+
+                // 총 소요 시간
+                int totalMinutes = runtime + buffer;
+
+                // 랜덤 시작 시간 선택
+                int availableMinutes = (int) Duration.between(dayStartTime, dayEndTime).toMinutes() - totalMinutes;
+                if (availableMinutes <= 0) break;
+
+                int randomMinutes = random.nextInt(availableMinutes);
+                LocalTime rawStart = dayStartTime.plusMinutes(randomMinutes);
+
+                // 시작 시간 5분 단위 정렬
+                int modStart = rawStart.getMinute() % 5;
+                LocalTime adjustedStart = rawStart.plusMinutes(modStart == 0 ? 0 : 5 - modStart);
+
+                // 종료 시간 계산 및 정렬
+                LocalTime rawFinish = adjustedStart.plusMinutes(runtime);
+                int modFinish = rawFinish.getMinute() % 5;
+                LocalTime adjustedFinish = rawFinish.plusMinutes(modFinish == 0 ? 0 : 5 - modFinish);
+
+                if (adjustedFinish.isAfter(LocalTime.of(23, 59))) continue;
+
+                // ✅ 겹침 검사 (기존 + 생성 예정)
+                boolean overlaps = occupiedSlots.stream().anyMatch(slot ->
+                        !(adjustedFinish.isBefore(slot[0]) || adjustedStart.isAfter(slot[1]))
+                );
+                if (overlaps) continue;
+
+                // 상영 정보 저장
+                Screening screening = Screening.builder()
+                        .movie(movie)
+                        .room(room)
+                        .date(date)
+                        .start(adjustedStart)
+                        .finish(adjustedFinish)
+                        .price(price)
+                        .build();
+
+                screeningRepository.save(screening);
+
+                // ✅ 겹침 리스트에 현재 시간대 추가
+                occupiedSlots.add(new LocalTime[]{adjustedStart, adjustedFinish});
+
+                createdDTOs.add(new ScreeningAddDTO(
+                        date,
+                        room.getRoomnumber(),
+                        movie.getTitle(),
+                        adjustedStart,
+                        adjustedFinish
+                ));
+
+                generated++;
+            }
+        }
+
+        return createdDTOs;
+    }
+
+
+    /**
+     *
+     * 예시 : 2025-04-07, 3, 10000으로 요청하면
+     * 모든 방에 각각 3개의 상영 데이터가 추가됨
+     * 상영 데이터에서 날짜는 2025-04-07이고 가격은 10000으로 설정됨
+     *
+     * 각 방에 존재하는 최대 상영 개수는 6, 그 이상은 생성 불가
+     *
+     */
+    @Transactional
+    public List<ScreeningAddDTO> createScreeningsForDateV3(LocalDate date, int screeningsPerRoom, int price) {
+
+        if (screeningsPerRoom < 1 || screeningsPerRoom > 3) {
+            throw new IllegalArgumentException("screeningsPerRoom 값은 1에서 3 사이여야 합니다.");
+        }
+
+        List<Movie> movies = movieRepository.findAll();
+        List<Room> rooms = roomRepository.findAll();
+        List<ScreeningAddDTO> createdDTOs = new ArrayList<>();
+        Random random = new Random();
+
+        LocalTime dayStartTime = LocalTime.of(9, 0);   // 09:00 시작
+        LocalTime dayEndTime = LocalTime.of(23, 0);    // 23:00 시작까지 가능
+
+        for (Room room : rooms) {
+            // ✅ DB에서 이미 저장된 Screening 정보 조회
+            List<Screening> existingScreenings = screeningRepository.findByRoomAndDate(room, date);
+
+            // ✅ 6개 이상이면 건너뜀
+            if (existingScreenings.size() >= 6) {
+                continue;
+            }
+
+            // ✅ 기존 상영 시간대를 occupiedSlots에 포함
+            List<LocalTime[]> occupiedSlots = existingScreenings.stream()
+                    .map(s -> new LocalTime[]{s.getStart(), s.getFinish()})
+                    .collect(Collectors.toList());
+
+            int availableSlots = 6 - existingScreenings.size(); // 추가 가능 개수
+            int toGenerate = Math.min(screeningsPerRoom, availableSlots); // 추가 개수 제한
+            int generated = 0;
+
+            while (generated < toGenerate) {
+                Movie movie = movies.get(random.nextInt(movies.size()));
+                int runtime = Optional.ofNullable(movie.getRuntime()).orElse(100);
+                int buffer = 10;
+
+                // 총 소요 시간
+                int totalMinutes = runtime + buffer;
+
+                // 랜덤 시작 시간 선택
+                int availableMinutes = (int) Duration.between(dayStartTime, dayEndTime).toMinutes() - totalMinutes;
+                if (availableMinutes <= 0) break;
+
+                int randomMinutes = random.nextInt(availableMinutes);
+                LocalTime rawStart = dayStartTime.plusMinutes(randomMinutes);
+
+                // 시작 시간 5분 단위 정렬
+                int modStart = rawStart.getMinute() % 5;
+                LocalTime adjustedStart = rawStart.plusMinutes(modStart == 0 ? 0 : 5 - modStart);
+
+                // 종료 시간 계산 및 정렬
+                LocalTime rawFinish = adjustedStart.plusMinutes(runtime);
+                int modFinish = rawFinish.getMinute() % 5;
+                LocalTime adjustedFinish = rawFinish.plusMinutes(modFinish == 0 ? 0 : 5 - modFinish);
+
+                if (adjustedFinish.isAfter(LocalTime.of(23, 59))) continue;
+
+                // ✅ 겹침 검사
+                boolean overlaps = occupiedSlots.stream().anyMatch(slot ->
+                        !(adjustedFinish.isBefore(slot[0]) || adjustedStart.isAfter(slot[1]))
+                );
+                if (overlaps) continue;
+
+                // 저장
+                Screening screening = Screening.builder()
+                        .movie(movie)
+                        .room(room)
+                        .date(date)
+                        .start(adjustedStart)
+                        .finish(adjustedFinish)
+                        .price(price)
+                        .build();
+
+                screeningRepository.save(screening);
+
+                occupiedSlots.add(new LocalTime[]{adjustedStart, adjustedFinish});
+                createdDTOs.add(new ScreeningAddDTO(
+                        date,
+                        room.getRoomnumber(),
+                        movie.getTitle(),
+                        adjustedStart,
+                        adjustedFinish
+                ));
+
+                generated++;
+            }
+        }
+
+        return createdDTOs;
+    }
 
     /**
      * 코드 작성 중, 에러 발생

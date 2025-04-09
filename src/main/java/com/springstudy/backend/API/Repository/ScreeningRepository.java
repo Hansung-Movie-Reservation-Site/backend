@@ -29,6 +29,8 @@ public interface ScreeningRepository extends JpaRepository<Screening, Long> {
     @Query("SELECT s FROM Screening s WHERE LOWER(s.movie.title) LIKE LOWER(CONCAT('%', :title, '%'))")
     List<Screening> findByMovieTitleContaining(@Param("title") String title);
 
+    List<Screening> findByRoomAndDate(Room room, LocalDate date);
+
     List<Screening> findByRoomIdAndDate(Long roomId, LocalDate date);
 
     boolean existsByMovieAndRoomAndDateAndStartAndFinishAndPrice(
