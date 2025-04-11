@@ -43,7 +43,11 @@ public enum ErrorCode implements CodeInterface{
     JSON_PATH_ERROR(-27, "JSON_PATH_ERROR"),
 
     ERROR_RETRIEVE_TYPE(-28, "ERROR_RETRIEVE_TYPE"),
-    ERROR_CHANGE_TYPE (-29, "ERROR_CHANGE_TYPE");
+    ERROR_CHANGE_TYPE (-29, "ERROR_CHANGE_TYPE"),
+
+    NOT_EXIST_SPOT(-30, "NOT_EXIST_SPOT"),
+
+    TRANSACTION_ERROR(-31, "TRANSACTION_ERROR");
 
     private final Integer code;
     private final String message;

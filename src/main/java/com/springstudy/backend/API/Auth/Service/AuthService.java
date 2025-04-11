@@ -1,13 +1,13 @@
 package com.springstudy.backend.API.Auth.Service;
-import com.springstudy.backend.API.Auth.Model.Request.CreateUserRequest;
-import com.springstudy.backend.API.Auth.Model.Request.DeleteAccountRequest;
-import com.springstudy.backend.API.Auth.Model.Response.CreateUserResponse;
-import com.springstudy.backend.API.Auth.Model.Response.DeleteAccountResponse;
+import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.CreateUserRequest;
+import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.DeleteAccountRequest;
+import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.CreateUserResponse;
+import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.DeleteAccountResponse;
 import com.springstudy.backend.API.Auth.Model.UserDetailDTO;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.API.Auth.Model.AuthUser;
-import com.springstudy.backend.API.Auth.Model.Request.LoginRequest;
-import com.springstudy.backend.API.Auth.Model.Response.LoginResponse;
+import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.LoginRequest;
+import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.LoginResponse;
 import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.Entity.UserCredentional;
 import com.springstudy.backend.Common.CheckPasswordService;
@@ -122,6 +122,7 @@ public class AuthService {
                 .email(user.getEmail())
                 .username(user.getUsername())
                 .user_id(user.getId())
+                .myTheatherList(user.getMyTheatherList())
                 .build();
         return new LoginResponse(ErrorCode.SUCCESS,userDetailDTO);
     }

@@ -1,4 +1,4 @@
-package com.springstudy.backend.API.Auth.Model.Response;
+package com.springstudy.backend.API.Auth.Model.Response.AccountResponse;
 
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import io.swagger.v3.oas.annotations.media.Schema;

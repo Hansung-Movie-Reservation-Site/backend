@@ -83,5 +83,12 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<AI> aiList = new ArrayList<>();
 
+    @Column(nullable = true)
+    @JsonIgnoreProperties("user")
+    @OneToMany(mappedBy= "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    List<MyTheather> myTheatherList = new ArrayList<>();
 
+    public void setMyTheatherList(List<MyTheather> myTheatherList) {
+        this.myTheatherList = myTheatherList;
+    }
 }
