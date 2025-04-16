@@ -138,12 +138,15 @@ public class MovieService {
             throw new RuntimeException(e);
         }
 
-        // ✅ 제목, 줄거리, 장르, 감독, 나이 제한, 상영 시간 값이 `null` 또는 공백이면 저장하지 않음
+        String trailerUrl = fetchTmdbMovieTrailerUrlKey(dto.getTmdbMovieId());
+
+        // ✅ 제목, 줄거리, 장르, 감독, 나이 제한, 상영 시간, 예고편 링크 값이 `null` 또는 공백이면 저장하지 않음
         if (isEmpty(dto.getTitle())
                 || isEmpty(detail.getOverview())
                 || isEmpty(detail.getGenreNames())
                 || isEmpty(detail.getDirectorNames())
                 || isEmpty(detail.getFullPosterUrl())
+                || trailerUrl == null
                 ) {
             // System.out.println("=========================================");
 //            System.out.println("❌ 필수 데이터가 없거나 공백이어서 저장하지 않음\n"
@@ -166,6 +169,8 @@ public class MovieService {
                 .genres(detail.getGenreNames())  // ✅ 한국어 장르
                 .posterImage(detail.getFullPosterUrl())
                 .runtime(detail.getRuntime())  // ✅ 상영 시간 추가
+                .full_video_link(trailerUrl)
+                .fetchedDate(LocalDate.now())
                 .build();
 
         System.out.println("🎬 ========= 새롭게 저장하는 영화 정보 ===========");
@@ -177,9 +182,14 @@ public class MovieService {
         System.out.println("👨‍🎬 감독: " + m.getDirector());
         System.out.println("🖼️ 포스터: " + m.getPosterImage());
         System.out.println("📝 줄거리: " + m.getOverview());
+        System.out.println("영화 예고편 링크: " + m.getFull_video_link());
+        System.out.println("데이터 가져온 날짜: " + m.getFetchedDate());
         System.out.println();
         System.out.println("🎞️ KOBIS 영화 코드: " + m.getKobisMovieCd());
         System.out.println("박스오피스 순위 : " + m.getBoxOfficeRank());
+        System.out.println("전일 랭킹 증가 : " + m.getRankInten());
+        System.out.println("랭킹 진입 여부 : " + m.getRankOldAndNew());
+        System.out.println("총 관객 수 : " + m.getAudiAcc());
         System.out.println("============================================");
 
 
@@ -227,7 +237,9 @@ public class MovieService {
         for (Map<String, Object> movieData : movieList) {
             String kobisMovieCd = (String) movieData.get("movieCd");
             Integer rank = Integer.parseInt((String) movieData.get("rank"));
-
+            Integer rankInten = Integer.parseInt((String) movieData.get("rankInten"));
+            String rankOldAndNew = (String) movieData.get("rankOldAndNew");
+            Integer audiAcc = Integer.parseInt((String) movieData.get("audiAcc"));
 
             // System.out.println("kobisMovieCd : " + kobisMovieCd);
             // System.out.println("rank : " + rank);
@@ -240,8 +252,15 @@ public class MovieService {
 
                 Movie movie = existingMovieByKobis.get();
                 movie.setBoxOfficeRank(rank); // ✅ rank 업데이트
+                movie.setRankInten(rankInten);
+                movie.setRankOldAndNew(rankOldAndNew);
+                movie.setAudiAcc(audiAcc);
+                movie.setFetchedDate(LocalDate.now());
                 movieRepository.save(movie); // ✅ 업데이트 반영
-                System.out.println("✅ 기존 영화 rank 업데이트: " + movie.getTitle() + " → " + rank + "위");
+                System.out.println(
+                        "✅ 기존 영화 업데이트: " + movie.getTitle() + " : " + rank + "위" +
+                        "전일 대비 랭킹 증가 : " + movie.getRankInten() +
+                        "총 관객 수 : " + movie.getAudiAcc());
                 finalMovies.add(movie);
 
                 continue;
@@ -282,6 +301,10 @@ public class MovieService {
                 existing.setDirector(newMovie.getDirector());
                 existing.setRuntime(newMovie.getRuntime());
                 existing.setGenres(newMovie.getGenres());
+                existing.setRankInten(newMovie.getRankInten());
+                existing.setRankOldAndNew(newMovie.getRankOldAndNew());
+                existing.setAudiAcc(newMovie.getAudiAcc());
+                existing.setFull_video_link(newMovie.getFull_video_link());
 
                 movieRepository.save(existing);
                 finalMovies.add(existing);
@@ -357,6 +380,9 @@ public class MovieService {
                 .kobisMovieCd(kobisMovieCd)
                 .title((String) movieData.get("movieNm"))
                 .boxOfficeRank(Integer.parseInt((String) movieData.get("rank")))
+                .rankInten(Integer.parseInt((String) movieData.get("rankInten")))
+                .rankOldAndNew((String) movieData.get("rankOldAndNew"))
+                .audiAcc(Integer.parseInt((String) movieData.get("audiAcc")))
                 .releaseDate(releaseDate.isEmpty() ?
                         LocalDate.parse((String) tmdbData.getOrDefault("release_date", null), DateTimeFormatter.ofPattern("yyyy-MM-dd")) :
                         LocalDate.parse(releaseDate, DateTimeFormatter.ofPattern("yyyyMMdd")))
@@ -367,6 +393,8 @@ public class MovieService {
                         (String) tmdbData.getOrDefault("director", null)
                         : director)
                 .runtime((Integer) tmdbData.getOrDefault("runtime", null))  // ✅ 상영 시간 추가
+                .full_video_link((String) tmdbData.getOrDefault("full_video_link", null))
+                .fetchedDate(LocalDate.now())
                 .genres(genres)
                 .build();
 
@@ -382,6 +410,10 @@ public class MovieService {
         System.out.println("🖼️ 포스터: " + a.getPosterImage());
         System.out.println("📝 줄거리: " + a.getOverview());
         System.out.println("박스오피스 순위 : " + a.getBoxOfficeRank());
+        System.out.println("랭킹 진입 : " + a.getRankOldAndNew());
+        System.out.println("전일 대비 랭킹 증가 : " + a.getRankInten());
+        System.out.println("총 관객 수 : " + a.getAudiAcc());
+        System.out.println("영화 예고편 링크 : " + a.getFull_video_link());
         System.out.println("=================================");
 
 
@@ -437,9 +469,12 @@ public class MovieService {
         String director = fetchTmdbMovieDirector(movieId);
         // System.out.println("director : " + director);
 
-        /**
-         *  ✅ 상영 시간 추가
-         *  ✅ 감독 이름 추가
+        String trailerUrl = Optional.ofNullable(fetchTmdbMovieTrailerUrlKey(movieId))
+                .orElse("예고편이 제공되지 않습니다.");
+        // System.out.println("trailerUrl : " + trailerUrl);
+
+        /*
+        Map에서 null이 들어가면 오류 발생
          */
         return Map.of(
                 "id", matchedMovie.get("id"),
@@ -447,7 +482,8 @@ public class MovieService {
                 "overview", matchedMovie.get("overview"),
                 "release_date", matchedMovie.get("release_date"),
                 "runtime", runtime,
-                "director", director
+                "director", director,
+                "full_video_link", trailerUrl
         );
 
     }
@@ -472,6 +508,54 @@ public class MovieService {
         }
 
         return (Integer) response.getBody().get("runtime");
+    }
+
+    private String fetchTmdbMovieTrailerUrlKey(Integer movieId) {
+        if (movieId == null) return null;
+
+        String videoUrl = "https://api.themoviedb.org/3/movie/"
+                + movieId + "/videos?api_key="
+                + TMDB_API_KEY
+                + "&language=ko-KR";
+
+        ResponseEntity<Map> response = restTemplate.getForEntity(videoUrl, Map.class);
+
+
+        if (response.getBody() == null
+                || !response.getBody().containsKey("results")
+                || response.getBody().get("results") == null) {
+            return null;
+        }
+
+        /*
+        System.out.println("////////////////");
+        System.out.println(movieId);
+        System.out.println(response.getBody().get("results"));
+        System.out.println(response.getBody().get("results").getClass());
+        System.out.println("////////////////");
+        */
+
+
+        List<Map<String, Object>> results = (List<Map<String, Object>>) response.getBody().get("results");
+
+        // System.out.println("dfdfdfdfddfd");
+
+        if (results.isEmpty()) {
+            // System.out.println("dfdfd");
+            return null;
+        }
+
+        for (Map<String, Object> video : results) {
+            String type = (String) video.get("type");
+            String site = (String) video.get("site");
+
+            if ("YouTube".equalsIgnoreCase(site)) {
+                String key = (String) video.get("key");
+                return "https://www.youtube.com/watch?v=" + key;
+            }
+        }
+
+        return null; // 예고편이 없을 경우
     }
 
     private String fetchTmdbMovieDirector(Integer movieId) {

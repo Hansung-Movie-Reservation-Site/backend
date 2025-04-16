@@ -50,4 +50,21 @@ public class Movie {
      */
     @Column(nullable = true)
     private Integer boxOfficeRank;  // ✅ 박스오피스 순위
+
+    @Column(nullable = true)
+    private Integer rankInten; // 전일 대비 랭크 증가 수치
+
+    @Column(nullable = true)
+    private String rankOldAndNew; // 새로 랭크에 진입했는지 알려주는 문자열
+
+    @Column(nullable = true)
+    private Integer audiAcc; // 총 관객 수
+
+    @Column(nullable = true)
+    private String full_video_link; // 영화 예고편 유튜브 링크
+
+    @Column(nullable = true)
+    private LocalDate fetchedDate; // 영화 데이터를 가져온 날짜
+
+
 }
