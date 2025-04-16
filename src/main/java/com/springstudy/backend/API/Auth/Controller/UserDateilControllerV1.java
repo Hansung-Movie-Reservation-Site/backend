@@ -1,16 +1,17 @@
 package com.springstudy.backend.API.Auth.Controller;
 
-import com.springstudy.backend.API.Auth.Model.Request.ChangeEmailRequest;
+import com.springstudy.backend.API.Auth.Model.Request.ChangeDetail.AddMyTheatherRequest;
+import com.springstudy.backend.API.Auth.Model.Request.ChangeDetail.ChangeEmailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.RetrieveRequest;
-import com.springstudy.backend.API.Auth.Model.Response.RetrieveAIResponse;
-import com.springstudy.backend.API.Auth.Model.Response.RetrieveTicketResponse;
+import com.springstudy.backend.API.Auth.Model.Response.ChangeResponse.AddTheatherResponse;
+import com.springstudy.backend.API.Auth.Model.Response.Response;
 import com.springstudy.backend.API.Auth.Model.RetrieveResponse;
 import com.springstudy.backend.API.Auth.Model.RetrieveType;
 import com.springstudy.backend.API.Auth.Service.DetailType;
 import com.springstudy.backend.API.Auth.Service.emailTemplate.EmailType;
-import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
-import com.springstudy.backend.API.Auth.Model.Request.EmailRequest;
-import com.springstudy.backend.API.Auth.Model.Response.ChangeDetailResponse;
+import com.springstudy.backend.API.Auth.Model.Request.ChangeDetail.ChangeDetailRequest;
+import com.springstudy.backend.API.Auth.Model.Request.EmailRequest.EmailRequest;
+import com.springstudy.backend.API.Auth.Model.Response.ChangeResponse.ChangeDetailResponse;
 import com.springstudy.backend.API.Auth.Service.DetailService;
 import com.springstudy.backend.API.Auth.Service.EmailService;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
@@ -26,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserDateilControllerV1 {
     private final EmailService emailService;
-    private final DetailService DetailService;
     private final DetailService detailService;
 
     @PostMapping("/findPassword")
@@ -36,17 +36,17 @@ public class UserDateilControllerV1 {
     @PostMapping("/change/email")
     public ChangeDetailResponse changeEmail(
             @RequestBody ChangeEmailRequest changeEmailRequest){
-        return DetailService.changeEmail(changeEmailRequest);
+        return detailService.changeEmail(changeEmailRequest);
     }
     @PostMapping("/change/password")
     public ChangeDetailResponse changePassword(
             @RequestBody ChangeDetailRequest changeDetailRequest){
-        return DetailService.changeDetail(changeDetailRequest,DetailType.PASSWORD);
+        return detailService.changeDetail(changeDetailRequest,DetailType.PASSWORD);
     }
     @PostMapping("/change/username")
     public ChangeDetailResponse changeUsername(
             @RequestBody ChangeDetailRequest changeDetailRequest){
-        return DetailService.changeDetail(changeDetailRequest, DetailType.USERNAME);
+        return detailService.changeDetail(changeDetailRequest, DetailType.USERNAME);
     }
 
     @PostMapping("/retrieve/ticket")
@@ -56,5 +56,14 @@ public class UserDateilControllerV1 {
     @PostMapping("/retrieve/AI")
     public RetrieveResponse retrieveAI(RetrieveRequest lookupTicketRequest) {
         return detailService.retrieve(lookupTicketRequest, RetrieveType.AI);
+    }
+
+    @PostMapping("/update/myTheather")
+    public AddTheatherResponse updateMyTheather(AddMyTheatherRequest addMyTheatherRequest) {
+        return detailService.updateTheather(addMyTheatherRequest);
+    }
+    @PostMapping("/retrieve/myTheather")
+    public RetrieveResponse addMyTheather(RetrieveRequest retrieveRequest) {
+        return detailService.retrieve(retrieveRequest, RetrieveType.MY_THEATHER);
     }
 }

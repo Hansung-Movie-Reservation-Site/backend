@@ -1,17 +1,19 @@
 package com.springstudy.backend.API.Auth.Service;
 
-import com.springstudy.backend.API.Auth.Model.Request.ChangeDetailRequest;
-import com.springstudy.backend.API.Auth.Model.Request.ChangeEmailRequest;
+import com.springstudy.backend.API.Auth.Model.Request.ChangeDetail.AddMyTheatherRequest;
+import com.springstudy.backend.API.Auth.Model.Request.ChangeDetail.ChangeDetailRequest;
+import com.springstudy.backend.API.Auth.Model.Request.ChangeDetail.ChangeEmailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.RetrieveRequest;
-import com.springstudy.backend.API.Auth.Model.Response.ChangeDetailResponse;
-import com.springstudy.backend.API.Auth.Model.Response.RetrieveAIResponse;
-import com.springstudy.backend.API.Auth.Model.Response.RetrieveTicketResponse;
+import com.springstudy.backend.API.Auth.Model.Response.ChangeResponse.AddTheatherResponse;
+import com.springstudy.backend.API.Auth.Model.Response.ChangeResponse.ChangeDetailResponse;
+import com.springstudy.backend.API.Auth.Model.Response.RetrieveResponse.RetrieveAIResponse;
+import com.springstudy.backend.API.Auth.Model.Response.RetrieveResponse.RetrieveMyTheatherResponse;
+import com.springstudy.backend.API.Auth.Model.Response.RetrieveResponse.RetrieveTicketResponse;
 import com.springstudy.backend.API.Auth.Model.RetrieveResponse;
 import com.springstudy.backend.API.Auth.Model.RetrieveType;
-import com.springstudy.backend.API.Repository.AIRepository;
-import com.springstudy.backend.API.Repository.Entity.AI;
-import com.springstudy.backend.API.Repository.Entity.Ticket;
-import com.springstudy.backend.API.Repository.Entity.User;
+import com.springstudy.backend.API.Repository.Entity.*;
+import com.springstudy.backend.API.Repository.MyTheatherRepository;
+import com.springstudy.backend.API.Repository.SpotRepository;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.Common.CheckPasswordService;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
@@ -22,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,9 +107,36 @@ public class DetailService {
                 return new RetrieveTicketResponse(ErrorCode.SUCCESS, ticketList);
             case AI: List<AI> aiList = user.getAiList();
                 return new RetrieveAIResponse(ErrorCode.SUCCESS, aiList);
+            case MY_THEATHER: List<MyTheather> myTheather = user.getMyTheatherList();
+                return new RetrieveMyTheatherResponse(ErrorCode.SUCCESS, myTheather);
             default: throw new CustomException(ErrorCode.ERROR_RETRIEVE_TYPE);
         }
     }
 
 
+    @Transactional
+    public AddTheatherResponse updateTheather(AddMyTheatherRequest addTheatherRequest) {
+        Long user_id = addTheatherRequest.user_id();
+        List<Long> user_SpotList = addTheatherRequest.mySpotList();
+
+        Optional<User> userOptional = userRepository.findById(user_id);
+        if(userOptional.isEmpty()){throw new CustomException(ErrorCode.NOT_EXIST_USER);}
+        User user = userOptional.get();
+
+        List<MyTheather> myTheatherList = new ArrayList<>();
+        for(Long id: user_SpotList){
+            MyTheather myTheather = MyTheather.builder()
+                    .spot_id(id)
+                    .user(user)
+                    .build();
+            myTheatherList.add(myTheather);
+            System.out.println(myTheather.getId());
+        }
+
+        user.setMyTheatherList(myTheatherList);
+
+        //if(result == null){throw new CustomException(ErrorCode.TRANSACTION_ERROR);}
+
+        return new AddTheatherResponse(ErrorCode.SUCCESS, myTheatherList);
+        }
 }

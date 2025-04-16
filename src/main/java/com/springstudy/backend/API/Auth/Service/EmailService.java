@@ -1,7 +1,7 @@
 package com.springstudy.backend.API.Auth.Service;
 
-import com.springstudy.backend.API.Auth.Model.Request.EmailRequest;
-import com.springstudy.backend.API.Auth.Model.Request.EmailVerifyRequest;
+import com.springstudy.backend.API.Auth.Model.Request.EmailRequest.EmailRequest;
+import com.springstudy.backend.API.Auth.Model.Request.EmailRequest.EmailVerifyRequest;
 import com.springstudy.backend.API.Auth.Service.emailTemplate.EmailType;
 import com.springstudy.backend.API.Auth.Service.emailTemplate.TemporaryPasswordEmail;
 import com.springstudy.backend.API.Auth.Service.emailTemplate.VerifyEmail;

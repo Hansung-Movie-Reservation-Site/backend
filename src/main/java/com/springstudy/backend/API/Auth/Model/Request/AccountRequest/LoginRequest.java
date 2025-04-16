@@ -1,4 +1,4 @@
-package com.springstudy.backend.API.Auth.Model.Request;
+package com.springstudy.backend.API.Auth.Model.Request.AccountRequest;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

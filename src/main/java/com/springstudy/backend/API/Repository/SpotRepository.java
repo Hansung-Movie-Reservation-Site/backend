@@ -11,4 +11,6 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
 
     // ✅ Spot name으로 Spot 엔티티 조회
     Optional<Spot> findByName(String name);
+
+
 }

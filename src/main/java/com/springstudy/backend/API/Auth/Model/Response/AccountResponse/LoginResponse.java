@@ -1,9 +1,9 @@
-package com.springstudy.backend.API.Auth.Model.Response;
+package com.springstudy.backend.API.Auth.Model.Response.AccountResponse;
 
+import com.springstudy.backend.API.Auth.Model.Response.Response;
 import com.springstudy.backend.API.Auth.Model.UserDetailDTO;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

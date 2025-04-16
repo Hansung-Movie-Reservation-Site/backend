@@ -1,10 +1,14 @@
 package com.springstudy.backend.API.Auth.Controller;
 
+import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.CreateUserRequest;
+import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.DeleteAccountRequest;
+import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.LoginRequest;
+import com.springstudy.backend.API.Auth.Model.Request.EmailRequest.EmailRequest;
+import com.springstudy.backend.API.Auth.Model.Request.EmailRequest.EmailVerifyRequest;
 import com.springstudy.backend.API.Auth.Service.emailTemplate.EmailType;
-import com.springstudy.backend.API.Auth.Model.Request.*;
-import com.springstudy.backend.API.Auth.Model.Response.CreateUserResponse;
-import com.springstudy.backend.API.Auth.Model.Response.DeleteAccountResponse;
-import com.springstudy.backend.API.Auth.Model.Response.LoginResponse;
+import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.CreateUserResponse;
+import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.DeleteAccountResponse;
+import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.LoginResponse;
 import com.springstudy.backend.API.Auth.Service.AuthService;
 import com.springstudy.backend.API.Auth.Service.EmailService;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
