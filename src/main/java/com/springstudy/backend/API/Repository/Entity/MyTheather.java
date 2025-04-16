@@ -18,7 +18,7 @@ public class MyTheather {
     private Long spot_id;
 
     @JoinColumn(name = "userid", nullable = false,
-            foreignKey = @ForeignKey(name = "FK_ai_TO_user_1"))
+            foreignKey = @ForeignKey(name = "FK_mytheather_TO_user_1"))
     @JsonIgnore
     @ManyToOne(fetch =  FetchType.LAZY, cascade = CascadeType.ALL)
     private User user;
