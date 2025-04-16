@@ -61,6 +61,10 @@ dependencies {
     // 이메일 전송을 위한 스타터
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    // 웹소켓 통신
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 }
 
 tasks.named('test') {

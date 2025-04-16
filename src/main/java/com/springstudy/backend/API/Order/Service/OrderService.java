@@ -1,15 +1,18 @@
 package com.springstudy.backend.API.Order.Service;
 
+import com.springstudy.backend.API.Order.Model.SeatStatusMessage;
 import com.springstudy.backend.API.Repository.Entity.*;
 import com.springstudy.backend.API.Repository.*;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
@@ -33,18 +36,21 @@ public class OrderService {
 
     private final RestTemplate restTemplate;
 
+    private SimpMessagingTemplate messagingTemplate; // 메시지 전송용
+
     @Value("${api.RECOMMEND_API_KEY}")
     String RECOMMEND_API_KEY;
 
     public OrderService(OrderRepository orderRepository, ScreeningRepository screeningRepository,
                         SeatRepository seatRepository, UserRepository userRepository, TicketRepository ticketRepository,
-                        RestTemplate restTemplate) {
+                        RestTemplate restTemplate, SimpMessagingTemplate messagingTemplate) {
         this.orderRepository = orderRepository;
         this.screeningRepository = screeningRepository;
         this.seatRepository = seatRepository;
         this.userRepository = userRepository;
         this.ticketRepository = ticketRepository;
         this.restTemplate = restTemplate;
+        this.messagingTemplate = messagingTemplate;
     }
 
     /**
@@ -139,6 +145,10 @@ public class OrderService {
         // ✅ `Order`에 티켓 추가 후 다시 저장 (연관관계 설정)
         order.setTickets(tickets);
         orderRepository.save(order);
+
+        // ✅ 웹소켓을 통해 좌석 상태(PENDING) broadcast
+        SeatStatusMessage seatStatusMessage = new SeatStatusMessage(screeningId, seatIds, "PENDING");
+        messagingTemplate.convertAndSend("/topic/seats", seatStatusMessage);
 
         return order;
     }
