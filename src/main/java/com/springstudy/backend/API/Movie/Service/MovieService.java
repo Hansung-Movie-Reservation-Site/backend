@@ -257,10 +257,20 @@ public class MovieService {
                 movie.setAudiAcc(audiAcc);
                 movie.setFetchedDate(LocalDate.now());
                 movieRepository.save(movie); // ✅ 업데이트 반영
-                System.out.println(
-                        "✅ 기존 영화 업데이트: " + movie.getTitle() + " : " + rank + "위" +
-                        "전일 대비 랭킹 증가 : " + movie.getRankInten() +
-                        "총 관객 수 : " + movie.getAudiAcc());
+                /*System.out.println(
+                        "✅ 기존 영화 업데이트 [" + movie.getTitle() + "]     " +
+                        "랭킹 [" + movie.getBoxOfficeRank() + "]     " +
+                        "전일 대비 랭킹 증가 [" + movie.getRankInten() + "]     " +
+                        "총 관객 수 [" + movie.getAudiAcc() + "]");*/
+
+                System.out.printf(
+                        "✅ 기존 영화 업데이트 %-35s %-20s %-25s %-25s%n",
+                        "[" + movie.getTitle() + "]",
+                        "랭킹 [" + movie.getBoxOfficeRank() + "]",
+                        "전일 대비 랭킹 증가 [" + (movie.getRankInten() >= 0 ? "+" : "") + movie.getRankInten() + "]",
+                        "총 관객 수 [" + String.format("%,d", movie.getAudiAcc()) + "]"
+                );
+
                 finalMovies.add(movie);
 
                 continue;
