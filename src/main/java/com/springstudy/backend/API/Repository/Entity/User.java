@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+        //(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 @Getter

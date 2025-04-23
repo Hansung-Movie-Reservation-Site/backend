@@ -14,7 +14,6 @@ import com.springstudy.backend.Common.CheckPasswordService;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import com.springstudy.backend.Common.Hash.Hasher;
-import com.springstudy.backend.Common.JWTCommon.JWTUtil;
 import com.springstudy.backend.Common.RedisService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.Cookie;
@@ -27,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.springstudy.backend.Common.JWTCommon.*;
 
 import java.util.ArrayList;
 import java.util.Optional;
