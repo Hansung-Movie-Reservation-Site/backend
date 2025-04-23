@@ -1,4 +1,4 @@
-package com.springstudy.backend.API.OAuth;
+package com.springstudy.backend.Security.OAuth;
 
 import com.springstudy.backend.API.Auth.Model.AuthUser;
 import com.springstudy.backend.API.Repository.Entity.User;

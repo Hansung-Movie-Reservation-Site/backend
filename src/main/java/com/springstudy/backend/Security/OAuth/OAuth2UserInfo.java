@@ -1,8 +1,6 @@
-package com.springstudy.backend.API.OAuth;
+package com.springstudy.backend.Security.OAuth;
 
 public interface OAuth2UserInfo {
-    String getProviderId();
-    String getProvider();
     String getProviderEmail();
     String getProviderName();
 }

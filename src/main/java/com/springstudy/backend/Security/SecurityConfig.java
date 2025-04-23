@@ -1,6 +1,7 @@
 package com.springstudy.backend.Security;
 
-import com.springstudy.backend.API.OAuth.PrincipalOauth2UserService;
+import com.springstudy.backend.Security.OAuth.OAuth2SucessHandler;
+import com.springstudy.backend.Security.OAuth.PrincipalOauth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,10 +47,4 @@ public class SecurityConfig {
         return http.build();
         // SecurityFilterChain을 반환.
     }
-
-//    @Bean
-//    PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-//    // 스프링시큐리티에서 자동적으로 비밀번호를 암호화 시킨다.
 }

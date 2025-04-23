@@ -3,6 +3,7 @@ package com.springstudy.backend.API.Repository.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -86,8 +87,14 @@ public class User {
 
     @Column(nullable = true)
     @JsonIgnoreProperties("user")
-    @OneToMany(mappedBy= "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy= "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     List<MyTheather> myTheatherList = new ArrayList<>();
+
+    @Transactional
+    public List<MyTheather> getMyTheatherList() {
+        myTheatherList.size();
+        return myTheatherList;
+    }
 
     public void setMyTheatherList(List<MyTheather> myTheatherList) {
         this.myTheatherList = myTheatherList;

@@ -102,8 +102,9 @@ public class AuthService {
                 //todo error
                 throw new CustomException(ErrorCode.AUTH_SAVE_ERROR);
             }
-            String jwt = JWTUtil.createToken(auth);
-            String refreshJwt = JWTUtil.createRefreshToken(auth);
+            AuthUser user = (AuthUser) auth.getPrincipal();
+            String jwt = JWTUtil.createToken(user);
+            String refreshJwt = JWTUtil.createRefreshToken(user);
             redisService.setDataExpire("refresh_token: "+((AuthUser)auth.getPrincipal()).getUsername(), refreshJwt, 3600000);
             Cookie cookie= JWTUtil.createCookie("jwt",jwt);
             Cookie refreshCookie= JWTUtil.createCookie("refreshJwt",refreshJwt);

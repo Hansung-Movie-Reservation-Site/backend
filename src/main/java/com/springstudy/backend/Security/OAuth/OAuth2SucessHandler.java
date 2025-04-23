@@ -1,24 +1,31 @@
-package com.springstudy.backend.Security;
+package com.springstudy.backend.Security.OAuth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springstudy.backend.API.Auth.Model.AuthUser;
-import com.springstudy.backend.API.OAuth.PrincipalDetails;
+import com.springstudy.backend.API.Auth.Model.UserDetailDTO;
+import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.UserRepository;
+import com.springstudy.backend.Common.ErrorCode.CustomException;
+import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import com.springstudy.backend.Security.JWT.JWTUtil;
+import com.springstudy.backend.Security.RedisService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
     private final UserRepository userRepository;
     private final RedisService redisService;
@@ -34,42 +41,33 @@ public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
         AuthUser user = principalDetails.toAuthUser();
 
         try {
-            String jwt = JWTUtil.createToken(principalDetails);
-            String refreshJwt = JWTUtil.createRefreshToken(principalDetails);
+            String jwt = JWTUtil.createToken(user);
+            String refreshJwt = JWTUtil.createRefreshToken(user);
             redisService.setDataExpire("refresh_token: " + user.getUsername(), refreshJwt, 3600000);
-            Cookie cookie = createCookie("jwt", jwt);
-            Cookie refreshCookie = createCookie("refreshJwt", refreshJwt);
+            Cookie cookie = JWTUtil.createCookie("jwt", jwt);
+            Cookie refreshCookie = JWTUtil.createCookie("refreshJwt", refreshJwt);
             response.addCookie(cookie);
             response.addCookie(refreshCookie);
         } catch (JwtException e) {
             //todo error
-            //log.error(e.getMessage());
-            //throw new CustomException(ErrorCode.JWT_CREATE_ERROR);
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
+            throw new CustomException(ErrorCode.JWT_CREATE_ERROR);
         }
 
-//        Long id = principalDetails.getUser().getId();
-//        Optional<User> userOptional = userRepository.findById(id);
-//        User user1 = userOptional.get();
-//        UserDetailDTO userDetailDTO = UserDetailDTO.builder()
-//                .email(user.getEmail())
-//                .username(user.getUsername())
-//                .user_id(id)
-//                .myTheatherList(user1.getMyTheatherList())
-//                .build();
-//        String json = objectMapper.writeValueAsString(userDetailDTO);
-//
-//        response.getWriter().write(json);
-        response.sendRedirect("http://localhost:3000/");
-    }
+        response.setContentType("application/json; charset=UTF-8");
+        Long id = principalDetails.getUser().getId();
+        Optional<User> userOptional = userRepository.findById(id);
+        User user1 = userOptional.get();
+        //if(user1.getMyTheatherList().size() == 0)
+        UserDetailDTO userDetailDTO = UserDetailDTO.builder()
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .user_id(id)
+                .myTheatherList(user1.getMyTheatherList())
+                .build();
+        String json = objectMapper.writeValueAsString(userDetailDTO);
 
-    private Cookie createCookie(String name, String jwt){
-        Cookie cookie = new Cookie(name, jwt);
-        cookie.setHttpOnly(true);   // XSS 공격 방지
-        cookie.setSecure(true);     // HTTPS 환경에서만 쿠키 전달 -> 배포시 true 해야 됨.
-        cookie.setPath("/");        // 전체 경로에서 쿠키 사용 가능
-        cookie.setMaxAge(1000000); // 1일
-        cookie.setAttribute("SameSite", "None");  // 크로스 사이트 요청 허용
-        return cookie;
+        response.getWriter().write(json);
+        response.sendRedirect("http://localhost:3000/");
     }
 }

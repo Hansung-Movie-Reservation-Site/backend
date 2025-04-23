@@ -1,4 +1,4 @@
-package com.springstudy.backend.API.OAuth;
+package com.springstudy.backend.Security.OAuth;
 
 import java.util.Map;
 
@@ -7,16 +7,6 @@ public class GoogleUserInfo implements OAuth2UserInfo{
 
     public GoogleUserInfo(Map<String, Object> attributes) {
         this.attributes = attributes;
-    }
-
-    @Override
-    public String getProviderId() {
-        return (String) attributes.get("sub");
-    }
-
-    @Override
-    public String getProvider() {
-        return "google";
     }
 
     @Override
