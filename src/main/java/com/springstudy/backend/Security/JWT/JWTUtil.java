@@ -1,13 +1,14 @@
-package com.springstudy.backend.Common.JWTCommon;
+package com.springstudy.backend.Security.JWT;
 
 import com.google.gson.internal.LinkedTreeMap;
 import com.springstudy.backend.API.Auth.Model.AuthUser;
 import com.springstudy.backend.API.OAuth.PrincipalDetails;
-import com.springstudy.backend.Common.RedisService;
+import com.springstudy.backend.Security.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -123,5 +124,15 @@ public class JWTUtil {
                 .signWith(key)
                 .compact();
         return refreshJwt;
+    }
+
+    public static Cookie createCookie(String name, String jwt){
+        Cookie cookie = new Cookie(name, jwt);
+        cookie.setHttpOnly(true);   // XSS 공격 방지
+        cookie.setSecure(true);     // HTTPS 환경에서만 쿠키 전달 -> 배포시 true 해야 됨.
+        cookie.setPath("/");        // 전체 경로에서 쿠키 사용 가능
+        cookie.setMaxAge(1000000); // 1일
+        cookie.setAttribute("SameSite", "None");  // 크로스 사이트 요청 허용
+        return cookie;
     }
 }

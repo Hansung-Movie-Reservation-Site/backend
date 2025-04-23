@@ -54,16 +54,6 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
             user.setUserCredentional(userCredentional);
             userRepository.save(user);
 
-//            member = Member.builder()
-//                    .loginId(loginId)
-//                    .password(password)
-//                    .email(email)
-//                    .username(username)
-//                    .role(role)
-//                    .provider(provider)
-//                    .providerId(providerId)
-//                    .build();
-//            memberRepository.save(member);
         } else {
             System.out.println("이미 로그인을 한적이 있습니다.");
         }
