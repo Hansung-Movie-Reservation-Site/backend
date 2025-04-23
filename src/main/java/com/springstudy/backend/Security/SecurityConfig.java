@@ -41,7 +41,8 @@ public class SecurityConfig {
                                 .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                         .userService(userService))
                                 .successHandler(oauth2SucessHandler)
-                        //.failureHandler()
+                                //.failureHandler()
+                        // 소셜로그인은 /oauth2/authorization/google에서 진행.
                 );
 
         return http.build();
