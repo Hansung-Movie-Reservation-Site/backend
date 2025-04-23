@@ -2,6 +2,7 @@ package com.springstudy.backend.Common.JWTCommon;
 
 import com.google.gson.internal.LinkedTreeMap;
 import com.springstudy.backend.API.Auth.Model.AuthUser;
+import com.springstudy.backend.API.OAuth.PrincipalDetails;
 import com.springstudy.backend.Common.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -28,6 +29,24 @@ public class JWTUtil {
     public static String createToken(Authentication auth) {
         // auth: JWT로 회원정보를 저장해야 되기 때문에.
         AuthUser user = (AuthUser) auth.getPrincipal();
+
+        String jwt = Jwts.builder()
+                .claim("username", user.getUsername())
+                // .claim CustomUser 정보를 저장하는 메소드.
+                // .claim: 저장할 정보 추가.
+                .claim("authorities", user.getAuthorities())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                // .issuedAt: 생성날짜를 생성하는 메소드.
+                .expiration(new Date(System.currentTimeMillis() + 10)) //유효기간 1시간
+                // .expiration: 만료기간을 설정하는 메소드.
+                .signWith(key)
+                .compact();
+        return jwt;
+    }
+
+    public static String createToken(PrincipalDetails principalDetails) {
+        // auth: JWT로 회원정보를 저장해야 되기 때문에.
+        AuthUser user = principalDetails.toAuthUser();
 
         String jwt = Jwts.builder()
                 .claim("username", user.getUsername())
@@ -74,6 +93,23 @@ public class JWTUtil {
     public static String createRefreshToken(Authentication auth) {
         // auth: JWT로 회원정보를 저장해야 되기 때문에.
         AuthUser user = (AuthUser) auth.getPrincipal();
+
+        String refreshJwt = Jwts.builder()
+                .claim("username", user.getUsername())
+                // .claim CustomUser 정보를 저장하는 메소드.
+                // .claim: 저장할 정보 추가.
+                .claim("authorities", user.getAuthorities())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                // .issuedAt: 생성날짜를 생성하는 메소드.
+                .expiration(new Date(System.currentTimeMillis() + 1000000)) //유효기간 1시간
+                // .expiration: 만료기간을 설정하는 메소드.
+                .signWith(key)
+                .compact();
+        return refreshJwt;
+    }
+    public static String createRefreshToken(PrincipalDetails principalDetails) {
+        // auth: JWT로 회원정보를 저장해야 되기 때문에.
+        AuthUser user = principalDetails.toAuthUser();
 
         String refreshJwt = Jwts.builder()
                 .claim("username", user.getUsername())
