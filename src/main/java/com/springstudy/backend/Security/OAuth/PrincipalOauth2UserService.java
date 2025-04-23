@@ -1,8 +1,10 @@
-package com.springstudy.backend.API.OAuth;
+package com.springstudy.backend.Security.OAuth;
 
 import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.Entity.UserCredentional;
 import com.springstudy.backend.API.Repository.UserRepository;
+import com.springstudy.backend.Common.ErrorCode.CustomException;
+import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -11,6 +13,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -32,46 +35,37 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         } else {
             System.out.println("지원하지않음.");
         }
-        String provider = oAuth2UserInfo.getProvider();
-        String providerId = oAuth2UserInfo.getProviderId();
+
         String email = oAuth2UserInfo.getProviderEmail();
-        String loginId = provider + "_" + providerId;
         String username = oAuth2UserInfo.getProviderName();
         String password = passwordEncoder.encode("겟인데어");
 
-        //Member member = memberRepository.findByLoginId(loginId).orElse(null);
-
         Optional<User> userOptional = userRepository.findByEmail(email);
+
+        User user = null;
         if (userOptional.isEmpty()) {
-            User user = new User().builder()
-                    .username(username)
-                    .email(email)
-                    .build();
-            UserCredentional userCredentional = new UserCredentional().builder()
-                    .user(user)
-                    .password(password)
-                    .build();
-            user.setUserCredentional(userCredentional);
-            userRepository.save(user);
+            user = generatedUser(username, password, email);
+            if (user == null) {
+                throw new CustomException(ErrorCode.AUTH_SAVE_ERROR);
+            }
+        } else user = userOptional.get();
 
-//            member = Member.builder()
-//                    .loginId(loginId)
-//                    .password(password)
-//                    .email(email)
-//                    .username(username)
-//                    .role(role)
-//                    .provider(provider)
-//                    .providerId(providerId)
-//                    .build();
-//            memberRepository.save(member);
-        } else {
-            System.out.println("이미 로그인을 한적이 있습니다.");
-        }
+        return new PrincipalDetails(user, oAuth2User.getAttributes());
+    }
 
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        AuthUser authUser = (AuthUser) authentication.getPrincipal();
-//        System.out.println(authUser.getEmail());
+    public User generatedUser(String username, String password, String email) {
 
-        return new PrincipalDetails(userOptional.get(), oAuth2User.getAttributes());
+        User user = new User().builder()
+                .username(username)
+                .email(email)
+                .myTheatherList(new ArrayList<>())
+                .build();
+        UserCredentional userCredentional = new UserCredentional().builder()
+                .user(user)
+                .password(password)
+                .build();
+
+        user.setUserCredentional(userCredentional);
+        return userRepository.save(user);
     }
 }

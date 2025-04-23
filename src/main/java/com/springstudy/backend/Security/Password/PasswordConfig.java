@@ -1,4 +1,4 @@
-package com.springstudy.backend.Config;
+package com.springstudy.backend.Security.Password;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
