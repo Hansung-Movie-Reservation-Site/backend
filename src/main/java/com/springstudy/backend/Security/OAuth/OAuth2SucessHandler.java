@@ -58,7 +58,6 @@ public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
         Long id = principalDetails.getUser().getId();
         Optional<User> userOptional = userRepository.findById(id);
         User user1 = userOptional.get();
-        //if(user1.getMyTheatherList().size() == 0)
         UserDetailDTO userDetailDTO = UserDetailDTO.builder()
                 .email(user.getEmail())
                 .username(user.getUsername())
@@ -66,8 +65,10 @@ public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
                 .myTheatherList(user1.getMyTheatherList())
                 .build();
         String json = objectMapper.writeValueAsString(userDetailDTO);
+        System.out.println(json);
 
+        response.setStatus(200);
         response.getWriter().write(json);
-        response.sendRedirect("http://localhost:3000/");
+        //response.sendRedirect("http://localhost:3000/"); sendRedirect 문제
     }
 }
