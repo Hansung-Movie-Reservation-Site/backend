@@ -9,6 +9,7 @@ import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
+import com.springstudy.backend.Common.util.LogUtil;
 import com.springstudy.backend.Security.JWT.JWTUtil;
 import com.springstudy.backend.Security.RedisService;
 import io.jsonwebtoken.JwtException;
@@ -27,7 +28,6 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
     private final UserRepository userRepository;
     private final RedisService redisService;
@@ -37,7 +37,7 @@ public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(
             HttpServletRequest request,
             HttpServletResponse response,
-            Authentication authentication) throws IOException, ServletException {
+            Authentication authentication){
 
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         AuthUser user = principalDetails.toAuthUser();
@@ -51,16 +51,21 @@ public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
             response.addCookie(cookie);
             response.addCookie(refreshCookie);
         } catch (JwtException e) {
-            //todo error
-            log.error(e.getMessage());
+            LogUtil.error(getClass(),"JwtException 54 line", e);
             throw new CustomException(ErrorCode.JWT_CREATE_ERROR);
         }
 
-        response.setContentType("application/json; charset=UTF-8");
-        Long id = principalDetails.getUser().getId();
-        String loginResponse = writeLoginResponse(id);
+        try{
+            response.setContentType("application/json; charset=UTF-8");
+            Long id = principalDetails.getUser().getId();
+            String loginResponse = writeLoginResponse(id);
+            response.getWriter().write(loginResponse);
+        }
+        catch(IOException e){
+            LogUtil.error(getClass(),"IOException 65line", e);
+            throw new CustomException(ErrorCode.JWT_CREATE_ERROR);
+        }
         response.setStatus(200);
-        response.getWriter().write(loginResponse);
         //response.sendRedirect("http://localhost:3000/"); sendRedirect 문제
     }
     public String writeLoginResponse(Long id){
