@@ -1,4 +1,5 @@
 package com.springstudy.backend.API.Auth.Service;
+
 import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.CreateUserRequest;
 import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.DeleteAccountRequest;
 import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.CreateUserResponse;
@@ -10,12 +11,10 @@ import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.LoginReques
 import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.LoginResponse;
 import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.Entity.UserCredentional;
-import com.springstudy.backend.Common.CheckPasswordService;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
-import com.springstudy.backend.Common.Hash.Hasher;
-import com.springstudy.backend.Common.JWTCommon.JWTUtil;
-import com.springstudy.backend.Common.RedisService;
+import com.springstudy.backend.Security.Password.Hasher;
+import com.springstudy.backend.Security.RedisService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.springstudy.backend.Security.JWT.*;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -38,7 +38,6 @@ public class AuthService {
     private final UserRepository userRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisService redisService;
-    private final CheckPasswordService checkPasswordService;
 
     public CreateUserResponse createUser(CreateUserRequest request) {
         // 1. 동일 이메일 있나 확인.
@@ -103,11 +102,12 @@ public class AuthService {
                 //todo error
                 throw new CustomException(ErrorCode.AUTH_SAVE_ERROR);
             }
-            String jwt = JWTUtil.createToken(auth);
-            String refreshJwt = JWTUtil.createRefreshToken(auth);
+            AuthUser user = (AuthUser) auth.getPrincipal();
+            String jwt = JWTUtil.createToken(user);
+            String refreshJwt = JWTUtil.createRefreshToken(user);
             redisService.setDataExpire("refresh_token: "+((AuthUser)auth.getPrincipal()).getUsername(), refreshJwt, 3600000);
-            Cookie cookie= createCookie("jwt",jwt);
-            Cookie refreshCookie= createCookie("refreshJwt",refreshJwt);
+            Cookie cookie= JWTUtil.createCookie("jwt",jwt);
+            Cookie refreshCookie= JWTUtil.createCookie("refreshJwt",refreshJwt);
             response.addCookie(cookie);
             response.addCookie(refreshCookie);
         }
@@ -141,15 +141,6 @@ public class AuthService {
         throw new CustomException(ErrorCode.MISMATCH_PASSWORD);
     }
     }
-    private Cookie createCookie(String name, String jwt){
-        Cookie cookie = new Cookie(name, jwt);
-        cookie.setHttpOnly(true);   // XSS 공격 방지
-        cookie.setSecure(true);     // HTTPS 환경에서만 쿠키 전달 -> 배포시 true 해야 됨.
-        cookie.setPath("/");        // 전체 경로에서 쿠키 사용 가능
-        cookie.setMaxAge(1000000); // 1일
-        cookie.setAttribute("SameSite", "None");  // 크로스 사이트 요청 허용
-        return cookie;
-    }
     public DeleteAccountResponse deleteAccount(DeleteAccountRequest deleteAccountRequest) {
         String password = deleteAccountRequest.password();
         Optional<User> userOptional = userRepository.findByEmail(deleteAccountRequest.email());
@@ -157,7 +148,7 @@ public class AuthService {
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
         User user = userOptional.get();
-        checkPasswordService.checkPassword(user, password);
+        Hasher.checkPassword(user, password);
         userRepository.delete(user);
 
         return new DeleteAccountResponse(ErrorCode.SUCCESS);

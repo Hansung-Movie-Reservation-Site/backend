@@ -12,12 +12,10 @@ import com.springstudy.backend.API.Auth.Model.Response.RetrieveResponse.Retrieve
 import com.springstudy.backend.API.Auth.Model.RetrieveResponse;
 import com.springstudy.backend.API.Auth.Model.RetrieveType;
 import com.springstudy.backend.API.Repository.Entity.*;
-import com.springstudy.backend.API.Repository.MyTheatherRepository;
-import com.springstudy.backend.API.Repository.SpotRepository;
 import com.springstudy.backend.API.Repository.UserRepository;
-import com.springstudy.backend.Common.CheckPasswordService;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
+import com.springstudy.backend.Security.Password.Hasher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,7 +32,7 @@ import java.util.Optional;
 public class DetailService {
 
     private final UserRepository userRepository;
-    private final CheckPasswordService checkPasswordService;
+    //private final CheckPasswordService checkPasswordService;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -62,7 +60,7 @@ public class DetailService {
     }
     private void checkPassword(User user, String before, DetailType detailType) {
         if(detailType == DetailType.EMAIL)return;
-        checkPasswordService.checkPassword(user, before);
+        Hasher.checkPassword(user, before);
     }
     private void change(User user, ChangeDetailRequest changeDetailRequest, DetailType detailType) {
         String after = changeDetailRequest.after();

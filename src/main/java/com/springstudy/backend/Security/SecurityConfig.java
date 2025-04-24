@@ -1,19 +1,24 @@
-package com.springstudy.backend.Config;
+package com.springstudy.backend.Security;
 
+import com.springstudy.backend.Security.OAuth.OAuth2SucessHandler;
+import com.springstudy.backend.Security.OAuth.PrincipalOauth2UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 // @Configuration, @EnableWebSecurity: 스프링 시큐리티 설정에 대한 클래스이다.
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final PrincipalOauth2UserService userService;
+    private final OAuth2SucessHandler oauth2SucessHandler;
 
     @Bean
     // SecurityFilterChain라는 객체를 컨테이너에 저장.
@@ -31,13 +36,16 @@ public class SecurityConfig {
         );
         // JWT 방식을 사용할 것이므로 세션 생성을 못하게 한다.
         //permitAll(): "/**" -> 모든 페이지에 관해 로그인 없이 접근하도록 한다.
+        http
+                .oauth2Login(oauth2Configurer -> oauth2Configurer
+                                .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
+                                        .userService(userService))
+                                .successHandler(oauth2SucessHandler)
+                                //.failureHandler()
+                        // 소셜로그인은 /oauth2/authorization/google에서 진행.
+                );
+
         return http.build();
         // SecurityFilterChain을 반환.
     }
-
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-    // 스프링시큐리티에서 자동적으로 비밀번호를 암호화 시킨다.
 }
