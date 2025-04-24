@@ -1,7 +1,9 @@
 package com.springstudy.backend.Security.OAuth;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springstudy.backend.API.Auth.Model.AuthUser;
+import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.LoginResponse;
 import com.springstudy.backend.API.Auth.Model.UserDetailDTO;
 import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.UserRepository;
@@ -56,19 +58,28 @@ public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
 
         response.setContentType("application/json; charset=UTF-8");
         Long id = principalDetails.getUser().getId();
+        String loginResponse = writeLoginResponse(id);
+        response.setStatus(200);
+        response.getWriter().write(loginResponse);
+        //response.sendRedirect("http://localhost:3000/"); sendRedirect 문제
+    }
+    public String writeLoginResponse(Long id){
+        String response;
         Optional<User> userOptional = userRepository.findById(id);
-        User user1 = userOptional.get();
+        User user = userOptional.get();
         UserDetailDTO userDetailDTO = UserDetailDTO.builder()
                 .email(user.getEmail())
                 .username(user.getUsername())
                 .user_id(id)
-                .myTheatherList(user1.getMyTheatherList())
+                .myTheatherList(user.getMyTheatherList())
                 .build();
-        String json = objectMapper.writeValueAsString(userDetailDTO);
-        System.out.println(json);
-
-        response.setStatus(200);
-        response.getWriter().write(json);
-        //response.sendRedirect("http://localhost:3000/"); sendRedirect 문제
+        LoginResponse loginResponse = new LoginResponse(ErrorCode.SUCCESS, userDetailDTO);
+        try{
+             response = objectMapper.writeValueAsString(loginResponse);
+        }
+        catch(JsonProcessingException e){
+            throw new CustomException(ErrorCode.JSON_PROCESSOR_ERROR);
+        }
+        return response;
     }
 }
