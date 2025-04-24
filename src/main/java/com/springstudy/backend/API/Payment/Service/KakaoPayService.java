@@ -42,7 +42,7 @@ public class KakaoPayService {
     }
 
     /**
-     * ✅ 결제 요청 (카카오페이 결제 URL 반환)
+     * ✅ 결제 요청 (카카오페이 결제 PC 환경 URL 반환)
      */
     public String requestPayment(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -90,6 +90,108 @@ public class KakaoPayService {
             // return jsonNode.get("next_redirect_pc_url").asText();
 
             return kakaoReadyResponse.getNext_redirect_pc_url();
+        } catch (Exception e) {
+            throw new RuntimeException("❌ 카카오페이 결제 요청 실패: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ 결제 요청 (카카오페이 결제 모바일 웹 환경 URL 반환)
+     */
+    public String requestPaymentMobileWeb(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 주문 ID가 존재하지 않습니다: " + orderId));
+
+
+        if (ADMIN_KEY == null || ADMIN_KEY.isEmpty()) {
+            throw new RuntimeException("❌ ADMIN_KEY가 설정되지 않았습니다.");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "SECRET_KEY " + ADMIN_KEY.trim());  // ✅ 변경된 인증 방식
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("cid", "TC0ONETIME");
+        requestBody.put("partner_order_id", order.getUuid());
+        requestBody.put("partner_user_id", order.getUser().getId());
+        requestBody.put("item_name", "영화 티켓");
+        requestBody.put("quantity", order.getTickets().size());
+        requestBody.put("total_amount", order.getTotalAmount());
+        requestBody.put("tax_free_amount", 0);
+
+        // api 주소랑 동일하게 설정
+        requestBody.put("approval_url", DOMAIN_URL + "success");
+        requestBody.put("cancel_url", DOMAIN_URL + "cancel");
+        requestBody.put("fail_url", DOMAIN_URL + "fail");
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String> response;
+        try {
+            // response = restTemplate.exchange(KAKAO_PAY_READY_URL, HttpMethod.POST, entity, String.class);
+
+            kakaoReadyResponse = restTemplate.postForObject(KAKAO_PAY_READY_URL, entity, KakaoReadyResponse.class);
+            kakaoReadyResponse.setUuid(order.getUuid());
+
+        } catch (HttpClientErrorException e) {
+            System.err.println("❌ 카카오페이 API 요청 오류: " + e.getMessage());
+            throw new RuntimeException("❌ 카카오페이 API 요청 실패: " + e.getResponseBodyAsString());
+        }
+
+        try {
+            return kakaoReadyResponse.getNext_redirect_mobile_url();
+        } catch (Exception e) {
+            throw new RuntimeException("❌ 카카오페이 결제 요청 실패: " + e.getMessage());
+        }
+    }
+
+    /**
+     * ✅ 결제 요청 (카카오페이 결제 모바일 app 환경 URL 반환)
+     */
+    public String requestPaymentMobileApp(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ 해당 주문 ID가 존재하지 않습니다: " + orderId));
+
+
+        if (ADMIN_KEY == null || ADMIN_KEY.isEmpty()) {
+            throw new RuntimeException("❌ ADMIN_KEY가 설정되지 않았습니다.");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "SECRET_KEY " + ADMIN_KEY.trim());  // ✅ 변경된 인증 방식
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("cid", "TC0ONETIME");
+        requestBody.put("partner_order_id", order.getUuid());
+        requestBody.put("partner_user_id", order.getUser().getId());
+        requestBody.put("item_name", "영화 티켓");
+        requestBody.put("quantity", order.getTickets().size());
+        requestBody.put("total_amount", order.getTotalAmount());
+        requestBody.put("tax_free_amount", 0);
+
+        // api 주소랑 동일하게 설정
+        requestBody.put("approval_url", DOMAIN_URL + "success");
+        requestBody.put("cancel_url", DOMAIN_URL + "cancel");
+        requestBody.put("fail_url", DOMAIN_URL + "fail");
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String> response;
+        try {
+            // response = restTemplate.exchange(KAKAO_PAY_READY_URL, HttpMethod.POST, entity, String.class);
+
+            kakaoReadyResponse = restTemplate.postForObject(KAKAO_PAY_READY_URL, entity, KakaoReadyResponse.class);
+            kakaoReadyResponse.setUuid(order.getUuid());
+
+        } catch (HttpClientErrorException e) {
+            System.err.println("❌ 카카오페이 API 요청 오류: " + e.getMessage());
+            throw new RuntimeException("❌ 카카오페이 API 요청 실패: " + e.getResponseBodyAsString());
+        }
+
+        try {
+            return kakaoReadyResponse.getNext_redirect_app_url();
         } catch (Exception e) {
             throw new RuntimeException("❌ 카카오페이 결제 요청 실패: " + e.getMessage());
         }

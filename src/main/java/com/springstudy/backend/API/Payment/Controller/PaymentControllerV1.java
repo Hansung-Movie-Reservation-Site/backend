@@ -31,6 +31,26 @@ public class PaymentControllerV1 {
         return ResponseEntity.ok(paymentUrl); // ✅ 클라이언트가 카카오페이 페이지로 리디렉션해야 함
     }
 
+
+    /*
+    requestPayment와 원리 동일
+    반환값이 KakaoReadyResponse의 next_redirect_mobile_url, next_redirect_app_url으로
+    다른 것밖에 차이가 없다.
+     */
+    @PostMapping("/requestMobileWeb")
+    public ResponseEntity<String> requestPaymentMobileWeb(@RequestBody PaymentRequest request) {
+        String paymentUrl = kakaoPayService.requestPaymentMobileWeb(request.getOrderId());
+        return ResponseEntity.ok(paymentUrl);
+    }
+
+    @PostMapping("/requestMobileApp")
+    public ResponseEntity<String> requestPaymentMobileApp(@RequestBody PaymentRequest request) {
+        String paymentUrl = kakaoPayService.requestPaymentMobileApp(request.getOrderId());
+        return ResponseEntity.ok(paymentUrl);
+    }
+
+
+
     /**
      * ✅ 2️⃣ 결제 승인 API (카카오페이 결제 URL 반환되면서 자동으로 진행)
      * 예시: http://localhost:8080/api/v1/payment/success?pg_token=0b61d76630ecff3bdd6a
