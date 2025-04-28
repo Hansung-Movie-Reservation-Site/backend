@@ -17,7 +17,7 @@ public class UserUtil {
     public User existUserByEmail(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if(userOptional.isEmpty()) {
-            LogUtil.error("UserUtil", "NOT_EXIST_USER");
+            LogUtil.error(getClass(), "NOT_EXIST_USER");
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
         else return userOptional.get();
@@ -26,7 +26,7 @@ public class UserUtil {
     public User existUserById(Long id) {
         Optional<User> userOptional = userRepository.findById(id);
         if(userOptional.isEmpty()) {
-            LogUtil.error("UserUtil", "NOT_EXIST_USER");
+            LogUtil.error(getClass(), "NOT_EXIST_USER");
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
         else return userOptional.get();

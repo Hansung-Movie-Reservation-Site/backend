@@ -5,6 +5,7 @@ import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
+import com.springstudy.backend.Common.util.LogUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,11 +23,12 @@ import java.util.Optional;
 public class MyUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByUsername(username);
         if(user.isEmpty()){
-            //todo error
+            LogUtil.error(getClass(), "NOT_EXIST_USER 31Line");
             throw new CustomException(ErrorCode.NOT_EXIST_USER);
         }
         User member = user.get();

@@ -2,7 +2,6 @@ package com.springstudy.backend.Common.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
@@ -14,9 +13,6 @@ public class LogUtil {
         logger.error("{}의 {}: {}", className, msg, e.getMessage());
     }
     public static void error(Class<?> className, String msg){
-        logger.error("{}의 {}", className, msg);
-    }
-    public static void error(String className, String msg){
         logger.error("{}의 {}", className, msg);
     }
 //    private static String timestamp() {

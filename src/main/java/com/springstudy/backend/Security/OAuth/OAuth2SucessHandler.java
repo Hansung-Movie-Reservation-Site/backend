@@ -9,16 +9,15 @@ import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
+import com.springstudy.backend.Common.util.JsonResponseUtil;
 import com.springstudy.backend.Common.util.LogUtil;
 import com.springstudy.backend.Security.JWT.JWTUtil;
 import com.springstudy.backend.Security.RedisService;
 import io.jsonwebtoken.JwtException;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -31,7 +30,7 @@ import java.util.Optional;
 public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
     private final UserRepository userRepository;
     private final RedisService redisService;
-    private final ObjectMapper objectMapper;
+    private final JsonResponseUtil jsonResponseUtil;
 
     @Override
     public void onAuthenticationSuccess(
@@ -41,6 +40,7 @@ public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
 
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         AuthUser user = principalDetails.toAuthUser();
+        String loginResponse;
 
         try {
             String jwt = JWTUtil.createToken(user);
@@ -50,25 +50,25 @@ public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
             Cookie refreshCookie = JWTUtil.createCookie("refreshJwt", refreshJwt);
             response.addCookie(cookie);
             response.addCookie(refreshCookie);
-        } catch (JwtException e) {
-            LogUtil.error(getClass(),"JwtException 54 line", e);
-            throw new CustomException(ErrorCode.JWT_CREATE_ERROR);
-        }
 
-        try{
             response.setContentType("application/json; charset=UTF-8");
             Long id = principalDetails.getUser().getId();
-            String loginResponse = writeLoginResponse(id);
+            loginResponse = writeSucessResponse(id);
+
+        } catch (JwtException e) {
+            LogUtil.error(getClass(),"JwtException 54Line", e);
+            loginResponse = jsonResponseUtil.error(500,ErrorCode.JWT_CREATE_ERROR);
+        }
+        try{
             response.getWriter().write(loginResponse);
         }
         catch(IOException e){
-            LogUtil.error(getClass(),"IOException 65line", e);
-            throw new CustomException(ErrorCode.JWT_CREATE_ERROR);
+            LogUtil.error(getClass(),"IOException 65Line", e);
+            throw new CustomException(ErrorCode.IOEXCEPTION);
         }
-        response.setStatus(200);
         //response.sendRedirect("http://localhost:3000/"); sendRedirect 문제
     }
-    public String writeLoginResponse(Long id){
+    public String writeSucessResponse(Long id){
         String response;
         Optional<User> userOptional = userRepository.findById(id);
         User user = userOptional.get();
@@ -78,13 +78,7 @@ public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
                 .user_id(id)
                 .myTheatherList(user.getMyTheatherList())
                 .build();
-        LoginResponse loginResponse = new LoginResponse(ErrorCode.SUCCESS, userDetailDTO);
-        try{
-             response = objectMapper.writeValueAsString(loginResponse);
-        }
-        catch(JsonProcessingException e){
-            throw new CustomException(ErrorCode.JSON_PROCESSOR_ERROR);
-        }
+        response = jsonResponseUtil.success(userDetailDTO);
         return response;
     }
 }

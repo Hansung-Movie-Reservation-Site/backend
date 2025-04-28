@@ -17,7 +17,6 @@ import java.util.Date;
 // JWT 만들어주는 함수
 @RequiredArgsConstructor
 public class JWTUtil {
-    private final RedisService redisService;
     private static final SecretKey key =
             Keys.hmacShaKeyFor(Decoders.BASE64.decode(
                     "jwtpassword123jwtpassword123jwtpassword123jwtpassword123jwtpassword"
