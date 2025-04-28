@@ -1,5 +1,6 @@
 package com.springstudy.backend.Security;
 
+import com.springstudy.backend.Security.OAuth.OAuth2FailureHandler;
 import com.springstudy.backend.Security.OAuth.OAuth2SucessHandler;
 import com.springstudy.backend.Security.OAuth.PrincipalOauth2UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class SecurityConfig {
 
     private final PrincipalOauth2UserService userService;
     private final OAuth2SucessHandler oauth2SucessHandler;
+    private final OAuth2FailureHandler oauth2FailureHandler;
 
     @Bean
     // SecurityFilterChain라는 객체를 컨테이너에 저장.
@@ -41,7 +43,7 @@ public class SecurityConfig {
                                 .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                         .userService(userService))
                                 .successHandler(oauth2SucessHandler)
-                                //.failureHandler()
+                                .failureHandler(oauth2FailureHandler)
                         // 소셜로그인은 /oauth2/authorization/google에서 진행.
                 );
 

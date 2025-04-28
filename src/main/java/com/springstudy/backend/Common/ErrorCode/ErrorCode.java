@@ -47,7 +47,9 @@ public enum ErrorCode implements CodeInterface{
 
     NOT_EXIST_SPOT(-30, "NOT_EXIST_SPOT"),
 
-    TRANSACTION_ERROR(-31, "TRANSACTION_ERROR");
+    TRANSACTION_ERROR(-31, "TRANSACTION_ERROR"),
+    JSON_PROCESSOR_ERROR(-32, "JSON_PROCESSOR_ERROR"),
+    IOEXCEPTION(-33, "IOEXCEPTION");
 
     private final Integer code;
     private final String message;
