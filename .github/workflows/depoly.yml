@@ -1,5 +1,5 @@
 name: Deploy To EC2
- 🚨 배포용 코드 n4
+ #🚨 배포용 코드 n4
 on:
   push:
     branches:
