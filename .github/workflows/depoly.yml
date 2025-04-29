@@ -1,66 +1,67 @@
-#name: Deploy To EC2
-# 🚨 배포용 코드 n4
-#on:
-#  push:
-#    branches:
-#      - main
-#
-#jobs:
-#  test:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Github Repository 파일 불러오기1
-#        uses: actions/checkout@v4
-#
-#      - name: JDK 17버전 설치
-#        uses: actions/setup-java@v4
-#        with:
-#          distribution: temurin
-#          java-version: 17
-#
-#      - name: application.yml 파일 만들기
-#        run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.yml
-#
-#      - name: .env 파일 만들기
-#        run: echo "${{ secrets.ENV_PROPERTIES }}" > .env
-##          mysql root password: 1234
-#      - name: .env 파일 확인
-#        run: cat .env
-#
-#      - name: 테스트 및 빌드하기
-#        run: |
-#         ./gradlew clean build
-#         ls ./build/libs
-#
-#      - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
-#        uses: aws-actions/configure-aws-credentials@v4
-#        with:
-#          aws-region: ap-northeast-2
-#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#
-#      - name: ECR에 로그인하기
-#        id: login-ecr
-#        uses: aws-actions/amazon-ecr-login@v2
-#
-#      - name: Docker 이미지 생성
-#        run: docker build -t movie-server .
-#
-#      - name: Docker 이미지에 Tag 붙이기
-#        run: docker tag movie-server ${{ steps.login-ecr.outputs.registry }}/movie-server:latest
-#
-#      - name: ECR에 Docker 이미지 Push하기
-#        run: docker push ${{ steps.login-ecr.outputs.registry }}/movie-server:latest
-#
-#      - name: SSH로 EC2에 접속하기
-#        uses: appleboy/ssh-action@v1.0.3
-#        with:
-#          host: ${{ secrets.EC2_HOST }}
-#          username: ${{ secrets.EC2_USERNAME }}
-#          key: ${{ secrets.EC2_PRIVATE_KEY }}
-#          script_stop: true
-#          script: |
-#            docker stop movie-server || true
-#            docker rm movie-server || true
-#            docker pull ${{ steps.login-ecr.outputs.registry }}/movie-server:latest
-#            docker run -d --name movie-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/movie-server:latest
+name: Deploy To EC2
+ 🚨 배포용 코드 n4
+on:
+  push:
+    branches:
+      - main
+
+# s
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Github Repository 파일 불러오기1
+        uses: actions/checkout@v4
+
+      - name: JDK 17버전 설치
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: application.yml 파일 만들기
+        run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.yml
+
+      - name: .env 파일 만들기
+        run: echo "${{ secrets.ENV_PROPERTIES }}" > .env
+#          mysql root password: 1234
+      - name: .env 파일 확인
+        run: cat .env
+
+      - name: 테스트 및 빌드하기
+        run: |
+         ./gradlew clean build
+         ls ./build/libs
+
+      - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-northeast-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: ECR에 로그인하기
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Docker 이미지 생성
+        run: docker build -t movie-server .
+
+      - name: Docker 이미지에 Tag 붙이기
+        run: docker tag movie-server ${{ steps.login-ecr.outputs.registry }}/movie-server:latest
+
+      - name: ECR에 Docker 이미지 Push하기
+        run: docker push ${{ steps.login-ecr.outputs.registry }}/movie-server:latest
+
+      - name: SSH로 EC2에 접속하기
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            docker stop movie-server || true
+            docker rm movie-server || true
+            docker pull ${{ steps.login-ecr.outputs.registry }}/movie-server:latest
+            docker run -d --name movie-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/movie-server:latest
