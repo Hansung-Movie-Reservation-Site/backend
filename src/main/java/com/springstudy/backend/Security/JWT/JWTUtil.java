@@ -66,7 +66,7 @@ public class JWTUtil {
     public static Cookie createCookie(String name, String jwt){
         Cookie cookie = new Cookie(name, jwt);
         cookie.setHttpOnly(true);   // XSS 공격 방지
-        cookie.setSecure(true);     // HTTPS 환경에서만 쿠키 전달 -> 배포시 true 해야 됨.
+        //cookie.setSecure(true);     // HTTPS 환경에서만 쿠키 전달 -> 배포시 true 해야 됨.
         cookie.setPath("/");        // 전체 경로에서 쿠키 사용 가능
         cookie.setMaxAge(1000000); // 1일
         cookie.setAttribute("SameSite", "None");  // 크로스 사이트 요청 허용
