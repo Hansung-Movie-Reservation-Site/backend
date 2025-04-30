@@ -48,6 +48,11 @@ public class KakaoPayService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("❌ 해당 주문 ID가 존재하지 않습니다: " + orderId));
 
+        // ✅ 이미 결제 완료 또는 취소된 주문이면 요청 거부
+        String status = order.getStatus();
+        if ("PAID".equalsIgnoreCase(status) || "CANCELLED".equalsIgnoreCase(status)) {
+            throw new IllegalStateException("❌ 이미 결제 완료되었거나 취소된 주문입니다. 결제 요청을 진행할 수 없습니다.");
+        }
 
         if (ADMIN_KEY == null || ADMIN_KEY.isEmpty()) {
             throw new RuntimeException("❌ ADMIN_KEY가 설정되지 않았습니다.");
@@ -102,6 +107,12 @@ public class KakaoPayService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("❌ 해당 주문 ID가 존재하지 않습니다: " + orderId));
 
+        // ✅ 이미 결제 완료 또는 취소된 주문이면 요청 거부
+        String status = order.getStatus();
+        if ("PAID".equalsIgnoreCase(status) || "CANCELLED".equalsIgnoreCase(status)) {
+            throw new IllegalStateException("❌ 이미 결제 완료되었거나 취소된 주문입니다. 결제 요청을 진행할 수 없습니다.");
+        }
+
 
         if (ADMIN_KEY == null || ADMIN_KEY.isEmpty()) {
             throw new RuntimeException("❌ ADMIN_KEY가 설정되지 않았습니다.");
@@ -153,6 +164,12 @@ public class KakaoPayService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("❌ 해당 주문 ID가 존재하지 않습니다: " + orderId));
 
+
+        // ✅ 이미 결제 완료 또는 취소된 주문이면 요청 거부
+        String status = order.getStatus();
+        if ("PAID".equalsIgnoreCase(status) || "CANCELLED".equalsIgnoreCase(status)) {
+            throw new IllegalStateException("❌ 이미 결제 완료되었거나 취소된 주문입니다. 결제 요청을 진행할 수 없습니다.");
+        }
 
         if (ADMIN_KEY == null || ADMIN_KEY.isEmpty()) {
             throw new RuntimeException("❌ ADMIN_KEY가 설정되지 않았습니다.");
