@@ -40,6 +40,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 """)
     List<Order> findPaidOrdersToNotify(@Param("now") LocalDateTime now, @Param("cutoff") LocalDateTime cutoff);
 
+    @Query("SELECT o FROM Order o WHERE o.status = 'PENDING' AND o.createdAt <= :cutoff")
+    List<Order> findPendingOrdersBefore(@Param("cutoff") LocalDateTime cutoff);
+
     /**
      * ✅ 특정 주문 상태인 주문이 존재하는지 확인 (PENDING, PAID)
      */

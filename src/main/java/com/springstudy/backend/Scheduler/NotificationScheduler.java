@@ -17,6 +17,7 @@ public class NotificationScheduler {
         // System.out.println("동작 중 입니다.");
 
         notificationService.notifyUpcomingScreeningsV2();
+        notificationService.cancelExpiredPendingOrders();
 
     }
 }

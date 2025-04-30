@@ -129,4 +129,40 @@ public class NotificationService {
 
         mailSender.send(message);
     }
+
+    @Transactional
+    public void cancelExpiredPendingOrders() {
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime cutoff = now.minusMinutes(2);
+
+        // 조건: 생성된지 30분 이상 경과 && 상태가 PENDING
+        List<Order> expiredOrders = orderRepository.findPendingOrdersBefore(cutoff);
+
+        for (Order order : expiredOrders) {
+
+            order.setStatus("CANCELLED");
+            orderRepository.save(order); // 상태 변경 저장
+            System.out.println("시간 초과 주문 취소 이메일 발송됨");
+
+            User user = order.getUser();
+            sendCancelEmail(user.getEmail(), order);
+        }
+    }
+
+    private void sendCancelEmail(String email, Order order) {
+        String subject = "[영화 예매 취소 알림] 예매가 자동 취소되었습니다";
+        String body = String.format(
+                "안녕하세요!\n\n%s 영화 예매가 결제 없이 30분이 지나 자동 취소되었습니다.\n" +
+                        "다시 예매를 원하신다면 사이트를 방문해주세요.\n\n감사합니다.",
+                order.getScreening().getMovie().getTitle()
+        );
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject(subject);
+        message.setText(body);
+
+        mailSender.send(message);
+    }
 }
