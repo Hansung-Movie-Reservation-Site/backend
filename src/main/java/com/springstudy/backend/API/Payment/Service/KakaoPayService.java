@@ -2,12 +2,14 @@ package com.springstudy.backend.API.Payment.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.springstudy.backend.API.Order.Model.SeatStatusMessage;
 import com.springstudy.backend.API.Payment.Response.KakaoReadyResponse;
 import com.springstudy.backend.API.Repository.Entity.Order;
 import com.springstudy.backend.API.Repository.Entity.Ticket;
 import com.springstudy.backend.API.Repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
@@ -23,6 +25,7 @@ public class KakaoPayService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final OrderRepository orderRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     private static KakaoReadyResponse kakaoReadyResponse;
 
@@ -35,10 +38,11 @@ public class KakaoPayService {
     @Value("${api.KAKAO_API_KEY}")
     String ADMIN_KEY;
 
-    public KakaoPayService(RestTemplate restTemplate, ObjectMapper objectMapper, OrderRepository orderRepository) {
+    public KakaoPayService(RestTemplate restTemplate, ObjectMapper objectMapper, OrderRepository orderRepository, SimpMessagingTemplate messagingTemplate) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.orderRepository = orderRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     /**
@@ -248,6 +252,13 @@ public class KakaoPayService {
 
             orderRepository.save(order);
 
+            // ✅ 웹소켓을 통해 좌석 상태(CANCELED) broadcast
+            SeatStatusMessage seatStatusMessage = new SeatStatusMessage(
+                    order.getScreening().getId(),
+                    order.getTickets().stream().map(ticket -> ticket.getSeat().getId()).toList(),
+                    "PAID");
+            messagingTemplate.convertAndSend("/topic/seats", seatStatusMessage);
+
             return "✅ 결제 성공! TID: " + newTid;
         } catch (Exception e) {
             throw new RuntimeException("❌ 카카오페이 결제 승인 실패: " + e.getMessage());
@@ -287,6 +298,13 @@ public class KakaoPayService {
         order.updateStatus("CANCELED");
         order.setTid(null);
         orderRepository.save(order);
+
+        // ✅ 웹소켓을 통해 좌석 상태(CANCELED) broadcast
+        SeatStatusMessage seatStatusMessage = new SeatStatusMessage(
+                order.getScreening().getId(),
+                order.getTickets().stream().map(ticket -> ticket.getSeat().getId()).toList(),
+                "CANCELED");
+        messagingTemplate.convertAndSend("/topic/seats", seatStatusMessage);
     }
 
 }

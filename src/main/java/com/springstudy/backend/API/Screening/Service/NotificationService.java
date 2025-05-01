@@ -1,13 +1,17 @@
 package com.springstudy.backend.API.Screening.Service;
 
+import com.springstudy.backend.API.Order.Model.SeatStatusMessage;
 import com.springstudy.backend.API.Repository.Entity.Order;
 import com.springstudy.backend.API.Repository.Entity.Screening;
+import com.springstudy.backend.API.Repository.Entity.Ticket;
 import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.OrderRepository;
 import com.springstudy.backend.API.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +25,9 @@ public class NotificationService {
     private final JavaMailSender mailSender;
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate; // 메시지 전송용
 
     /**
      * User을 조회한 후 Order을 조회하여 트랜잭션 문제 발생
@@ -141,8 +148,25 @@ public class NotificationService {
 
         for (Order order : expiredOrders) {
 
+            /**
+             * ✅ 주문과 연결된 티켓 정보 삭제 처리
+             */
+            List<Ticket> tickets = order.getTickets();
+            for (Ticket ticket : tickets) {
+                ticket.setOrder(null);  // ✅ 주문 정보 제거
+                // ticket.setUser(null);   // ✅ 사용자 정보 제거
+            }
+
             order.setStatus("CANCELLED");
             orderRepository.save(order); // 상태 변경 저장
+
+            // ✅ 웹소켓을 통해 좌석 상태(CANCELED) broadcast
+            SeatStatusMessage seatStatusMessage = new SeatStatusMessage(
+                    order.getScreening().getId(),
+                    order.getTickets().stream().map(ticket -> ticket.getSeat().getId()).toList(),
+                    "CANCELED");
+            messagingTemplate.convertAndSend("/topic/seats", seatStatusMessage);
+
             System.out.println("시간 초과 주문 취소 이메일 발송됨");
 
             User user = order.getUser();
