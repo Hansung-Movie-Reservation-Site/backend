@@ -20,6 +20,13 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     // ✅ 특정 Seat가 예약되었는지 확인 (order가 null이 아닌 경우)
     boolean existsBySeatAndOrderIsNotNull(Seat seat);
 
+    @Query("SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END " +
+            "FROM Ticket t " +
+            "WHERE t.seat.id = :seatId " +
+            "AND t.order.status IN :statuses")
+    boolean existsReservedTicketBySeatId(@Param("seatId") Long seatId,
+                                         @Param("statuses") List<String> statuses);
+
     // ✅ 특정 Screening과 Seat이 이미 존재하는지 확인 (중복 방지)
     boolean existsByScreeningAndSeat(Screening screening, Seat seat);
 

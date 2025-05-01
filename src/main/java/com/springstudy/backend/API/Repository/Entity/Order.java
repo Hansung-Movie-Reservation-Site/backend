@@ -39,7 +39,7 @@ public class Order {
     private List<Ticket> tickets;  // ✅ 한 개의 주문에 여러 개의 티켓이 포함됨
 
     @Column(nullable = false)
-    private String status;  // 주문 상태 (PENDING, PAID, CANCELLED, TIME_OUT)
+    private String status;  // 주문 상태 (PENDING, PAID, CANCELLED)
 
     @Column(nullable = false)
     private int totalAmount;  // 총 주문 금액

@@ -197,6 +197,27 @@ public class ScreeningService {
                         ticketRepository.existsBySeatAndOrderIsNotNull(seat) // ✅ 예약 여부 확인
                 ))
                 .collect(Collectors.toList());
+
+
+        /*
+        return seats.stream()
+                .map(seat -> {
+                    boolean isReserved = ticketRepository.existsReservedTicketBySeatId(
+                            seat.getId(), List.of("PENDING", "PAID"));
+
+                    // ✅ 예약 여부를 콘솔에 출력
+                    System.out.println("Seat ID: " + seat.getId() + ", Reserved: " + isReserved);
+
+                    return new SeatResponseDTO(
+                            seat.getId(),
+                            seat.getHorizontal(),
+                            seat.getVertical(),
+                            isReserved
+                    );
+                })
+                .collect(Collectors.toList());
+
+         */
     }
 
     /**
