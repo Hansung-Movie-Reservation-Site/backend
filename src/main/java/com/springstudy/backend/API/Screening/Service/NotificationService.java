@@ -26,8 +26,8 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
 
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate; // 메시지 전송용
+//    @Autowired
+//    private SimpMessagingTemplate messagingTemplate; // 메시지 전송용
 
     /**
      * User을 조회한 후 Order을 조회하여 트랜잭션 문제 발생
@@ -160,12 +160,14 @@ public class NotificationService {
             order.setStatus("CANCELLED");
             orderRepository.save(order); // 상태 변경 저장
 
+            /*
             // ✅ 웹소켓을 통해 좌석 상태(CANCELED) broadcast
             SeatStatusMessage seatStatusMessage = new SeatStatusMessage(
                     order.getScreening().getId(),
                     order.getTickets().stream().map(ticket -> ticket.getSeat().getId()).toList(),
                     "CANCELED");
             messagingTemplate.convertAndSend("/topic/seats", seatStatusMessage);
+             */
 
             System.out.println("시간 초과 주문 취소 이메일 발송됨");
 

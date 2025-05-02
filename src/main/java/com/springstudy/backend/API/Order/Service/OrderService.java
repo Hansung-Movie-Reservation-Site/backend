@@ -36,11 +36,12 @@ public class OrderService {
 
     private final RestTemplate restTemplate;
 
-    private SimpMessagingTemplate messagingTemplate; // 메시지 전송용
+//    private SimpMessagingTemplate messagingTemplate; // 메시지 전송용
 
     @Value("${api.RECOMMEND_API_KEY}")
     String RECOMMEND_API_KEY;
 
+    /*
     public OrderService(OrderRepository orderRepository, ScreeningRepository screeningRepository,
                         SeatRepository seatRepository, UserRepository userRepository, TicketRepository ticketRepository,
                         RestTemplate restTemplate, SimpMessagingTemplate messagingTemplate) {
@@ -51,6 +52,18 @@ public class OrderService {
         this.ticketRepository = ticketRepository;
         this.restTemplate = restTemplate;
         this.messagingTemplate = messagingTemplate;
+    }
+     */
+
+    public OrderService(OrderRepository orderRepository, ScreeningRepository screeningRepository,
+                        SeatRepository seatRepository, UserRepository userRepository, TicketRepository ticketRepository,
+                        RestTemplate restTemplate) {
+        this.orderRepository = orderRepository;
+        this.screeningRepository = screeningRepository;
+        this.seatRepository = seatRepository;
+        this.userRepository = userRepository;
+        this.ticketRepository = ticketRepository;
+        this.restTemplate = restTemplate;
     }
 
     /**
@@ -155,9 +168,11 @@ public class OrderService {
         order.setTickets(tickets);
         orderRepository.save(order);
 
+        /*
         // ✅ 웹소켓을 통해 좌석 상태(PENDING) broadcast
         SeatStatusMessage seatStatusMessage = new SeatStatusMessage(screeningId, seatIds, "PENDING");
         messagingTemplate.convertAndSend("/topic/seats", seatStatusMessage);
+         */
 
         return order;
     }
@@ -247,5 +262,15 @@ public class OrderService {
         order.updateStatus("CANCELED");
         order.setTid(null);
         orderRepository.save(order);
+
+        /*
+        // ✅ 웹소켓을 통해 좌석 상태(CANCELED) broadcast
+        SeatStatusMessage seatStatusMessage = new SeatStatusMessage(
+                order.getScreening().getId(),
+                order.getTickets().stream().map(ticket -> ticket.getSeat().getId()).toList(),
+                "CANCELED");
+        messagingTemplate.convertAndSend("/topic/seats", seatStatusMessage);
+
+         */
     }
 }

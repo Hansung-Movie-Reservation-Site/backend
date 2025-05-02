@@ -1,3 +1,4 @@
+/*
 package com.springstudy.backend.Config;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,3 +32,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registration.interceptors(webSocketLoggingInterceptor); // ✅ 메시지 가로채기 등록
     }
 }
+*/

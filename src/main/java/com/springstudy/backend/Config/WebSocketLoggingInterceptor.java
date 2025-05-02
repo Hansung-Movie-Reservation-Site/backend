@@ -1,3 +1,4 @@
+/*
 package com.springstudy.backend.Config;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,3 +34,4 @@ public class WebSocketLoggingInterceptor implements ChannelInterceptor {
         return message;
     }
 }
+*/

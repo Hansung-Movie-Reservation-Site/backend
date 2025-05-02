@@ -25,7 +25,8 @@ public class KakaoPayService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final OrderRepository orderRepository;
-    private final SimpMessagingTemplate messagingTemplate;
+
+//    private final SimpMessagingTemplate messagingTemplate;
 
     private static KakaoReadyResponse kakaoReadyResponse;
 
@@ -38,11 +39,20 @@ public class KakaoPayService {
     @Value("${api.KAKAO_API_KEY}")
     String ADMIN_KEY;
 
+    /*
     public KakaoPayService(RestTemplate restTemplate, ObjectMapper objectMapper, OrderRepository orderRepository, SimpMessagingTemplate messagingTemplate) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.orderRepository = orderRepository;
         this.messagingTemplate = messagingTemplate;
+    }
+
+     */
+
+    public KakaoPayService(RestTemplate restTemplate, ObjectMapper objectMapper, OrderRepository orderRepository) {
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
+        this.orderRepository = orderRepository;
     }
 
     /**
@@ -252,12 +262,15 @@ public class KakaoPayService {
 
             orderRepository.save(order);
 
-            // ✅ 웹소켓을 통해 좌석 상태(CANCELED) broadcast
+            /*
+            // ✅ 웹소켓을 통해 좌석 상태(PAID) broadcast
             SeatStatusMessage seatStatusMessage = new SeatStatusMessage(
                     order.getScreening().getId(),
                     order.getTickets().stream().map(ticket -> ticket.getSeat().getId()).toList(),
                     "PAID");
             messagingTemplate.convertAndSend("/topic/seats", seatStatusMessage);
+
+             */
 
             return "✅ 결제 성공! TID: " + newTid;
         } catch (Exception e) {
@@ -299,12 +312,15 @@ public class KakaoPayService {
         order.setTid(null);
         orderRepository.save(order);
 
+        /*
         // ✅ 웹소켓을 통해 좌석 상태(CANCELED) broadcast
         SeatStatusMessage seatStatusMessage = new SeatStatusMessage(
                 order.getScreening().getId(),
                 order.getTickets().stream().map(ticket -> ticket.getSeat().getId()).toList(),
                 "CANCELED");
         messagingTemplate.convertAndSend("/topic/seats", seatStatusMessage);
+
+         */
     }
 
 }
