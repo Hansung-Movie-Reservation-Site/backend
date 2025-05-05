@@ -66,5 +66,23 @@ public class Movie {
     @Column(nullable = true)
     private LocalDate fetchedDate; // 영화 데이터를 가져온 날짜
 
+    @Column(nullable = true, length = 1000)
+    private String cast_1;
+
+    @Column(nullable = true, length = 1000)
+    private String cast_1_image;
+
+    @Column(nullable = true, length = 1000)
+    private String cast_2;
+
+    @Column(nullable = true, length = 1000)
+    private String cast_2_image;
+
+    @Column(nullable = true, length = 1000)
+    private String cast_3;
+
+    @Column(nullable = true, length = 1000)
+    private String cast_3_image;
+
 
 }

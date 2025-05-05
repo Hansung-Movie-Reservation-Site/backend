@@ -15,10 +15,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MovieService {
@@ -315,6 +313,12 @@ public class MovieService {
                 existing.setRankOldAndNew(newMovie.getRankOldAndNew());
                 existing.setAudiAcc(newMovie.getAudiAcc());
                 existing.setFull_video_link(newMovie.getFull_video_link());
+                existing.setCast_1(newMovie.getCast_1());
+                existing.setCast_1_image(newMovie.getCast_1_image());
+                existing.setCast_2(newMovie.getCast_2());
+                existing.setCast_2_image(newMovie.getCast_2_image());
+                existing.setCast_3(newMovie.getCast_3());
+                existing.setCast_3_image(newMovie.getCast_3_image());
 
                 movieRepository.save(existing);
                 finalMovies.add(existing);
@@ -406,6 +410,12 @@ public class MovieService {
                 .full_video_link((String) tmdbData.getOrDefault("full_video_link", null))
                 .fetchedDate(LocalDate.now())
                 .genres(genres)
+                .cast_1((String) tmdbData.getOrDefault("cast_1", null))
+                .cast_1_image((String) tmdbData.getOrDefault("cast_1_image", null))
+                .cast_2((String) tmdbData.getOrDefault("cast_2", null))
+                .cast_2_image((String) tmdbData.getOrDefault("cast_2_image", null))
+                .cast_3((String) tmdbData.getOrDefault("cast_3", null))
+                .cast_3_image((String) tmdbData.getOrDefault("cast_3_image", null))
                 .build();
 
 
@@ -424,6 +434,9 @@ public class MovieService {
         System.out.println("전일 대비 랭킹 증가 : " + a.getRankInten());
         System.out.println("총 관객 수 : " + a.getAudiAcc());
         System.out.println("영화 예고편 링크 : " + a.getFull_video_link());
+        System.out.println("배우1 : " + a.getCast_1() + " | 프로필 : " + a.getCast_1_image());
+        System.out.println("배우2 : " + a.getCast_2() + " | 프로필 : " + a.getCast_2_image());
+        System.out.println("배우3 : " + a.getCast_3() + " | 프로필 : " + a.getCast_3_image());
         System.out.println("=================================");
 
 
@@ -479,6 +492,13 @@ public class MovieService {
         String director = fetchTmdbMovieDirector(movieId);
         // System.out.println("director : " + director);
 
+        List<Map<String, String>> casts = fetchTmdbMovieCasts(movieId);
+        /*
+        System.out.println("///////////////////");
+        System.out.println(casts);
+        System.out.println("//////////////////");
+         */
+
         String trailerUrl = Optional.ofNullable(fetchTmdbMovieTrailerUrlKey(movieId))
                 .orElse("예고편이 제공되지 않습니다.");
         // System.out.println("trailerUrl : " + trailerUrl);
@@ -486,6 +506,7 @@ public class MovieService {
         /*
         Map에서 null이 들어가면 오류 발생
          */
+        /*
         return Map.of(
                 "id", matchedMovie.get("id"),
                 "poster_path", "https://image.tmdb.org/t/p/w500" + matchedMovie.get("poster_path"),
@@ -493,7 +514,27 @@ public class MovieService {
                 "release_date", matchedMovie.get("release_date"),
                 "runtime", runtime,
                 "director", director,
-                "full_video_link", trailerUrl
+                "full_video_link", trailerUrl,
+                "cast_1", casts.get(0).get("name"),
+                "cast_1_image", casts.get(0).get("profile_url"),
+                "cast_2", casts.get(1).get("name")
+        );
+         */
+
+        return Map.ofEntries(
+                Map.entry("id", matchedMovie.get("id")),
+                Map.entry("poster_path", "https://image.tmdb.org/t/p/w500" + matchedMovie.get("poster_path")),
+                Map.entry("overview", matchedMovie.get("overview")),
+                Map.entry("release_date", matchedMovie.get("release_date")),
+                Map.entry("runtime", runtime),
+                Map.entry("director", director),
+                Map.entry("full_video_link", trailerUrl),
+                Map.entry("cast_1", casts.get(0).get("name")),
+                Map.entry("cast_1_image", casts.get(0).get("profile_url")),
+                Map.entry("cast_2", casts.get(1).get("name")),
+                Map.entry("cast_2_image", casts.get(1).get("profile_url")),
+                Map.entry("cast_3", casts.get(2).get("name")),
+                Map.entry("cast_3_image", casts.get(2).get("profile_url"))
         );
 
     }
@@ -598,6 +639,72 @@ public class MovieService {
                 .map(crew -> (String) crew.getOrDefault("name", ""))
                 .findFirst()
                 .orElse("");
+    }
+
+
+    /*
+    배우들 정보 반환하는 코드
+     */
+    private List<Map<String, String>> fetchTmdbMovieCasts(Integer movieId) {
+        if (movieId == null) return Collections.emptyList();
+
+        String movieDetailUrl = "https://api.themoviedb.org/3/movie/"
+                + movieId + "?api_key="
+                + TMDB_API_KEY
+                + "&language=ko-KR&append_to_response=credits";
+
+        ResponseEntity<Map> response = restTemplate.getForEntity(movieDetailUrl, Map.class);
+
+        if (response.getBody() == null || !response.getBody().containsKey("credits")) {
+            System.out.println("❌ credits 정보 없음");
+            return Collections.emptyList();
+        }
+
+        Map<String, Object> credits = (Map<String, Object>) response.getBody().get("credits");
+        List<Map<String, Object>> castList = (List<Map<String, Object>>) credits.get("cast");
+
+        if (castList == null || castList.isEmpty()) {
+            System.out.println("❌ cast 정보 없음");
+            return Collections.emptyList();
+        }
+
+        // TMDB 프로필 이미지 base URL
+        String imageBaseUrl = "https://image.tmdb.org/t/p/w600_and_h900_bestv2/";
+
+        // cast 정보를 name, profile_url로 가공
+        List<Map<String, String>> result = castList.stream()
+                .map(cast -> {
+                    Map<String, String> castInfo = new HashMap<>();
+                    castInfo.put("name", (String) cast.getOrDefault("name", "배우 정보 없음"));
+
+                    String profilePath = (String) cast.get("profile_path");
+                    if (profilePath != null && !profilePath.isEmpty()) {
+                        castInfo.put("profile_url", imageBaseUrl + profilePath);
+                    } else {
+                        castInfo.put("profile_url", "배우 정보 없음");
+                    }
+
+
+                    return castInfo;
+                })
+                .collect(Collectors.toList());
+
+        // 3명 미만일 경우 부족한 만큼 '배우 정보 없음' 데이터로 채우기
+        while (result.size() < 3) {
+            Map<String, String> emptyCastInfo = new HashMap<>();
+            emptyCastInfo.put("name", "배우 정보 없음");
+            emptyCastInfo.put("profile_url", "배우 정보 없음");
+            result.add(emptyCastInfo);
+        }
+
+        // 3명 초과 → 앞 3명만 반환
+        if (result.size() > 3) {
+            return result.subList(0, 3);
+        }
+
+        // 3명일 경우 → 그대로 반환
+        return result;
+
     }
 
     /**
