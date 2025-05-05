@@ -462,7 +462,7 @@ public class ScreeningService {
                     .map(s -> new LocalTime[]{s.getStart(), s.getFinish()})
                     .collect(Collectors.toList());
 
-            int availableSlots = 6 - existingScreenings.size(); // 추가 가능 개수
+            int availableSlots = 3 - existingScreenings.size(); // 추가 가능 개수
             int toGenerate = Math.min(screeningsPerRoom, availableSlots); // 추가 개수 제한
             int generated = 0;
 
