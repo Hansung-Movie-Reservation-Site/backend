@@ -46,6 +46,7 @@ public class ReviewService {
         Review review = Review.builder()
                 .rating(request.getRating())
                 .review(request.getReview())
+                .spoiler(request.getSpoiler())
                 .user(user)
                 .movie(movie)
                 .build();

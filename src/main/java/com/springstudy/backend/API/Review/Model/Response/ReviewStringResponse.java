@@ -10,4 +10,5 @@ public class ReviewStringResponse {
     private Float rating;
     private String review;
     private String username;
+    private Boolean spoiler;
 }

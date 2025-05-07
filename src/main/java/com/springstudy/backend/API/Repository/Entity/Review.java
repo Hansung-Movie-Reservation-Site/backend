@@ -29,6 +29,9 @@ public class Review {
     @Column(nullable = false, length = 500)
     private String review;
 
+    @Column(nullable = false)
+    private boolean spoiler;
+
     @ManyToOne
     @JoinColumn(name = "userid", referencedColumnName = "id", nullable = false,
             foreignKey = @ForeignKey(name = "FK_review_TO_user_1"))
@@ -56,4 +59,11 @@ public class Review {
         this.review = review;
     }
 
+    public Boolean getSpoiler() { // @Getter있는데 r.getSpoiler()에서 자꾸 에러나서 추가함;;
+        return spoiler;
+    }
+
+    public void setSpoiler(Boolean spoiler) {
+        this.spoiler = spoiler;
+    }
 }

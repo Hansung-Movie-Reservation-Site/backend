@@ -6,6 +6,7 @@ import lombok.Getter;
 public class ReviewRequest {
     private Float rating;
     private String review;
+    private Boolean spoiler;
     private Long userId;
     private Long movieId;
 }
