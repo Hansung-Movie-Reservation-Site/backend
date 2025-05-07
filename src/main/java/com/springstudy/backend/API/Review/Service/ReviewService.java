@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -49,4 +51,9 @@ public class ReviewService {
                 .build();
         reviewRepository.save(review);
     }
+
+    public List<Review> getReviewsByMovieId(Long movieId) {
+        return reviewRepository.findByMovieId(movieId);
+    }
+
 }

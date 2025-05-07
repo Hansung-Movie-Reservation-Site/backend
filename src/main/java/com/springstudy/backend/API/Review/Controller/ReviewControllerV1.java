@@ -1,10 +1,14 @@
 package com.springstudy.backend.API.Review.Controller;
 
+import com.springstudy.backend.API.Repository.Entity.Review;
 import com.springstudy.backend.API.Review.Model.Request.ReviewRequest;
 import com.springstudy.backend.API.Review.Model.Response.ReviewResponse;
+import com.springstudy.backend.API.Review.Model.Response.ReviewStringResponse;
 import com.springstudy.backend.API.Review.Service.ReviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/review")
@@ -29,4 +33,16 @@ public class ReviewControllerV1 {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/getReviewsByMovie")
+    public List<ReviewStringResponse> getReviewsByMovie(@RequestParam Long movieId) {
+        List<Review> reviews = reviewService.getReviewsByMovieId(movieId);
+        return reviews.stream()
+                .map(r -> new ReviewStringResponse(
+                        r.getId(),
+                        r.getRating(),
+                        r.getReview(),
+                        r.getUser().getUsername()
+                ))
+                .toList();
+    }
 }
