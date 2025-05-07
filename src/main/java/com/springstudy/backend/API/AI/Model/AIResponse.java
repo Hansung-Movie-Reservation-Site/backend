@@ -10,13 +10,13 @@ public record AIResponse(
 
         @Schema(description = "성공여부")
         @NotBlank
-        ErrorCode errorCode,
+        ErrorCode code,
 
         @Schema(description = "추천 영화 id")
         @NotNull
         Long movie_id,
 
         @Schema(description = "추천 이유")
-        String aiResponse
+        String reason
 ) {
 }
