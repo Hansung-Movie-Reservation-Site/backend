@@ -466,6 +466,22 @@ public class MovieService {
 
         List<Map<String, Object>> results = (List<Map<String, Object>>) response.getBody().get("results");
 
+        /*
+        영화 영어 명으로 결과가 없을 시 한글 제목으로 조회
+         */
+        if (results.isEmpty()) {
+            query =  movieNm;
+            searchUrl = TMDB_SEARCH_URL + TMDB_API_KEY + "&query=" + query + "&year="
+                    + (releaseDate.isEmpty() ? "" : releaseDate.substring(0, 4))
+                    + "&language=ko-KR"
+                    + "&append_to_response=credits";
+            response = restTemplate.getForEntity(searchUrl, Map.class);
+            results = (List<Map<String, Object>>) response.getBody().get("results");
+        }
+
+        /*
+        그래도 없을 시 null 반환
+         */
         if (results.isEmpty()) {
             return Map.of();
         }
@@ -664,8 +680,18 @@ public class MovieService {
         List<Map<String, Object>> castList = (List<Map<String, Object>>) credits.get("cast");
 
         if (castList == null || castList.isEmpty()) {
-            System.out.println("❌ cast 정보 없음");
-            return Collections.emptyList();
+            List<Map<String, String>> emptyResult = new ArrayList<>();
+
+            /*
+            List.of()로 정의 시 불변 객체여서 원소를 추가할 수 없음
+             */
+            while (emptyResult.size() < 3) {
+                Map<String, String> emptyCastInfo = new HashMap<>();
+                emptyCastInfo.put("name", "배우 정보 없음");
+                emptyCastInfo.put("profile_url", "배우 정보 없음");
+                emptyResult.add(emptyCastInfo);
+            }
+            return emptyResult;
         }
 
         // TMDB 프로필 이미지 base URL
