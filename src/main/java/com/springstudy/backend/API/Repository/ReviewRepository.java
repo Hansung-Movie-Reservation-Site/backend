@@ -13,7 +13,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     //특정 유저의 모든 리뷰
     List<Review> findByUserId(Long userId);
     //특정 영화의 모든 리뷰
-    List<Review> findByMovieId(Long movieId);
+    List<Review> findByMovieIdOrderByIdDesc(Long movieId);
     //특정 영화에 특정 유저가 쓴 리뷰
     Optional<Review> findByMovieIdAndUserId(Long movieId, Long userId);
 
