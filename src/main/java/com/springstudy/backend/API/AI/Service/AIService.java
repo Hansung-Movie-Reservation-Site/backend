@@ -77,7 +77,7 @@ public class AIService {
         requestBody.put("model", "gpt-4o");
         // messages 리스트를 올바르게 구성
         List<Map<String, String>> messages = new ArrayList<>();
-        messages.add(Map.of("role", "system", "content", "사용자가 본 영화를 분석하여"+ movieData +"에서 사용자가 가장 선호할 것으로 예측되는 영화를 추천합니다. ex) 추천 영화가 아이리시맨이라면 추천영화:아이리시맨\n추천이유:인간이 범죄에 가담하면서 자아가 타락되는 이야기를 선호."));
+        messages.add(Map.of("role", "system", "content", "사용자가 본 영화를 분석하여"+ movieData +"에서 사용자가 가장 선호할 것으로 예측되는 영화를 추천합니다. ex) 추천 영화가 아이리시맨이라면 추천영화^^아이리시맨\n추천이유^^인간이 범죄에 가담하면서 자아가 타락되는 이야기를 선호."));
         messages.add(Map.of("role", "user", "content", likeMovies+"를 재밌게 봤는데 비슷한 영화 추천해줘."));
 
         requestBody.put("messages", messages);
@@ -91,7 +91,7 @@ public class AIService {
         String[] content = null;
         try{
             JsonNode rootNode = objectMapper.readTree(gptResponse.getBody());
-            content = rootNode.path("choices").get(0).path("message").path("content").asText().split(":");
+            content = rootNode.path("choices").get(0).path("message").path("content").asText().split("\n");
 
             if(content.length == 0)throw new CustomException(ErrorCode.GPT_PATH_ERROR);
             for(int i= 0;i<content.length;i++) {System.out.println(content[i]);}
@@ -136,11 +136,13 @@ public class AIService {
         // 4. 영화 내용 + api key로 요청 데이터 만들고 gpt 통신.
 
         String[] content= responseToString(gptResponse);
-        // 5. 통신 결과를 string으로 맵핑.
+        // 5. 통신 결과를 string으로 맵핑. 2 3
 
-        String title = content[1].split("\n")[0].trim();
-        String reason = content[2].trim();
-        AI result = saveResponse(user, title, reason);
+            String title = content[0].split("\\^\\^")[1].trim();
+            System.out.println("content 최종 title: "+title);
+            String reason = content[1].split("\\^\\^")[1].trim();
+            AI result = saveResponse(user, title, reason);
+
         System.out.println(result.toString());
         // 6. 추천 결과를 저장.
         if(result == null){throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);}
