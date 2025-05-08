@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.springstudy.backend.API.AI.Model.AIRecommendedMovieDTO;
 import com.springstudy.backend.API.AI.Model.AIRequest;
 import com.springstudy.backend.API.AI.Model.AIResponse;
 import com.springstudy.backend.API.Repository.AIRepository;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -146,5 +148,24 @@ public class AIService {
         if(result == null){throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);}
 
         return new AIResponse(ErrorCode.SUCCESS, result.getMovieId(), result.getReason());
+    }
+
+    public List<AIRecommendedMovieDTO> getAIRecommendedMovies(User user) {
+        List<AI> aiList = aiRepository.findByUser(user);
+
+        // movieId -> reason 매핑
+        Map<Long, String> reasonMap = aiList.stream()
+                .collect(Collectors.toMap(AI::getMovieId, AI::getReason));
+
+        List<Movie> movies = movieRepository.findAllById(reasonMap.keySet());
+
+        return movies.stream()
+                .map(movie -> new AIRecommendedMovieDTO(
+                        movie.getId(),
+                        movie.getTitle(),
+                        movie.getPosterImage() != null ? movie.getPosterImage() : "/placeholder.svg?height=256&width=200&text=" + movie.getTitle(),
+                        reasonMap.get(movie.getId())  // ✅ 추천 이유도 전달
+                ))
+                .collect(Collectors.toList());
     }
 }
