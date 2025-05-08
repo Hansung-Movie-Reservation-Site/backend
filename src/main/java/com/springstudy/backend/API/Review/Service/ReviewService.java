@@ -25,8 +25,10 @@ public class ReviewService {
     private final UserRepository userRepository;
 
     public ReviewResponse getAverageRatingByMovieId(Long movieId) {
-        double averageRating = reviewRepository.findAverageRatingByMovieId(movieId);
-
+        Double averageRating = reviewRepository.findAverageRatingByMovieId(movieId);
+        if(averageRating == null) {
+            averageRating = 0.0;
+        }
         return new ReviewResponse(movieId, averageRating);
     }
 
