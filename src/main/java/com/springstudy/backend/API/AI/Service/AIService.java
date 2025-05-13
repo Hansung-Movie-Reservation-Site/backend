@@ -142,7 +142,11 @@ public class AIService {
 
             String title = content[0].split("\\^\\^")[1].trim();
             System.out.println("content 최종 title: "+title);
+        String r = content[1].split("\\^\\^")[1].trim();
+        System.out.println("content 최종 r: "+r);
             String reason = content[1].split("\\^\\^")[1].trim();
+            System.out.println("content 최종 reason: "+reason);
+            if(content[1].equals(""))reason = content[2].split("\\^\\^")[1].trim();
             AI result = saveResponse(user, title, reason);
 
         System.out.println(result.toString());
