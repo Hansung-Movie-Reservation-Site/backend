@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "review",
         uniqueConstraints = @UniqueConstraint(
@@ -31,6 +33,9 @@ public class Review {
 
     @Column(nullable = false)
     private boolean spoiler;
+
+    @Column(nullable = false)
+    private LocalDate reviewDate = LocalDate.now();
 
     @ManyToOne
     @JoinColumn(name = "userid", referencedColumnName = "id", nullable = false,

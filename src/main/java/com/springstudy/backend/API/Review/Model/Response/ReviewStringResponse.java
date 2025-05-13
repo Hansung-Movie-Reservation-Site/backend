@@ -3,6 +3,8 @@ package com.springstudy.backend.API.Review.Model.Response;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDate;
+
 @Getter
 @AllArgsConstructor
 public class ReviewStringResponse {
@@ -11,4 +13,5 @@ public class ReviewStringResponse {
     private String review;
     private String username;
     private Boolean spoiler;
+    private LocalDate review_date;
 }

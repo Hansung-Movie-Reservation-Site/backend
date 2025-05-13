@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -24,8 +25,10 @@ public class ReviewService {
     private final UserRepository userRepository;
 
     public ReviewResponse getAverageRatingByMovieId(Long movieId) {
-        double averageRating = reviewRepository.findAverageRatingByMovieId(movieId);
-
+        Double averageRating = reviewRepository.findAverageRatingByMovieId(movieId);
+        if(averageRating == null) {
+            averageRating = 0.0;
+        }
         return new ReviewResponse(movieId, averageRating);
     }
 
@@ -47,6 +50,7 @@ public class ReviewService {
                 .rating(request.getRating())
                 .review(request.getReview())
                 .spoiler(request.getSpoiler())
+                .reviewDate(LocalDate.now())
                 .user(user)
                 .movie(movie)
                 .build();

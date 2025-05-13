@@ -42,7 +42,8 @@ public class ReviewControllerV1 {
                         r.getRating(),
                         r.getReview(),
                         r.getUser().getUsername(),
-                        r.getSpoiler()
+                        r.getSpoiler(),
+                        r.getReviewDate()
                 ))
                 .toList();
     }
