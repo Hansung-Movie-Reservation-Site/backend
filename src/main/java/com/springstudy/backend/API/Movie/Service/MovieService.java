@@ -746,6 +746,17 @@ public class MovieService {
         return movieRepository.findByTitleContainingIgnoreCase(keyword);
     }
 
+    @Transactional(readOnly = true)
+    public Movie searchMoviesById(Long id) {
+        if (id == null) {
+            System.out.println(id); // 문자열 null 발생
+            throw new IllegalArgumentException("❌ id를 입력하세요.");
+        }
+        Optional<Movie> movieOptional = movieRepository.findById(id);
+
+        return movieOptional.get();
+    }
+
     /**
      * ✅ `null`이거나 공백 문자열인지 확인하는 유틸리티 메서드
      */

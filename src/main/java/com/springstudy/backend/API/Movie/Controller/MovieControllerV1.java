@@ -60,4 +60,14 @@ public class MovieControllerV1 {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    @GetMapping("/search/id")
+    public ResponseEntity<Movie> searchMovies(@RequestParam Long id) {
+        try {
+            Movie movie = movieService.searchMoviesById(id);
+            return ResponseEntity.ok(movie);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
 }
