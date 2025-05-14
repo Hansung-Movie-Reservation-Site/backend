@@ -13,7 +13,12 @@ public class WebConfig implements WebMvcConfigurer {
         // addCorsMappings: CorsRegistry의 속성을 관리하여 CORS 설정을 하는 메소드.
         // CorsRegistry: CORS 관리하는 클래스.
         registry.addMapping("/**") // addMapping: 어떤 엔드포인트에 CORS를 허용할지.
-                .allowedOrigins("http://localhost:3000", "http://localhost:8000", "http://43.200.184.143:8080","http://hs-cinemagix.duckdns.org:8080") // allowedOriginPatterns: 어떤 클라이언트 주소 요청을 허용할지.
+                .allowedOrigins(
+                        "http://localhost:3000",
+                        "http://localhost:8000",
+                        "http://43.200.184.143:8080",
+                        "http://hs-cinemagix.duckdns.org:8080",
+                        "https://cinemagix-xi.vercel.app") // allowedOriginPatterns: 어떤 클라이언트 주소 요청을 허용할지.
                 // nextjs: 3000, flutter: 8000
                 .allowedMethods("GET","POST","PUT","DELETE") // allowedMethods: CORS가 허용하는 메소드 설정.
                 .allowedHeaders("*") // allowedHeaders: CORS가 허용하는 요청 헤더 설정.
