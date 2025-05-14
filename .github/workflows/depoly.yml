@@ -63,6 +63,6 @@ jobs:
           script: |
             docker stop movie-server || true
             docker rm movie-server || true
-            docker image prune -f
             docker pull ${{ steps.login-ecr.outputs.registry }}/movie-server:latest
             docker run -d --name movie-server -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/movie-server:latest
+            docker image prune -f
