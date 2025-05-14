@@ -61,7 +61,7 @@ public class MovieControllerV1 {
         }
     }
 
-    @GetMapping("/search")
+    @GetMapping("/searchById")
     public ResponseEntity<Movie> searchMovies(@RequestParam Long id) {
         try {
             Movie movie = movieService.searchMoviesById(id);
