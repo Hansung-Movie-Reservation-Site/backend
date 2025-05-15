@@ -9,7 +9,7 @@ import com.springstudy.backend.API.Repository.Entity.Region;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/regions")
+@RequestMapping("/api/v1/regions")
 @RequiredArgsConstructor
 public class RegionController {
 
