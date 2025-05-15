@@ -1,6 +1,7 @@
 package com.springstudy.backend.Scheduler;
 
 import com.springstudy.backend.API.Movie.Service.MovieService;
+import com.springstudy.backend.API.Region.RegionService;
 import com.springstudy.backend.API.Repository.Entity.Movie;
 import com.springstudy.backend.API.Repository.Entity.Room;
 import com.springstudy.backend.API.Room.Service.RoomService;
@@ -34,6 +35,7 @@ public class DailyApiScheduler {
     private final ScreeningService screeningService;
     private final RoomService roomService;
     private final SpotService spotService;
+    private final RegionService regionService;
 
     /*
     // ✅ 매일 09:00에 두 API 호출
@@ -76,9 +78,11 @@ public class DailyApiScheduler {
 
     public void callDailyApisWeek() {
         try {
+            // 최초. 누락된 region 데이터 삽입
+            regionService.insertMissingRegions();
+
             // ✅ 0. 누락된 Spot 데이터 삽입
             spotService.insertMissingSpots();
-            System.out.println("[✅] Spot 누락된 데이터 삽입 완료");
 
             // ✅ 1. Room + Seat 생성
             int roomsToCreatePerSpot = 5;

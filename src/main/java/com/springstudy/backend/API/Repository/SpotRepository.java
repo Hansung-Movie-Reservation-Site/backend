@@ -14,4 +14,6 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
 
     boolean existsByNameAndRegionId(String name, Long regionId);
 
+    boolean existsByNameAndRegion_Name(String name, String regionName);
+
 }

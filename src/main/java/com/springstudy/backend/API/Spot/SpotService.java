@@ -24,21 +24,23 @@ public class SpotService {
     @Transactional
     public void insertMissingSpots() {
         List<SpotSeed> requiredSpots = List.of(
-                new SpotSeed("강남", 1L), new SpotSeed("건대입구", 1L), new SpotSeed("대학로", 1L), new SpotSeed("미아", 1L),
-                new SpotSeed("남양주", 2L), new SpotSeed("동탄", 2L), new SpotSeed("분당", 2L), new SpotSeed("수원", 2L),
-                new SpotSeed("검단", 3L), new SpotSeed("송도", 3L), new SpotSeed("영종", 3L), new SpotSeed("인천논현", 3L),
-                new SpotSeed("남춘천", 4L), new SpotSeed("속초", 4L), new SpotSeed("원주혁신", 4L), new SpotSeed("춘천석사", 4L),
-                new SpotSeed("대구신세계", 5L), new SpotSeed("대구이시아", 5L), new SpotSeed("마산", 5L), new SpotSeed("창원", 5L),
-                new SpotSeed("경상대", 6L), new SpotSeed("덕천", 6L), new SpotSeed("부산대", 6L), new SpotSeed("해운대", 6L),
-                new SpotSeed("서귀포", 7L), new SpotSeed("제주삼화", 7L), new SpotSeed("제주아라", 7L)
+                new SpotSeed("강남", "서울"), new SpotSeed("건대입구", "서울"), new SpotSeed("대학로", "서울"), new SpotSeed("미아", "서울"),
+                new SpotSeed("남양주", "경기"), new SpotSeed("동탄", "경기"), new SpotSeed("분당", "경기"), new SpotSeed("수원", "경기"),
+                new SpotSeed("검단", "인천"), new SpotSeed("송도", "인천"), new SpotSeed("영종", "인천"), new SpotSeed("인천논현", "인천"),
+                new SpotSeed("남춘천", "강원"), new SpotSeed("속초", "강원"), new SpotSeed("원주혁신", "강원"), new SpotSeed("춘천석사", "강원"),
+                new SpotSeed("대구신세계", "대구"), new SpotSeed("대구이시아", "대구"), new SpotSeed("마산", "대구"), new SpotSeed("창원", "대구"),
+                new SpotSeed("경상대", "부산"), new SpotSeed("덕천", "부산"), new SpotSeed("부산대", "부산"), new SpotSeed("해운대", "부산"),
+                new SpotSeed("서귀포", "제주"), new SpotSeed("제주삼화", "제주"), new SpotSeed("제주아라", "제주")
         );
 
         int insertedCount = 0;
 
         for (SpotSeed seed : requiredSpots) {
-            boolean exists = spotRepository.existsByNameAndRegionId(seed.name(), seed.regionId());
+            boolean exists = spotRepository.existsByNameAndRegion_Name(seed.name(), seed.regionName());
             if (!exists) {
-                Region region = regionRepository.getReferenceById(seed.regionId());
+                Region region = regionRepository.findByName(seed.regionName())
+                        .orElseThrow(() -> new IllegalArgumentException("❌ Region name not found: " + seed.regionName()));
+
                 Spot spot = Spot.builder()
                         .name(seed.name())
                         .region(region)
