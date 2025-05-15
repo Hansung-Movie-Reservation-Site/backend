@@ -82,6 +82,8 @@ public class OrderService {
         Screening screening = screeningRepository.findById(screeningId)
                 .orElseThrow(() -> new IllegalArgumentException("❌ 유효하지 않은 상영 ID"));
 
+
+        /*
         // ✅ 현재 시간이 상영 시작 30분 전인지 확인
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime screeningStartTime = LocalDateTime.of(screening.getDate(), screening.getStart());
@@ -89,7 +91,7 @@ public class OrderService {
         if (now.isAfter(screeningStartTime.minusMinutes(30))) {
             throw new IllegalStateException("❌ 상영 시작 30분 전 이후에는 예매할 수 없습니다.");
         }
-
+        */
 
         // ✅ 선택한 좌석 조회
         List<Seat> seats = seatRepository.findByIdIn(seatIds);

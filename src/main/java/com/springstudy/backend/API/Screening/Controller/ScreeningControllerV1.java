@@ -25,6 +25,11 @@ public class ScreeningControllerV1 {
         this.screeningService = screeningService;
     }
 
+    @GetMapping("/getAll")
+    public List<Screening> getAllScreenings() {
+        return screeningService.getAllScreenings();
+    }
+
     /**
      * ✅ 날짜, Spot 이름, (선택적) 영화 ID를 이용하여 Screening 데이터 조회
      * GET /api/v1/screening?spotName=강남&date=2025-02-20

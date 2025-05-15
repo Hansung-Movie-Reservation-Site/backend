@@ -3,10 +3,7 @@ package com.springstudy.backend.API.Room.Controller;
 import com.springstudy.backend.API.Repository.Entity.Room;
 import com.springstudy.backend.API.Room.Service.RoomService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -47,4 +44,11 @@ public class RoomController {
         List<Room> rooms = roomService.createAllRoomsWithSeats(count);
         return ResponseEntity.ok(rooms);
     }
+
+    @GetMapping("/getAll")
+    public List<Room> getAllRooms() {
+        return roomService.getAllRooms();
+    }
+
+
 }

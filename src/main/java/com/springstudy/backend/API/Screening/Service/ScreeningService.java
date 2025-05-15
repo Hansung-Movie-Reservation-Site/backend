@@ -37,6 +37,10 @@ public class ScreeningService {
         this.movieRepository = movieRepository;
     }
 
+    public List<Screening> getAllScreenings() {
+        return screeningRepository.findAll();
+    }
+
     /**
      * ✅ 특정 Spot 이름으로 Spot ID 찾기
      */

@@ -171,5 +171,9 @@ public class RoomService {
         return seats;
     }
 
+    public List<Room> getAllRooms() {
+        return roomRepository.findAll();
+    }
+
 
 }
