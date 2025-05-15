@@ -456,8 +456,8 @@ public class ScreeningService {
             // ✅ DB에서 이미 저장된 Screening 정보 조회
             List<Screening> existingScreenings = screeningRepository.findByRoomAndDate(room, date);
 
-            // ✅ 6개 이상이면 건너뜀
-            if (existingScreenings.size() >= 6) {
+            // ✅ 3개 이상이면 건너뜀
+            if (existingScreenings.size() >= 3) {
                 continue;
             }
 
@@ -529,6 +529,96 @@ public class ScreeningService {
 
         return createdDTOs;
     }
+
+
+    public List<ScreeningAddDTO> createScreeningsForWeekWithSpecificMovies(
+            int screeningsPerRoom, int price, List<Long> allowedMovieIds) {
+
+        if (screeningsPerRoom < 1 || screeningsPerRoom > 3) {
+            throw new IllegalArgumentException("screeningsPerRoom 값은 1에서 3 사이여야 합니다.");
+        }
+
+        List<Movie> movies = movieRepository.findAllById(allowedMovieIds);
+        List<Room> rooms = roomRepository.findAll();
+        List<ScreeningAddDTO> allCreatedDTOs = new ArrayList<>();
+        Random random = new Random();
+
+        LocalDate today = LocalDate.now();
+        LocalTime dayStartTime = LocalTime.of(9, 0);
+        LocalTime dayEndTime = LocalTime.of(23, 0);
+
+        // ✅ 오늘부터 7일 동안 반복
+        for (int i = 0; i < 7; i++) {
+            LocalDate targetDate = today.plusDays(i);
+
+            for (Room room : rooms) {
+                List<Screening> existingScreenings = screeningRepository.findByRoomAndDate(room, targetDate);
+                if (existingScreenings.size() >= 3) continue;
+
+                List<LocalTime[]> occupiedSlots = existingScreenings.stream()
+                        .map(s -> new LocalTime[]{s.getStart(), s.getFinish()})
+                        .collect(Collectors.toList());
+
+                int availableSlots = 3 - existingScreenings.size();
+                int toGenerate = Math.min(screeningsPerRoom, availableSlots);
+                int generated = 0;
+
+                while (generated < toGenerate) {
+                    Movie movie = movies.get(random.nextInt(movies.size()));
+                    int runtime = Optional.ofNullable(movie.getRuntime()).orElse(100);
+                    int buffer = 10;
+
+                    // 총 소요 시간
+                    int totalMinutes = runtime + buffer;
+
+                    // 랜덤 시작 시간 선택
+                    int availableMinutes = (int) Duration.between(dayStartTime, dayEndTime).toMinutes() - totalMinutes;
+                    if (availableMinutes <= 0) break;
+
+                    int randomMinutes = random.nextInt(availableMinutes);
+                    LocalTime rawStart = dayStartTime.plusMinutes(randomMinutes);
+
+                    // 시작 시간 5분 단위 정렬
+                    int modStart = rawStart.getMinute() % 5;
+                    LocalTime adjustedStart = rawStart.plusMinutes(modStart == 0 ? 0 : 5 - modStart);
+
+                    // 종료 시간 계산 및 정렬
+                    LocalTime rawFinish = adjustedStart.plusMinutes(runtime);
+                    int modFinish = rawFinish.getMinute() % 5;
+                    LocalTime adjustedFinish = rawFinish.plusMinutes(modFinish == 0 ? 0 : 5 - modFinish);
+
+                    if (adjustedFinish.isAfter(LocalTime.of(23, 59))) continue;
+
+                    // ✅ 겹침 검사
+                    boolean overlaps = occupiedSlots.stream().anyMatch(slot ->
+                            !(adjustedFinish.isBefore(slot[0]) || adjustedStart.isAfter(slot[1]))
+                    );
+                    if (overlaps) continue;
+
+                    Screening screening = Screening.builder()
+                            .movie(movie)
+                            .room(room)
+                            .date(targetDate)
+                            .start(adjustedStart)
+                            .finish(adjustedFinish)
+                            .price(price)
+                            .build();
+
+                    screeningRepository.save(screening);
+                    occupiedSlots.add(new LocalTime[]{adjustedStart, adjustedFinish});
+
+                    allCreatedDTOs.add(new ScreeningAddDTO(
+                            targetDate, room.getRoomnumber(), movie.getTitle(), adjustedStart, adjustedFinish
+                    ));
+
+                    generated++;
+                }
+            }
+        }
+
+        return allCreatedDTOs;
+    }
+
 
     /**
      * 코드 작성 중, 에러 발생
