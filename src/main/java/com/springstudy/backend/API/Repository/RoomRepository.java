@@ -16,4 +16,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 
     @Query("SELECT MAX(r.roomnumber) FROM Room r WHERE r.spot.id = :spotId")
     Optional<Long> findMaxRoomNumberBySpotId(Long spotId);
+
+    int countBySpotId(Long spotId);
 }

@@ -45,6 +45,12 @@ public class RoomController {
         return ResponseEntity.ok(rooms);
     }
 
+    @PostMapping("/create/with-seats-all-max-5")
+    public ResponseEntity<List<Room>> createAllRoomsWithSeatsV2(@RequestParam int count) {
+        List<Room> rooms = roomService.createAllRoomsWithSeatsV2(count);
+        return ResponseEntity.ok(rooms);
+    }
+
     @GetMapping("/getAll")
     public List<Room> getAllRooms() {
         return roomService.getAllRooms();

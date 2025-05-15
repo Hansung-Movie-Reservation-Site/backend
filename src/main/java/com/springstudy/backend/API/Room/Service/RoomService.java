@@ -154,6 +154,44 @@ public class RoomService {
         return createdRooms;
     }
 
+    @Transactional
+    public List<Room> createAllRoomsWithSeatsV2(int count) {
+        List<Spot> allSpots = spotRepository.findAll();
+        List<Room> createdRooms = new ArrayList<>();
+
+        for (Spot spot : allSpots) {
+            Long spotId = spot.getId();
+
+            // 현재 spot에 존재하는 room 수 조회
+            int existingRoomCount = roomRepository.countBySpotId(spotId);
+            // System.out.println("spot Id: " + spotId + " existingRoomCount: " + existingRoomCount);
+
+            int roomsToCreate = Math.min(count, 5 - existingRoomCount);
+
+            if (roomsToCreate <= 0) continue;
+
+            // 현재 최대 roomnumber 조회
+            Long currentMax = roomRepository.findMaxRoomNumberBySpotId(spotId).orElse(0L);
+
+            for (int i = 1; i <= roomsToCreate; i++) {
+                Room room = Room.builder()
+                        .spot(spot)
+                        .roomnumber(currentMax + i)
+                        .build();
+
+                Room savedRoom = roomRepository.save(room);
+
+                List<Seat> seats = generateSeatsForRoom(savedRoom);
+                seatRepository.saveAll(seats);
+
+                createdRooms.add(savedRoom);
+            }
+        }
+
+        return createdRooms;
+    }
+
+
     private List<Seat> generateSeatsForRoom(Room room) {
         List<Seat> seats = new ArrayList<>();
 
