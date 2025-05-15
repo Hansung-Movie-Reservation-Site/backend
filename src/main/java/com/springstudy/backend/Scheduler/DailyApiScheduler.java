@@ -6,6 +6,7 @@ import com.springstudy.backend.API.Repository.Entity.Room;
 import com.springstudy.backend.API.Room.Service.RoomService;
 import com.springstudy.backend.API.Screening.Response.ScreeningAddDTO;
 import com.springstudy.backend.API.Screening.Service.ScreeningService;
+import com.springstudy.backend.API.Spot.SpotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -27,11 +28,12 @@ public class DailyApiScheduler {
 
     private static final String MOVIE_API_URL =
             "http://localhost:8080/api/v1/movies/daily";
-    private static final LocalTime SCHEDULED_TIME = LocalTime.of(9, 0); // 오전 9시
+    private static final LocalTime SCHEDULED_TIME = LocalTime.of(0, 0); // 오전 9시
 
     private final MovieService movieService;
     private final ScreeningService screeningService;
     private final RoomService roomService;
+    private final SpotService spotService;
 
     /*
     // ✅ 매일 09:00에 두 API 호출
@@ -58,22 +60,26 @@ public class DailyApiScheduler {
 
      */
 
-    @Scheduled(cron = "0 0 9 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void scheduledDailyApiCalls() {
-        System.out.println("[스케줄러] 09:00에 자동 실행 시작");
+        System.out.println("[스케줄러] 00:00에 자동 실행 시작");
         callDailyApisWeek();
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void runOnStartupIfNeeded() {
         if (LocalTime.now().isAfter(SCHEDULED_TIME)) {
-            System.out.println("[스케줄러] 애플리케이션 시작 시 09:00 이후 → 즉시 실행");
+            System.out.println("[스케줄러] 애플리케이션 시작 시 00:00 이후 → 즉시 실행");
             callDailyApisWeek();
         }
     }
 
     public void callDailyApisWeek() {
         try {
+            // ✅ 0. 누락된 Spot 데이터 삽입
+            spotService.insertMissingSpots();
+            System.out.println("[✅] Spot 누락된 데이터 삽입 완료");
+
             // ✅ 1. Room + Seat 생성
             int roomsToCreatePerSpot = 5;
             List<Room> createdRooms = roomService.createAllRoomsWithSeatsV2(roomsToCreatePerSpot);
