@@ -33,7 +33,7 @@ public class KakaoPayService {
     private static final String KAKAO_PAY_READY_URL = "https://open-api.kakaopay.com/online/v1/payment/ready";
     private static final String KAKAO_PAY_APPROVE_URL = "https://open-api.kakaopay.com/online/v1/payment/approve";
     private static final String KAKAO_PAY_CANCEL_URL = "https://open-api.kakaopay.com/online/v1/payment/cancel";
-    private static final String DOMAIN_URL = "http://localhost:8080/api/v1/payment/";
+    private static final String DOMAIN_URL = "https://hs-cinemagix.duckdns.org/api/v1/payment/";
 
 
     @Value("${api.KAKAO_API_KEY}")
