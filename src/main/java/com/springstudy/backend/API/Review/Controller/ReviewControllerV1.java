@@ -8,7 +8,9 @@ import com.springstudy.backend.API.Review.Service.ReviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/review")
@@ -46,5 +48,26 @@ public class ReviewControllerV1 {
                         r.getReviewDate()
                 ))
                 .toList();
+    }
+
+    @PostMapping("/likeToggle")
+    public ResponseEntity<Map<String, Object>> toggleLike(@RequestParam Long userId, @RequestParam Long reviewId) {
+        boolean liked = reviewService.toggleReviewLike(userId, reviewId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("reviewId", reviewId);
+        response.put("userId", userId);
+        response.put("liked", liked);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getLikeCount")
+    public ResponseEntity<Map<String, Object>> getLikeCount(@RequestParam Long reviewId) {
+        long likeCount = reviewService.getLikeCount(reviewId);
+        Map<String, Object> response = new HashMap<>();
+        response.put("reviewId", reviewId);
+        response.put("likeCount", likeCount);
+        return ResponseEntity.ok(response);
     }
 }

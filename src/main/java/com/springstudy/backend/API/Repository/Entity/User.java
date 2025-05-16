@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -89,6 +90,14 @@ public class User {
     @JsonIgnoreProperties("user")
     @OneToMany(mappedBy= "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     List<MyTheather> myTheatherList = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "review_like",
+            joinColumns = @JoinColumn(name = "userid"),
+            inverseJoinColumns = @JoinColumn(name = "reviewid")
+    )
+    private Set<Review> likedReviews;
 
     @Transactional
     public List<MyTheather> getMyTheatherList() {

@@ -1,5 +1,7 @@
 package com.springstudy.backend.API.Review.Service;
 
+import com.springstudy.backend.API.Repository.Entity.ReviewLike;
+import com.springstudy.backend.API.Repository.ReviewLikeRepository;
 import com.springstudy.backend.API.Review.Model.Request.ReviewRequest;
 import com.springstudy.backend.API.Review.Model.Response.ReviewResponse;
 import com.springstudy.backend.API.Repository.Entity.Movie;
@@ -23,6 +25,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final MovieRepository movieRepository;
     private final UserRepository userRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     public ReviewResponse getAverageRatingByMovieId(Long movieId) {
         Double averageRating = reviewRepository.findAverageRatingByMovieId(movieId);
@@ -61,4 +64,31 @@ public class ReviewService {
         return reviewRepository.findByMovieIdOrderByIdDesc(movieId);
     }
 
+    @Transactional
+    public boolean toggleReviewLike(Long userId, Long reviewId) {
+        boolean alreadyLiked = reviewLikeRepository.existsByUserIdAndReviewId(userId, reviewId);
+
+        if (alreadyLiked) {
+            reviewLikeRepository.deleteByUserIdAndReviewId(userId, reviewId);
+            return false; // 좋아요 취소됨
+        } else {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+            Review review = reviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new RuntimeException("리뷰 없음"));
+
+            ReviewLike like = ReviewLike.builder()
+                    .user(user)
+                    .review(review)
+                    .build();
+
+            reviewLikeRepository.save(like);
+            return true; // 좋아요 추가됨
+        }
+    }
+
+    public long getLikeCount(Long reviewId) {
+        return reviewLikeRepository.countByReviewId(reviewId);
+    }
 }

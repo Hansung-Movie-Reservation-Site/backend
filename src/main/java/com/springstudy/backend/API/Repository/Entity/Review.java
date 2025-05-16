@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Table(name = "review",
@@ -46,6 +47,9 @@ public class Review {
     @JoinColumn(name = "movieid", referencedColumnName = "id", nullable = false,
             foreignKey = @ForeignKey(name = "FK_review_TO_movie_1"))
     private Movie movie;
+
+    @ManyToMany(mappedBy = "likedReviews")
+    private Set<User> likedByUsers;
 
     public void setRating(Float rating) {
         if (rating < 0.0 || rating > 5.0) {
