@@ -13,6 +13,6 @@ public interface ReviewLikeRepository extends JpaRepository<ReviewLike, ReviewLi
     void deleteByUserIdAndReviewId(Long userId, Long reviewId);
 
     @Query("SELECT COUNT(rl) FROM ReviewLike rl WHERE rl.review.id = :reviewId")
-    long countByReviewId(@Param("reviewId") Long reviewId);
+    int countByReviewId(@Param("reviewId") Long reviewId);
 
 }

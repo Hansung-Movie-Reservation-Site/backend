@@ -2,6 +2,7 @@ package com.springstudy.backend.API.Review.Controller;
 
 import com.springstudy.backend.API.Repository.Entity.Review;
 import com.springstudy.backend.API.Review.Model.Request.ReviewRequest;
+import com.springstudy.backend.API.Review.Model.Response.ReviewLikeResponse;
 import com.springstudy.backend.API.Review.Model.Response.ReviewResponse;
 import com.springstudy.backend.API.Review.Model.Response.ReviewStringResponse;
 import com.springstudy.backend.API.Review.Service.ReviewService;
@@ -63,11 +64,8 @@ public class ReviewControllerV1 {
     }
 
     @GetMapping("/getLikeCount")
-    public ResponseEntity<Map<String, Object>> getLikeCount(@RequestParam Long reviewId) {
-        long likeCount = reviewService.getLikeCount(reviewId);
-        Map<String, Object> response = new HashMap<>();
-        response.put("reviewId", reviewId);
-        response.put("likeCount", likeCount);
+    public ResponseEntity<ReviewLikeResponse> getLikeCount(@RequestParam Long reviewId) {
+        ReviewLikeResponse response = reviewService.getLikeCount(reviewId);
         return ResponseEntity.ok(response);
     }
 }

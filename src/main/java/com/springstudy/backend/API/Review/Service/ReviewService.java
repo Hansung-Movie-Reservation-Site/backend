@@ -3,6 +3,7 @@ package com.springstudy.backend.API.Review.Service;
 import com.springstudy.backend.API.Repository.Entity.ReviewLike;
 import com.springstudy.backend.API.Repository.ReviewLikeRepository;
 import com.springstudy.backend.API.Review.Model.Request.ReviewRequest;
+import com.springstudy.backend.API.Review.Model.Response.ReviewLikeResponse;
 import com.springstudy.backend.API.Review.Model.Response.ReviewResponse;
 import com.springstudy.backend.API.Repository.Entity.Movie;
 import com.springstudy.backend.API.Repository.Entity.Review;
@@ -88,7 +89,8 @@ public class ReviewService {
         }
     }
 
-    public long getLikeCount(Long reviewId) {
-        return reviewLikeRepository.countByReviewId(reviewId);
+    public ReviewLikeResponse getLikeCount(Long reviewId) {
+        int likeCount = reviewLikeRepository.countByReviewId(reviewId);
+        return new ReviewLikeResponse(likeCount, reviewId);
     }
 }
