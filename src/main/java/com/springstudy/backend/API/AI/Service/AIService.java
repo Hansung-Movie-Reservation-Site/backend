@@ -247,15 +247,20 @@ public class AIService {
 
     private String getBoxofficeV2(Long id){
 
+        /*
         LocalDate today = LocalDate.now();
         List<Movie> movieList = movieRepository.findAllByFetchedDate(today);
+
+         */
+        List<Movie> movieList = movieRepository.findAll();
 
         if(movieList.isEmpty()){throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);}
 
         String movieData = "";
         for(int i= 0;i<movieList.size();i++){
             Movie m = movieList.get(i);
-            // if(reviewRepository.findByMovieIdAndUserId(m.getId(), id).isPresent()){continue;}
+            if(reviewRepository.findByMovieIdAndUserId(m.getId(), id).isPresent()){continue;}
+            // if(m.getFetchedDate().isBefore(LocalDate.now())){continue;}
             movieData = movieData + "영화: "+ m.getTitle()+", 장르: "+m.getGenres()+" 줄거리: "+m.getOverview()+"\n";
             System.out.println(movieData);
         }
