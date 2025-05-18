@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -97,15 +98,19 @@ public class ReviewService {
         return new ReviewLikeResponse(likeCount, reviewId);
     }
 
-    public List<ReviewWithLikesResponse> getReviewWithLikes(Long movieId) {
+    public List<ReviewWithLikesResponse> getReviewWithLikes(Long movieId, Long userId) {
         List<Review> reviews = reviewRepository.findByMovieIdOrderByIdDesc(movieId);
 
+        // 좋아요 수 조회
         List<Object[]> likeResults = reviewLikeRepository.countLikesByMovieId(movieId);
         Map<Long, Integer> likeMap = likeResults.stream()
                 .collect(Collectors.toMap(
                         row -> (Long) row[0],
                         row -> ((Number) row[1]).intValue()
                 ));
+
+        // 현재 사용자가 누른 좋아요 리스트 조회
+        Set<Long> likedReviewIds = reviewLikeRepository.findLikedReviewIdsByUserId(userId);
 
         return reviews.stream()
                 .map(r -> new ReviewWithLikesResponse(
@@ -115,7 +120,8 @@ public class ReviewService {
                         r.getReview(),
                         r.getSpoiler(),
                         r.getReviewDate(),
-                        likeMap.getOrDefault(r.getId(), 0)
+                        likeMap.getOrDefault(r.getId(), 0),
+                        likedReviewIds.contains(r.getId())
                 ))
                 .toList();
     }

@@ -16,5 +16,5 @@ public class ReviewWithLikesResponse {
     private boolean spoiler;
     private LocalDate reviewDate;
     private int likeCount;
-
+    private boolean liked;
 }

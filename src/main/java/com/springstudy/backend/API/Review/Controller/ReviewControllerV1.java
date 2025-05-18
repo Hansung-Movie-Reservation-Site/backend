@@ -72,8 +72,8 @@ public class ReviewControllerV1 {
 
     //리뷰, 좋아요 통합해서 반환해줌
     @GetMapping("/review/list/reviewWithLikes")
-    public ResponseEntity<?> getReviewsWithLikes(@RequestParam Long movieId) {
-        return ResponseEntity.ok(reviewService.getReviewWithLikes(movieId));
+    public ResponseEntity<?> getReviewsWithLikes(@RequestParam Long movieId, @RequestParam Long userId) {
+        return ResponseEntity.ok(reviewService.getReviewWithLikes(movieId, userId));
     }
 
     //해당 유저가 해당 리뷰에 좋아요를 눌렀는지 bool 타입을 반환해줌
