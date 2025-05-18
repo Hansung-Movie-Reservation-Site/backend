@@ -6,6 +6,7 @@ import com.springstudy.backend.API.Review.Model.Response.ReviewLikeResponse;
 import com.springstudy.backend.API.Review.Model.Response.ReviewResponse;
 import com.springstudy.backend.API.Review.Model.Response.ReviewStringResponse;
 import com.springstudy.backend.API.Review.Service.ReviewService;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -73,5 +74,12 @@ public class ReviewControllerV1 {
     @GetMapping("/review/list/reviewWithLikes")
     public ResponseEntity<?> getReviewsWithLikes(@RequestParam Long movieId) {
         return ResponseEntity.ok(reviewService.getReviewWithLikes(movieId));
+    }
+
+    //해당 유저가 해당 리뷰에 좋아요를 눌렀는지 bool 타입을 반환해줌
+    @GetMapping("/isLiked")
+    public ResponseEntity<Boolean> isLikedByUser(@RequestParam Long userId, @RequestParam Long reviewId) {
+        boolean isLiked = reviewService.getUserLikedReview(userId, reviewId);
+        return ResponseEntity.ok(isLiked);
     }
 }

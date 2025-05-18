@@ -120,4 +120,8 @@ public class ReviewService {
                 .toList();
     }
 
+    public boolean getUserLikedReview(Long userId, Long reviewId) {
+        return reviewLikeRepository.existsByUserIdAndReviewId(userId, reviewId);
+    }
+
 }
