@@ -14,7 +14,7 @@ public class ReviewWithLikesResponse {
     private double rating;
     private String review;
     private boolean spoiler;
-    private LocalDate reviewDate;
+    private LocalDate review_date;
     private int likeCount;
     private boolean liked;
 }
