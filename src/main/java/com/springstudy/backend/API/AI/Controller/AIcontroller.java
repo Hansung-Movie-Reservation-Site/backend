@@ -3,6 +3,7 @@ package com.springstudy.backend.API.AI.Controller;
 import com.springstudy.backend.API.AI.Model.AIRecommendedMovieDTO;
 import com.springstudy.backend.API.AI.Model.AIRequest;
 import com.springstudy.backend.API.AI.Model.AIResponse;
+import com.springstudy.backend.API.AI.Model.AIUserResponseDTO;
 import com.springstudy.backend.API.AI.Service.AIService;
 import com.springstudy.backend.API.Repository.Entity.AI;
 import com.springstudy.backend.API.Repository.UserRepository;
@@ -45,7 +46,7 @@ public class AIcontroller {
     }
 
     @GetMapping("/getAll")
-    public List<AI> getAllAIs() {
+    public List<AIUserResponseDTO> getAllAIs() {
         return aiService.getAllAIs();
     }
 

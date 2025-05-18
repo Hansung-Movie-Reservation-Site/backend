@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springstudy.backend.API.AI.Model.AIRecommendedMovieDTO;
 import com.springstudy.backend.API.AI.Model.AIRequest;
 import com.springstudy.backend.API.AI.Model.AIResponse;
+import com.springstudy.backend.API.AI.Model.AIUserResponseDTO;
 import com.springstudy.backend.API.Repository.AIRepository;
 import com.springstudy.backend.API.Repository.Entity.*;
 import com.springstudy.backend.API.Repository.MovieRepository;
@@ -278,8 +279,22 @@ public class AIService {
         return aiRepository.save(ai);
     }
 
+    /*
     public List<AI> getAllAIs() {
         return aiRepository.findAll();
+    }
+
+     */
+
+    public List<AIUserResponseDTO> getAllAIs() {
+        return aiRepository.findAll().stream()
+                .map(ai -> new AIUserResponseDTO(
+                        ai.getId(),
+                        ai.getMovieId(),
+                        ai.getReason(),
+                        ai.getUser().getId(),
+                        ai.getUser().getUsername()))
+                .collect(Collectors.toList());
     }
 
     //----------------------------------------------------------------------------
