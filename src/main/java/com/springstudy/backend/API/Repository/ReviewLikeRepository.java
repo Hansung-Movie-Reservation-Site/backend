@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface ReviewLikeRepository extends JpaRepository<ReviewLike, ReviewLikeId> {
 
     boolean existsByUserIdAndReviewId(Long userId, Long reviewId);
@@ -14,5 +16,8 @@ public interface ReviewLikeRepository extends JpaRepository<ReviewLike, ReviewLi
 
     @Query("SELECT COUNT(rl) FROM ReviewLike rl WHERE rl.review.id = :reviewId")
     int countByReviewId(@Param("reviewId") Long reviewId);
+
+    @Query("SELECT rl.review.id, COUNT(rl) FROM ReviewLike rl WHERE rl.review.movie.id = :movieId GROUP BY rl.review.id")
+    List<Object[]> countLikesByMovieId(@Param("movieId") Long movieId);
 
 }
