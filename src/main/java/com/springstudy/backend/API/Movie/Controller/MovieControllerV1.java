@@ -70,4 +70,12 @@ public class MovieControllerV1 {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<List<Movie>> getAllMovies() {
+        List<Movie> movies = movieService.getAllMovies();
+        return ResponseEntity.ok(movies);
+    }
+
+
 }

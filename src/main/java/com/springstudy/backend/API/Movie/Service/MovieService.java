@@ -774,4 +774,9 @@ public class MovieService {
         }
         return exists;
     }
+
+    public List<Movie> getAllMovies() {
+        return movieRepository.findAll();
+    }
+
 }
