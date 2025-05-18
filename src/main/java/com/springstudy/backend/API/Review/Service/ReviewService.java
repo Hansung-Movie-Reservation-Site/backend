@@ -11,6 +11,7 @@ import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.MovieRepository;
 import com.springstudy.backend.API.Repository.ReviewRepository;
 import com.springstudy.backend.API.Repository.UserRepository;
+import com.springstudy.backend.API.Review.Model.Response.ReviewWithLikesResponse;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -93,4 +96,28 @@ public class ReviewService {
         int likeCount = reviewLikeRepository.countByReviewId(reviewId);
         return new ReviewLikeResponse(likeCount, reviewId);
     }
+
+    public List<ReviewWithLikesResponse> getReviewWithLikes(Long movieId) {
+        List<Review> reviews = reviewRepository.findByMovieIdOrderByIdDesc(movieId);
+
+        List<Object[]> likeResults = reviewLikeRepository.countLikesByMovieId(movieId);
+        Map<Long, Integer> likeMap = likeResults.stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> ((Number) row[1]).intValue()
+                ));
+
+        return reviews.stream()
+                .map(r -> new ReviewWithLikesResponse(
+                        r.getId(),
+                        r.getUser().getUsername(),
+                        r.getRating(),
+                        r.getReview(),
+                        r.getSpoiler(),
+                        r.getReviewDate(),
+                        likeMap.getOrDefault(r.getId(), 0)
+                ))
+                .toList();
+    }
+
 }

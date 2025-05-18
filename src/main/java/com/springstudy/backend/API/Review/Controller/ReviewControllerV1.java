@@ -68,4 +68,10 @@ public class ReviewControllerV1 {
         ReviewLikeResponse response = reviewService.getLikeCount(reviewId);
         return ResponseEntity.ok(response);
     }
+
+    //리뷰, 좋아요 통합해서 반환해줌
+    @GetMapping("/review/list/reviewWithLikes")
+    public ResponseEntity<?> getReviewsWithLikes(@RequestParam Long movieId) {
+        return ResponseEntity.ok(reviewService.getReviewWithLikes(movieId));
+    }
 }
