@@ -4,6 +4,7 @@ import com.springstudy.backend.API.AI.Model.AIRecommendedMovieDTO;
 import com.springstudy.backend.API.AI.Model.AIRequest;
 import com.springstudy.backend.API.AI.Model.AIResponse;
 import com.springstudy.backend.API.AI.Service.AIService;
+import com.springstudy.backend.API.Repository.Entity.AI;
 import com.springstudy.backend.API.Repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,4 +35,20 @@ public class AIcontroller {
 
         return aiService.getAIRecommendedMovies(user);
     }
+
+    //----------------------------------------------------------------
+
+    @PostMapping("/synopsisV2")
+    public AIResponse synopsisV2(@RequestParam("userId") Long userId) {
+        System.out.println(userId);
+        return aiService.synopsisV2(userId);
+    }
+
+    @GetMapping("/getAll")
+    public List<AI> getAllAIs() {
+        return aiService.getAllAIs();
+    }
+
+    //----------------------------------------------------------------
+
 }
