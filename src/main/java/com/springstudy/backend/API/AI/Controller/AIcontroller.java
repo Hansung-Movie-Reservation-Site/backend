@@ -41,9 +41,10 @@ public class AIcontroller {
     //----------------------------------------------------------------
 
     @PostMapping("/synopsisV2")
-    public AIResponse synopsisV2(@RequestParam("userId") Long userId) {
-        System.out.println(userId);
-        return aiService.synopsisV2(userId);
+    public AIResponse synopsisV2(@RequestParam("userId") Long userId,
+                                 @RequestParam("type") String type) {
+        // System.out.println(userId);
+        return aiService.synopsisV2(userId, type);
     }
 
     @GetMapping("/getAll")
