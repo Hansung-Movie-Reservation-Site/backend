@@ -70,33 +70,33 @@ public class AIcontroller {
 
     //----------------------------------------------------------------
 
-//    @GetMapping("/recommended")
-//    public List<AIRecommendedMovieDTO> getRecommendedMovies(@RequestParam("userId") Long userId) {
-//
-//        // ✅ userId 기반으로 User 엔티티 조회
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
-//
-//        return aiService.getAIRecommendedMovies(user);
-//    }
-//
-//    @PostMapping("/synopsisV2")
-//    public AIResponse synopsisV2(@RequestParam("userId") Long userId,
-//                                 @RequestParam("type") String type) {
-//        // System.out.println(userId);
-//        return aiService.synopsisV2(userId, type);
-//    }
-//
-//    @GetMapping("/getAll")
-//    public List<AIUserResponseDTO> getAllAIs() {
-//        return aiService.getAllAIs();
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deleteAI(@PathVariable Long id) {
-//        aiService.deleteAIById(id);
-//        return ResponseEntity.noContent().build();  // 204 No Content
-//    }
+    @GetMapping("/recommended")
+    public List<AIRecommendedMovieDTO> getRecommendedMovies(@RequestParam("userId") Long userId) {
+
+        // ✅ userId 기반으로 User 엔티티 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+
+        return aiService.getAIRecommendedMovies(user);
+    }
+
+    @PostMapping("/synopsisV2")
+    public AIResponse synopsisV2(@RequestParam("userId") Long userId,
+                                 @RequestParam("type") String type) {
+        // System.out.println(userId);
+        return aiService.synopsisV2(userId, type);
+    }
+
+    @GetMapping("/getAll")
+    public List<AIUserResponseDTO> getAllAIs() {
+        return aiService.getAllAIs();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAI(@PathVariable Long id) {
+        aiService.deleteAIById(id);
+        return ResponseEntity.noContent().build();  // 204 No Content
+    }
 
     //----------------------------------------------------------------
 
