@@ -156,6 +156,51 @@ public class AIService {
         return new AIResponse(ErrorCode.SUCCESS, result.getMovieId(), result.getReason());
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
     //----------------------------------------------------------------------------
 
     private String[] responseToStringV2(ResponseEntity<String> gptResponse){
@@ -174,9 +219,7 @@ public class AIService {
         return content;
     }
 
-    /*
-    사용자가 작성한 리뷰가 없어도 작동하도록 설정
-     */
+
     public AIResponse synopsisV2(Long userId, String type){
 
         Long id = userId;
@@ -191,10 +234,6 @@ public class AIService {
         System.out.println("--------------------------------------------\n");
         // 2. 사용자 4.0 이상 리뷰 영화 조회.
 
-        /*
-        사용자가 본 영화 중에서 랜덤으로 비슷한 영화 추천?
-         */
-
         String movieData = getBoxofficeV2(id);
         System.out.println("\nmoviedata: " + movieData);
         // 3. 박스오피스 영화 조회.
@@ -207,34 +246,6 @@ public class AIService {
         // String[] content= responseToStringV2(gptResponse);
         // 5. 통신 결과를 string으로 맵핑. 2 3
 
-        /*
-        String title = content[1].split("\n")[0].trim();
-        String reason = content[2].trim();
-        AI result = saveResponseV2(user, title, reason);
-
-         */
-
-        /*
-        String title = content[0].split("\\^\\^")[1].trim();
-        System.out.println("content 최종 title: "+title);
-        String r = content[1].split("\\^\\^")[1].trim();
-        System.out.println("content 최종 r: "+r);
-        String reason = content[1].split("\\^\\^")[1].trim();
-        System.out.println("content 최종 reason: "+reason);
-        if(content[1].equals(""))reason = content[2].split("\\^\\^")[1].trim();
-        AI result = saveResponseV2(user, title, reason);
-
-        System.out.println(result.toString());
-
-        return new AIResponse(ErrorCode.SUCCESS, result.getMovieId(), result.getReason());
-
-         */
-
-        /*
-        String title = content[1].split("\n")[0].trim();
-        String reason = content[2].trim();
-
-         */
 
 
         // ✅ 1. JSON에서 content 추출
@@ -285,15 +296,6 @@ public class AIService {
         return "없음";
     }
 
-    private static String extractField(String text, String patternStr) {
-        Pattern pattern = Pattern.compile(patternStr, Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(text);
-        if (matcher.find()) {
-            return matcher.group(1).trim();
-        }
-        return "없음";
-    }
-
     private HttpEntity<Map<String, Object>> makeHttpEntityV2(String likeMovies, String movieData, String type){
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", "gpt-4o");
@@ -305,9 +307,7 @@ public class AIService {
 
         // messages.add(Map.of("role", "system", "content", "사용자가 본 영화를 분석하여"+ movieData +"에서 사용자가 가장 선호할 것으로 예측되는 영화를 추천합니다. ex) 추천 영화가 아이리시맨이라면 추천영화:아이리시맨\n추천이유:인간이 범죄에 가담하면서 자아가 타락되는 이야기를 선호."));
 
-        /*
-        리뷰 기반 추천
-         */
+        // 리뷰 기반 추천
         if (type.equals("review")) {
             if (likeMovies != null && !likeMovies.isEmpty()) {
                 System.out.println("review 기반, 작성된 리뷰 존재");
@@ -325,9 +325,8 @@ public class AIService {
                         + "ex) 추천 영화가 아이리시맨이라면 추천영화:아이리시맨\n추천이유:인기가 많고 사용자들에게 평가가 좋기 때문."));
             }
         }
-        /*
-        장르 기반 추천
-         */
+
+        // 장르 기반 추천
         else {
             System.out.println("장르 기반");
             messages.add(Map.of("role", "user", "content", movieData + "중에서"
@@ -420,13 +419,6 @@ public class AIService {
         return aiRepository.save(ai);
     }
 
-    /*
-    public List<AI> getAllAIs() {
-        return aiRepository.findAll();
-    }
-
-     */
-
     public List<AIUserResponseDTO> getAllAIs() {
         return aiRepository.findAll().stream()
                 .map(ai -> new AIUserResponseDTO(
@@ -444,8 +436,6 @@ public class AIService {
         }
         aiRepository.deleteById(id);
     }
-
-    //----------------------------------------------------------------------------
 
     public List<AIRecommendedMovieDTO> getAIRecommendedMovies(User user) {
         List<AI> aiList = aiRepository.findByUser(user);
@@ -465,4 +455,9 @@ public class AIService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    // ------------------------------------------------------------------------
+
+     */
+
 }

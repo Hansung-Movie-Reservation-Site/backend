@@ -28,6 +28,48 @@ public class AIcontroller {
         return aiService.synopsis(aiRequest);
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //----------------------------------------------------------------
+
     @GetMapping("/recommended")
     public List<AIRecommendedMovieDTO> getRecommendedMovies(@RequestParam("userId") Long userId) {
 
@@ -37,8 +79,6 @@ public class AIcontroller {
 
         return aiService.getAIRecommendedMovies(user);
     }
-
-    //----------------------------------------------------------------
 
     @PostMapping("/synopsisV2")
     public AIResponse synopsisV2(@RequestParam("userId") Long userId,
