@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,4 +37,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     // ✅ 영화 제목에 특정 문자열이 포함된 데이터 조회 (대소문자 구분 X)
     List<Movie> findByTitleContainingIgnoreCase(String keyword);
+
+    // ✅ JPQL 사용
+    List<Movie> findAllByFetchedDate(LocalDate fetchedDate);
 }

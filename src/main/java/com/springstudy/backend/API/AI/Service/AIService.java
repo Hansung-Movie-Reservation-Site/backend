@@ -25,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -236,7 +237,9 @@ public class AIService {
 
     private String getBoxofficeV2(Long id){
 
-        List<Movie> movieList = movieRepository.findAll();
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        List<Movie> movieList = movieRepository.findAllByFetchedDate(yesterday);
+
         if(movieList.isEmpty()){throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);}
 
         String movieData = "";
