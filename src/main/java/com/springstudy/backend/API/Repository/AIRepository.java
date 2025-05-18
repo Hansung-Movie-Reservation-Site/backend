@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.Optional;
 
 @Repository
-public interface AIRepository extends JpaRepository<AI , Integer> {
+public interface AIRepository extends JpaRepository<AI , Long> {
     Optional<List<AI>> findByUserId(Long user_id);
 
     List<AI> findByUser(User user);  // ✅ 유저별 AI 추천 데이터 가져오기

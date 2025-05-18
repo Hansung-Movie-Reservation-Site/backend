@@ -9,6 +9,7 @@ import com.springstudy.backend.API.Repository.Entity.AI;
 import com.springstudy.backend.API.Repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.springstudy.backend.API.Repository.Entity.User;
 
@@ -48,6 +49,12 @@ public class AIcontroller {
     @GetMapping("/getAll")
     public List<AIUserResponseDTO> getAllAIs() {
         return aiService.getAllAIs();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAI(@PathVariable Long id) {
+        aiService.deleteAIById(id);
+        return ResponseEntity.noContent().build();  // 204 No Content
     }
 
     //----------------------------------------------------------------

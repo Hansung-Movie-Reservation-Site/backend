@@ -297,6 +297,13 @@ public class AIService {
                 .collect(Collectors.toList());
     }
 
+    public void deleteAIById(Long id) {
+        if (!aiRepository.existsById(id)) {
+            throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);  // 예외처리 선택사항
+        }
+        aiRepository.deleteById(id);
+    }
+
     //----------------------------------------------------------------------------
 
     public List<AIRecommendedMovieDTO> getAIRecommendedMovies(User user) {
