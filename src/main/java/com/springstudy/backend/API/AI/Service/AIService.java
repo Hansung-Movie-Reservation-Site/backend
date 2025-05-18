@@ -247,8 +247,8 @@ public class AIService {
 
     private String getBoxofficeV2(Long id){
 
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        List<Movie> movieList = movieRepository.findAllByFetchedDate(yesterday);
+        LocalDate today = LocalDate.now();
+        List<Movie> movieList = movieRepository.findAllByFetchedDate(today);
 
         if(movieList.isEmpty()){throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);}
 
