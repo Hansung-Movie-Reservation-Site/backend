@@ -199,10 +199,10 @@ public class AIService {
         requestBody.put("model", "gpt-4o");
         // messages 리스트를 올바르게 구성
         List<Map<String, String>> messages = new ArrayList<>();
-        messages.add(Map.of("role", "system", "content", "사용자가 본 영화를 분석하여"+ movieData +"에서 사용자가 가장 선호할 것으로 예측되는 영화를 추천합니다. ex) 추천 영화가 아이리시맨이라면 추천영화:아이리시맨\n추천이유:인간이 범죄에 가담하면서 자아가 타락되는 이야기를 선호."));
+        messages.add(Map.of("role", "system", "content", "사용자가 본 영화를 분석하여 "+ movieData +"중에서 사용자가 가장 선호할 것으로 예측되는 영화를 추천합니다. ex) 추천 영화가 아이리시맨이라면 추천영화:아이리시맨\n추천이유:인간이 범죄에 가담하면서 자아가 타락되는 이야기를 선호."));
 
         if (likeMovies != null && !likeMovies.isEmpty()) {
-            messages.add(Map.of("role", "user", "content", likeMovies+"를 재밌게 봤는데 비슷한 영화 추천해줘."));
+            messages.add(Map.of("role", "user", "content", likeMovies+"를 재밌게 봤는데 " + movieData + "중에서 비슷한 영화 추천해줘."));
         }
 
 
