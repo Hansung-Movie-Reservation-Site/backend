@@ -71,7 +71,7 @@ public class ReviewControllerV1 {
     }
 
     //리뷰, 좋아요 통합해서 반환해줌
-    @GetMapping("/review/list/reviewWithLikes")
+    @GetMapping("/reviewWithLikes")
     public ResponseEntity<?> getReviewsWithLikes(@RequestParam Long movieId, @RequestParam Long userId) {
         return ResponseEntity.ok(reviewService.getReviewWithLikes(movieId, userId));
     }
