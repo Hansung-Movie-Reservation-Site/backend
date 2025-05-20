@@ -118,7 +118,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 || checkURL(request, "/swagger-resources")
                 || checkURL(request, "/verifyEmail")
                 || checkURL(request, "/check")
-                || checkURL(request, "/daliy")
+                || checkURL(request, "/dailgit y")
 
         ) {
             filterChain.doFilter(request, response);
