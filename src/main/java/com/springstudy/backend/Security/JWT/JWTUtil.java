@@ -1,5 +1,6 @@
 package com.springstudy.backend.Security.JWT;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.springstudy.backend.API.Auth.Model.AuthUser;
 import com.springstudy.backend.Security.RedisService;
 import io.jsonwebtoken.Claims;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 // JWT 만들어주는 함수
@@ -32,7 +35,7 @@ public class JWTUtil {
                 .claim("authorities", user.getAuthorities())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 // .issuedAt: 생성날짜를 생성하는 메소드.
-                .expiration(new Date(System.currentTimeMillis() + 10)) //유효기간 1시간
+                .expiration(new Date(System.currentTimeMillis() + 15 * 60 * 1000)) //유효기간 15분
                 // .expiration: 만료기간을 설정하는 메소드.
                 .signWith(key)
                 .compact();
@@ -46,6 +49,28 @@ public class JWTUtil {
         return claims;
     }
 
+    public static String createTokenToRefresh(Claims extract) {
+        // auth: JWT로 회원정보를 저장해야 되기 때문에.
+        String username =extract.get("username", String.class);
+        List<LinkedTreeMap<String, String>> rolesMap = extract.get("authorities", List.class);
+        List<String> roles = rolesMap.stream()
+                .map(map -> map.get("role")) // "authority" 키를 가진 값 추출
+                .collect(Collectors.toList());
+
+        String jwt = Jwts.builder()
+                .claim("username", username)
+                // .claim CustomUser 정보를 저장하는 메소드.
+                // .claim: 저장할 정보 추가.
+                .claim("authorities", rolesMap)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                // .issuedAt: 생성날짜를 생성하는 메소드.
+                .expiration(new Date(System.currentTimeMillis() + 15 * 60 * 1000)) //유효기간 1시간
+                // .expiration: 만료기간을 설정하는 메소드.
+                .signWith(key)
+                .compact();
+        return jwt;
+    }
+
     public static String createRefreshToken(AuthUser user) {
         // auth: JWT로 회원정보를 저장해야 되기 때문에.
 
@@ -56,7 +81,7 @@ public class JWTUtil {
                 .claim("authorities", user.getAuthorities())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 // .issuedAt: 생성날짜를 생성하는 메소드.
-                .expiration(new Date(System.currentTimeMillis() + 1000000)) //유효기간 1시간
+                .expiration(new Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000)) //유효기간 1시간
                 // .expiration: 만료기간을 설정하는 메소드.
                 .signWith(key)
                 .compact();

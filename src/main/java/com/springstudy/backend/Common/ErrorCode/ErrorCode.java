@@ -49,7 +49,10 @@ public enum ErrorCode implements CodeInterface{
 
     TRANSACTION_ERROR(-31, "TRANSACTION_ERROR"),
     JSON_PROCESSOR_ERROR(-32, "JSON_PROCESSOR_ERROR"),
-    IOEXCEPTION(-33, "IOEXCEPTION");
+    IOEXCEPTION(-33, "IOEXCEPTION"),
+
+    JWT_NOT_FOUND(-34, "JWT_NOT_FOUND"),
+    NO_COOKIE(-35, "NO_COOKIE");
 
     private final Integer code;
     private final String message;
