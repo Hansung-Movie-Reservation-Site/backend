@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springstudy.backend.API.AI.Model.AIRecommendedMovieDTO;
-import com.springstudy.backend.API.AI.Model.AIRequest;
-import com.springstudy.backend.API.AI.Model.AIResponse;
-import com.springstudy.backend.API.AI.Model.AIUserResponseDTO;
+import com.springstudy.backend.API.AI.Model.*;
 import com.springstudy.backend.API.Repository.AIRepository;
 import com.springstudy.backend.API.Repository.Entity.*;
 import com.springstudy.backend.API.Repository.MovieRepository;
@@ -465,6 +462,20 @@ public class AIService {
             throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);  // 예외처리 선택사항
         }
         aiRepository.deleteById(id);
+    }
+
+    public List<AIResponseDTO> getAIRecommendationsByUserId(Long userId) {
+        List<AI> aiList = aiRepository.findAllByUserId(userId);
+
+        return aiList.stream()
+                .map(ai -> AIResponseDTO.builder()
+                        .id(ai.getId())
+                        .movieId(ai.getMovieId())
+                        .reason(ai.getReason())
+                        .userId(ai.getUser().getId())
+                        .username(ai.getUser().getUsername())
+                        .build())
+                .collect(Collectors.toList());
     }
 
 

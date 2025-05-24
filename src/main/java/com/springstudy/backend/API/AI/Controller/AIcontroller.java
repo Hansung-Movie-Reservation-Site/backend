@@ -1,9 +1,6 @@
 package com.springstudy.backend.API.AI.Controller;
 
-import com.springstudy.backend.API.AI.Model.AIRecommendedMovieDTO;
-import com.springstudy.backend.API.AI.Model.AIRequest;
-import com.springstudy.backend.API.AI.Model.AIResponse;
-import com.springstudy.backend.API.AI.Model.AIUserResponseDTO;
+import com.springstudy.backend.API.AI.Model.*;
 import com.springstudy.backend.API.AI.Service.AIService;
 import com.springstudy.backend.API.Repository.Entity.AI;
 import com.springstudy.backend.API.Repository.UserRepository;
@@ -116,6 +113,13 @@ public class AIcontroller {
     public ResponseEntity<Void> deleteAI(@PathVariable Long id) {
         aiService.deleteAIById(id);
         return ResponseEntity.noContent().build();  // 204 No Content
+    }
+
+
+    @GetMapping("/getByUser")
+    public ResponseEntity<List<AIResponseDTO>> getAIRecommendationsByUser(@RequestParam("userId") Long userId) {
+        List<AIResponseDTO> result = aiService.getAIRecommendationsByUserId(userId);
+        return ResponseEntity.ok(result);
     }
 
     //----------------------------------------------------------------
