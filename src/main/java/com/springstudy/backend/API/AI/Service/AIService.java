@@ -22,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
@@ -478,6 +479,11 @@ public class AIService {
                 .collect(Collectors.toList());
     }
 
+
+    @Transactional
+    public void deleteAllAIByUserId(Long userId) {
+        aiRepository.deleteAllByUserId(userId);
+    }
 
     // ------------------------------------------------------------------------
 

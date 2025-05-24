@@ -122,6 +122,12 @@ public class AIcontroller {
         return ResponseEntity.ok(result);
     }
 
+    @DeleteMapping("/deleteByUser")
+    public ResponseEntity<String> deleteAIRecommendationsByUserId(@RequestParam("userId") Long userId) {
+        aiService.deleteAllAIByUserId(userId);
+        return ResponseEntity.ok("✅ userId " + userId + "에 해당하는 추천 데이터를 삭제했습니다.");
+    }
+
     //----------------------------------------------------------------
 
 }
