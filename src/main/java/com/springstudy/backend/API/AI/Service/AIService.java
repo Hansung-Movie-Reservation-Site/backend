@@ -248,6 +248,7 @@ public class AIService {
     }
 
 
+    @Transactional
     public AIResponse synopsisV2(Long userId, String type){
 
         Long id = userId;
@@ -424,6 +425,7 @@ public class AIService {
 
         Long movieId = movie.getId();
 
+        /*
         // user와 movieId가 모두 같은 AI 엔티티가 존재하는지 확인
         Optional<AI> existingAI = aiRepository.findByUserAndMovieId(user, movieId);
 
@@ -439,6 +441,18 @@ public class AIService {
         }
 
         // 존재하지 않는 경우 새로 저장
+        AI ai = AI.builder()
+                .user(user)
+                .movieId(movieId)
+                .reason(reason)
+                .build();
+        return aiRepository.save(ai);
+
+        */
+
+        // 2️⃣ 해당 user의 기존 추천 전체 삭제
+        aiRepository.deleteAllByUserId(user.getId());
+
         AI ai = AI.builder()
                 .user(user)
                 .movieId(movieId)
