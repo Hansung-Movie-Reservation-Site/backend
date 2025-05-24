@@ -469,13 +469,20 @@ public class AIService {
         List<AI> aiList = aiRepository.findAllByUserId(userId);
 
         return aiList.stream()
-                .map(ai -> AIResponseDTO.builder()
-                        .id(ai.getId())
-                        .movieId(ai.getMovieId())
-                        .reason(ai.getReason())
-                        .userId(ai.getUser().getId())
-                        .username(ai.getUser().getUsername())
-                        .build())
+                .map(ai -> {
+                    String posterImage = movieRepository.findById(ai.getMovieId())
+                            .map(Movie::getPosterImage)
+                            .orElse(null); // 또는 기본 이미지 설정 가능
+
+                    return AIResponseDTO.builder()
+                            .id(ai.getId())
+                            .movieId(ai.getMovieId())
+                            .reason(ai.getReason())
+                            .userId(ai.getUser().getId())
+                            .username(ai.getUser().getUsername())
+                            .posterImage(posterImage)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 

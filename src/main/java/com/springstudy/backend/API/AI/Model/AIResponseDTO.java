@@ -11,4 +11,5 @@ public class AIResponseDTO {
     private String reason;
     private Long userId;
     private String username;
+    private String posterImage;
 }
