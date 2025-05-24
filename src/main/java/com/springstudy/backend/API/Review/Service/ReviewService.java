@@ -41,7 +41,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public void saveReview(ReviewRequest request) {
+    public Long saveReview(ReviewRequest request) {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
 
@@ -62,7 +62,8 @@ public class ReviewService {
                 .user(user)
                 .movie(movie)
                 .build();
-        reviewRepository.save(review);
+        Review saved = reviewRepository.save(review);
+        return saved.getId(); // 저장된 리뷰의 id 반환
     }
 
     public List<Review> getReviewsByMovieId(Long movieId) {
