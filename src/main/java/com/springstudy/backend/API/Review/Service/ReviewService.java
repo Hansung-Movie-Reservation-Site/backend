@@ -3,6 +3,7 @@ package com.springstudy.backend.API.Review.Service;
 import com.springstudy.backend.API.Repository.Entity.ReviewLike;
 import com.springstudy.backend.API.Repository.ReviewLikeRepository;
 import com.springstudy.backend.API.Review.Model.Request.ReviewRequest;
+import com.springstudy.backend.API.Review.Model.Response.ReviewDTO;
 import com.springstudy.backend.API.Review.Model.Response.ReviewLikeResponse;
 import com.springstudy.backend.API.Review.Model.Response.ReviewResponse;
 import com.springstudy.backend.API.Repository.Entity.Movie;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -128,6 +130,24 @@ public class ReviewService {
 
     public boolean getUserLikedReview(Long userId, Long reviewId) {
         return reviewLikeRepository.existsByUserIdAndReviewId(userId, reviewId);
+    }
+
+    public List<ReviewDTO> getAllReviews(){
+        List<Review> reviews = reviewRepository.findAll();
+        List<ReviewDTO> reviewDTOS = new ArrayList<>();
+        ReviewDTO reviewDTO;
+        for(int i = 0; i<reviews.size(); i++){
+            Float rate = reviews.get(i).getRating();
+            String review = reviews.get(i).getReview();
+            boolean spoiler = reviews.get(i).getSpoiler();
+            String title = reviews.get(i).getMovie().getTitle();
+            String username = reviews.get(i).getUser().getUsername();
+            String poster = reviews.get(i).getMovie().getPosterImage();
+            reviewDTO = new ReviewDTO(username, rate, review, title, spoiler, poster);
+            reviewDTOS.add(reviewDTO);
+        }
+
+        return reviewDTOS;
     }
 
 }

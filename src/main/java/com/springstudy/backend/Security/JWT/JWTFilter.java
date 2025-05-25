@@ -119,6 +119,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 || checkURL(request, "/verifyEmail")
                 || checkURL(request, "/check")
                 || checkURL(request, "/daily")
+                //|| checkURL(request, "/daily")
 
         ) {
             filterChain.doFilter(request, response);

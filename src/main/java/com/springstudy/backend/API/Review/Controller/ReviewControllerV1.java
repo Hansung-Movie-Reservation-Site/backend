@@ -2,6 +2,7 @@ package com.springstudy.backend.API.Review.Controller;
 
 import com.springstudy.backend.API.Repository.Entity.Review;
 import com.springstudy.backend.API.Review.Model.Request.ReviewRequest;
+import com.springstudy.backend.API.Review.Model.Response.ReviewDTO;
 import com.springstudy.backend.API.Review.Model.Response.ReviewLikeResponse;
 import com.springstudy.backend.API.Review.Model.Response.ReviewResponse;
 import com.springstudy.backend.API.Review.Model.Response.ReviewStringResponse;
@@ -81,5 +82,11 @@ public class ReviewControllerV1 {
     public ResponseEntity<Boolean> isLikedByUser(@RequestParam Long userId, @RequestParam Long reviewId) {
         boolean isLiked = reviewService.getUserLikedReview(userId, reviewId);
         return ResponseEntity.ok(isLiked);
+    }
+    //모든 리뷰 가져옴
+    @GetMapping("/getReviews")
+    public ResponseEntity<List<ReviewDTO>> getReviews() {
+        List<ReviewDTO> reviews = reviewService.getAllReviews();
+        return ResponseEntity.ok(reviews);
     }
 }
