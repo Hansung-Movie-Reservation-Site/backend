@@ -1,9 +1,6 @@
 package com.springstudy.backend.API.AI.Controller;
 
-import com.springstudy.backend.API.AI.Model.AIRecommendedMovieDTO;
-import com.springstudy.backend.API.AI.Model.AIRequest;
-import com.springstudy.backend.API.AI.Model.AIResponse;
-import com.springstudy.backend.API.AI.Model.AIUserResponseDTO;
+import com.springstudy.backend.API.AI.Model.*;
 import com.springstudy.backend.API.AI.Service.AIService;
 import com.springstudy.backend.API.Repository.Entity.AI;
 import com.springstudy.backend.API.Repository.UserRepository;
@@ -13,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.springstudy.backend.API.Repository.Entity.User;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/AIRecommand")
@@ -73,10 +72,28 @@ public class AIcontroller {
     @GetMapping("/recommended")
     public List<AIRecommendedMovieDTO> getRecommendedMovies(@RequestParam("userId") Long userId) {
 
+
+        /*
         // ✅ userId 기반으로 User 엔티티 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
 
+
+
+        return aiService.getAIRecommendedMovies(user);
+
+         */
+
+        // ✅ userId 기반으로 User 엔티티 조회
+        Optional<User> optionalUser = userRepository.findById(userId);
+
+        // ✅ 존재하지 않으면 빈 배열 반환
+        if (optionalUser.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // ✅ 존재하면 추천 결과 반환
+        User user = optionalUser.get();
         return aiService.getAIRecommendedMovies(user);
     }
 
@@ -96,6 +113,19 @@ public class AIcontroller {
     public ResponseEntity<Void> deleteAI(@PathVariable Long id) {
         aiService.deleteAIById(id);
         return ResponseEntity.noContent().build();  // 204 No Content
+    }
+
+
+    @GetMapping("/getByUser")
+    public ResponseEntity<List<AIResponseDTO>> getAIRecommendationsByUser(@RequestParam("userId") Long userId) {
+        List<AIResponseDTO> result = aiService.getAIRecommendationsByUserId(userId);
+        return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping("/deleteByUser")
+    public ResponseEntity<String> deleteAIRecommendationsByUserId(@RequestParam("userId") Long userId) {
+        aiService.deleteAllAIByUserId(userId);
+        return ResponseEntity.ok("✅ userId " + userId + "에 해당하는 추천 데이터를 삭제했습니다.");
     }
 
     //----------------------------------------------------------------

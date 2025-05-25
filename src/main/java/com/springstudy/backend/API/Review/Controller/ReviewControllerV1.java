@@ -26,9 +26,12 @@ public class ReviewControllerV1 {
 
     //리뷰 작성
     @PostMapping("/reviews")
-    public ResponseEntity<String> saveReview(@RequestBody ReviewRequest review) {
-        reviewService.saveReview(review);
-        return ResponseEntity.ok("리뷰 작성 완료");
+    public ResponseEntity<Map<String, Object>> saveReview(@RequestBody ReviewRequest review) {
+        Long savedId = reviewService.saveReview(review);
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", savedId);
+        result.put("message", "리뷰 작성 완료");
+        return ResponseEntity.ok(result);
     }
 
     //movieId를 입력한 영화의 평균 별점 조회

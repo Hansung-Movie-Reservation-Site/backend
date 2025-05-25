@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springstudy.backend.API.AI.Model.AIRecommendedMovieDTO;
-import com.springstudy.backend.API.AI.Model.AIRequest;
-import com.springstudy.backend.API.AI.Model.AIResponse;
-import com.springstudy.backend.API.AI.Model.AIUserResponseDTO;
+import com.springstudy.backend.API.AI.Model.*;
 import com.springstudy.backend.API.Repository.AIRepository;
 import com.springstudy.backend.API.Repository.Entity.*;
 import com.springstudy.backend.API.Repository.MovieRepository;
@@ -25,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
@@ -251,6 +249,7 @@ public class AIService {
     }
 
 
+    @Transactional
     public AIResponse synopsisV2(Long userId, String type){
 
         Long id = userId;
@@ -427,6 +426,7 @@ public class AIService {
 
         Long movieId = movie.getId();
 
+        /*
         // user와 movieId가 모두 같은 AI 엔티티가 존재하는지 확인
         Optional<AI> existingAI = aiRepository.findByUserAndMovieId(user, movieId);
 
@@ -442,6 +442,18 @@ public class AIService {
         }
 
         // 존재하지 않는 경우 새로 저장
+        AI ai = AI.builder()
+                .user(user)
+                .movieId(movieId)
+                .reason(reason)
+                .build();
+        return aiRepository.save(ai);
+
+        */
+
+        // 2️⃣ 해당 user의 기존 추천 전체 삭제
+        aiRepository.deleteAllByUserId(user.getId());
+
         AI ai = AI.builder()
                 .user(user)
                 .movieId(movieId)
@@ -468,6 +480,32 @@ public class AIService {
         aiRepository.deleteById(id);
     }
 
+    public List<AIResponseDTO> getAIRecommendationsByUserId(Long userId) {
+        List<AI> aiList = aiRepository.findAllByUserId(userId);
+
+        return aiList.stream()
+                .map(ai -> {
+                    String posterImage = movieRepository.findById(ai.getMovieId())
+                            .map(Movie::getPosterImage)
+                            .orElse(null); // 또는 기본 이미지 설정 가능
+
+                    return AIResponseDTO.builder()
+                            .id(ai.getId())
+                            .movieId(ai.getMovieId())
+                            .reason(ai.getReason())
+                            .userId(ai.getUser().getId())
+                            .username(ai.getUser().getUsername())
+                            .posterImage(posterImage)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+
+    @Transactional
+    public void deleteAllAIByUserId(Long userId) {
+        aiRepository.deleteAllByUserId(userId);
+    }
 
     // ------------------------------------------------------------------------
 
