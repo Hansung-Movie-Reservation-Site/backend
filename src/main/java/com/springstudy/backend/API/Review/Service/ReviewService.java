@@ -64,7 +64,7 @@ public class ReviewService {
                 .user(user)
                 .movie(movie)
                 .build();
-        reviewRepository.save(review);
+       return reviewRepository.save(review);
     }
 
     public List<Review> getReviewsByMovieId(Long movieId) {
