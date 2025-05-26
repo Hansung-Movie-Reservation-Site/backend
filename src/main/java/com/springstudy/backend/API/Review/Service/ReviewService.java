@@ -43,7 +43,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public void saveReview(ReviewRequest request) {
+    public Review saveReview(ReviewRequest request) {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
 

@@ -27,7 +27,7 @@ public class ReviewControllerV1 {
     //리뷰 작성
     @PostMapping("/reviews")
     public ResponseEntity<Map<String, Object>> saveReview(@RequestBody ReviewRequest review) {
-        Long savedId = reviewService.saveReview(review);
+        Long savedId = reviewService.saveReview(review).getId();
         Map<String, Object> result = new HashMap<>();
         result.put("id", savedId);
         result.put("message", "리뷰 작성 완료");
