@@ -5,11 +5,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springstudy.backend.API.AI.Model.*;
-import com.springstudy.backend.API.Repository.AIRepository;
+import com.springstudy.backend.API.Repository.*;
 import com.springstudy.backend.API.Repository.Entity.*;
-import com.springstudy.backend.API.Repository.MovieRepository;
-import com.springstudy.backend.API.Repository.ReviewRepository;
-import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +39,7 @@ public class AIService {
     @Qualifier("gptRestTemplate")
     private final RestTemplate restTemplate;
     private final MovieRepository movieRepository;
+    private final RecommandRepository recommandRepository;
     private String model = "GPT-4.5";
     private String url = "https://api.openai.com/v1/chat/completions";
 
@@ -110,13 +108,27 @@ public class AIService {
 
     private AI saveResponse(User user, String title, String reason){
         Optional<Movie> recommandMovieOptional = movieRepository.findByTitle(title);
+        Optional<AI> aiOptional = aiRepository.findByMovieId(recommandMovieOptional.get().getId());
         if(recommandMovieOptional.isEmpty()){throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);}
-        System.out.println("movieid: "+recommandMovieOptional.get().getId()+" reason: "+reason +" id:" +user);
-        AI ai = AI.builder()
-                .user(user)
-                .movieId(recommandMovieOptional.get().getId())
-                .reason(reason)
-                .build();
+        AI ai;
+        if(aiOptional.isPresent()){
+            AI recommandedMovie = aiOptional.get();
+            System.out.println("이미 추천된 영화");
+            ai = AI.builder()
+                    .user(user)
+                    .movieId(recommandedMovie.getId())
+                    .reason(recommandedMovie.getReason())
+                    .build();
+            return ai;
+        }
+        else{
+            System.out.println("movieid: "+recommandMovieOptional.get().getId()+" reason: "+reason +" id:" +user);
+            ai = AI.builder()
+                    .user(user)
+                    .movieId(recommandMovieOptional.get().getId())
+                    .reason(reason)
+                    .build();
+        }
         return aiRepository.save(ai);
     }
 
@@ -157,6 +169,7 @@ public class AIService {
         System.out.println(result.toString());
         // 6. 추천 결과를 저장.
         if(result == null){throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);}
+
 
         return new AIResponse(ErrorCode.SUCCESS, result.getMovieId(), result.getReason());
     }

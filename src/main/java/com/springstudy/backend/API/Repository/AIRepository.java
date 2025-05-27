@@ -19,4 +19,6 @@ public interface AIRepository extends JpaRepository<AI , Long> {
     List<AI> findAllByUserId(Long userId);
 
     void deleteAllByUserId(Long userId);
+
+    Optional<AI> findByMovieId(Long movieId);
 }
