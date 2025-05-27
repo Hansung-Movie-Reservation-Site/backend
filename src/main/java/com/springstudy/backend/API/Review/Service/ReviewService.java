@@ -15,6 +15,7 @@ import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.API.Review.Model.Response.ReviewWithLikesResponse;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
+import com.springstudy.backend.Common.util.LogUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -147,6 +148,7 @@ public class ReviewService {
             reviewDTOS.add(reviewDTO);
         }
 
+        LogUtil.error(this.getClass() ,"review 가져오기 성공. 총 review 개수: "+ reviewDTOS.size());
         return reviewDTOS;
     }
 
