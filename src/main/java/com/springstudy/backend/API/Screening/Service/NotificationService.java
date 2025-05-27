@@ -141,9 +141,9 @@ public class NotificationService {
     public void cancelExpiredPendingOrders() {
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime cutoff = now.minusMinutes(2);
+        LocalDateTime cutoff = now.minusMinutes(1440);
 
-        // 조건: 생성된지 30분 이상 경과 && 상태가 PENDING
+        // 조건: 생성된지 1440분 이상 경과 && 상태가 PENDING
         List<Order> expiredOrders = orderRepository.findPendingOrdersBefore(cutoff);
 
         for (Order order : expiredOrders) {
