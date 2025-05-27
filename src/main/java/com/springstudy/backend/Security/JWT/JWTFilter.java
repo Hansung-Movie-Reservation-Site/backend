@@ -163,16 +163,16 @@ public class JWTFilter extends OncePerRequestFilter {
                     "\", \"message\": \"" + "로그인을 다시 시도해 주세요." + "\"}");
         }
 
-//        Cookie[] cookie = request.getCookies();
-//        //todo 쿠키가 없을 가능성??? 없을 듯.
-//        String jwtToken = findJWT("jwt", cookie);
-//        // 검증 1. jwt 검사.
-//        String extract = checkToken(jwtToken, cookie);
-//        Claims claims = JWTUtil.extractToken(extract);
-//        addContext(claims);
-//
-//        filterChain.doFilter(request, response);
-//        System.out.println("filterclear");
+        Cookie[] cookie = request.getCookies();
+        //todo 쿠키가 없을 가능성??? 없을 듯.
+        String jwtToken = findJWT("jwt", cookie);
+        // 검증 1. jwt 검사.
+        String extract = checkToken(jwtToken, cookie);
+        Claims claims = JWTUtil.extractToken(extract);
+        addContext(claims);
+
+        filterChain.doFilter(request, response);
+        System.out.println("filterclear");
     }
     private String findJWT(String name, Cookie[] cookie) {
         String jwt="";
