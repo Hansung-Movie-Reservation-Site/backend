@@ -21,6 +21,4 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // 특정 영화의 평균 평점 조회
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.movie.id = :movieId")
     Double findAverageRatingByMovieId(@Param("movieId") Long movieId);
-
-    Optional<Review> findByTitle(String title);
 }
