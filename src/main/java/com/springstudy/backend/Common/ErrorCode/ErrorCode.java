@@ -52,7 +52,11 @@ public enum ErrorCode implements CodeInterface{
     IOEXCEPTION(-33, "IOEXCEPTION"),
 
     JWT_NOT_FOUND(-34, "JWT_NOT_FOUND"),
-    NO_COOKIE(-35, "NO_COOKIE");
+    NO_COOKIE(-35, "NO_COOKIE"),
+
+
+
+    EXIST_MOVIE(-36, "EXIST_MOVIE");
 
     private final Integer code;
     private final String message;
