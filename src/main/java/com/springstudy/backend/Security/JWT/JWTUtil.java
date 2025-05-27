@@ -95,7 +95,8 @@ public class JWTUtil {
         cookie.setPath("/");        // 전체 경로에서 쿠키 사용 가능
         cookie.setMaxAge(1000000); // 1일
         //cookie.setAttribute("SameSite", "None");  // 크로스 사이트 요청 허용
-        cookie.setSecure(false);             // HTTPS 아닌 경우 false로 해야 동작
+        cookie.setSecure(false);
+        // s
         cookie.setAttribute("SameSite", "None"); // or "Strict" (크로스 사이트 안되면 Strict도 가능)
         return cookie;
     }
