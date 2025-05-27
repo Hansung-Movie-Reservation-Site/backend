@@ -1,7 +1,6 @@
 package com.springstudy.backend.API.AI.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springstudy.backend.API.AI.Model.*;
@@ -108,27 +107,27 @@ public class AIService {
 
     private AI saveResponse(User user, String title, String reason){
         Optional<Movie> recommandMovieOptional = movieRepository.findByTitle(title);
-        Optional<AI> aiOptional = aiRepository.findByMovieId(recommandMovieOptional.get().getId());
+        //Optional<AI> aiOptional = aiRepository.findByMovieIdAndUser_Id(recommandMovieOptional.get().getId(), user.getId());
         if(recommandMovieOptional.isEmpty()){throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);}
         AI ai;
-        if(aiOptional.isPresent()){
-            AI recommandedMovie = aiOptional.get();
-            System.out.println("이미 추천된 영화");
-            ai = AI.builder()
-                    .user(user)
-                    .movieId(recommandedMovie.getId())
-                    .reason(recommandedMovie.getReason())
-                    .build();
-            return ai;
-        }
-        else{
-            System.out.println("movieid: "+recommandMovieOptional.get().getId()+" reason: "+reason +" id:" +user);
-            ai = AI.builder()
-                    .user(user)
-                    .movieId(recommandMovieOptional.get().getId())
-                    .reason(reason)
-                    .build();
-        }
+//        if(aiOptional.isPresent()){
+//            AI recommandedMovie = aiOptional.get();
+//            System.out.println("이미 추천된 영화");
+//            ai = AI.builder()
+//                    .user(user)
+//                    .movieId(recommandedMovie.getId())
+//                    .reason(recommandedMovie.getReason())
+//                    .build();
+//            return ai;
+//        }
+//        else{
+//        }
+        System.out.println("movieid: "+recommandMovieOptional.get().getId()+" reason: "+reason +" id:" +user);
+        ai = AI.builder()
+                .user(user)
+                .movieId(recommandMovieOptional.get().getId())
+                .reason(reason)
+                .build();
         return aiRepository.save(ai);
     }
 
