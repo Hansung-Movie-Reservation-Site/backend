@@ -128,8 +128,8 @@ public class JWTFilter extends OncePerRequestFilter {
 
                 //-------------------------------------------------------
                 || checkURL(request, "/getAll")
-                || checkURL(request, "/getByUser")
-                || checkURL(request, "/synopsisV2")
+                // || checkURL(request, "/getByUser")
+                // || checkURL(request, "/synopsisV2")
                 || checkURL(request, "/deleteByUser")
 
         ) {
