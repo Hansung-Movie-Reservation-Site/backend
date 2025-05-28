@@ -122,7 +122,7 @@ public class AuthService {
                 .email(user.getEmail())
                 .username(user.getUsername())
                 .user_id(user.getId())
-                .myTheatherList(user.getMyTheatherList())
+                .myTheaterList(user.getMyTheaterList())
                 .build();
         return new LoginResponse(ErrorCode.SUCCESS,userDetailDTO);
     }

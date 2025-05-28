@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class MyTheather {
+public class MyTheater {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,6 +20,6 @@ public class MyTheather {
     @JoinColumn(name = "userid", nullable = false,
             foreignKey = @ForeignKey(name = "FK_mytheather_TO_user_1"))
     @JsonIgnore
-    @ManyToOne(fetch =  FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch =  FetchType.LAZY)
     private User user;
 }

@@ -89,7 +89,7 @@ public class User {
     @Column(nullable = true)
     @JsonIgnoreProperties("user")
     @OneToMany(mappedBy= "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    List<MyTheather> myTheatherList = new ArrayList<>();
+    List<MyTheater> myTheaterList = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -100,12 +100,15 @@ public class User {
     private Set<Review> likedReviews;
 
     @Transactional
-    public List<MyTheather> getMyTheatherList() {
-        myTheatherList.size();
-        return myTheatherList;
+    public List<MyTheater> getMyTheaterList() {
+        myTheaterList.size();
+        for(int i = 0; i< myTheaterList.size(); i++){
+            System.out.println("getSpot_id: "+ myTheaterList.get(i).getSpot_id());
+        }
+        return myTheaterList;
     }
 
-    public void setMyTheatherList(List<MyTheather> myTheatherList) {
-        this.myTheatherList = myTheatherList;
+    public void setMyTheaterList(List<MyTheater> myTheaterList) {
+        this.myTheaterList = myTheaterList;
     }
 }
