@@ -107,9 +107,15 @@ public class AIService {
 
     private AI saveResponse(User user, String title, String reason){
         Optional<Movie> recommandMovieOptional = movieRepository.findByTitle(title);
-        //Optional<AI> aiOptional = aiRepository.findByMovieIdAndUser_Id(recommandMovieOptional.get().getId(), user.getId());
         if(recommandMovieOptional.isEmpty()){throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);}
+        Optional<AI> aiOptional = aiRepository.findByMovieIdAndUser_Id(recommandMovieOptional.get().getId(), user.getId());
+
         AI ai;
+        if(aiOptional.isPresent()){
+            System.out.println(user.getUsername()+ "님에게 이미 추천한 영화");
+            AI ai2 = aiOptional.get();
+
+        }
 //        if(aiOptional.isPresent()){
 //            AI recommandedMovie = aiOptional.get();
 //            System.out.println("이미 추천된 영화");
@@ -131,7 +137,7 @@ public class AIService {
         return aiRepository.save(ai);
     }
 
-    public AIResponse synopsis(AIRequest aiRequest){
+    public AIResponseV2 synopsis(AIRequest aiRequest){
 
         Long id = aiRequest.user_id();
         Optional<User> userOptional = userRepository.findById(id);
@@ -168,9 +174,10 @@ public class AIService {
         System.out.println(result.toString());
         // 6. 추천 결과를 저장.
         if(result == null){throw new CustomException(ErrorCode.NOT_EXIST_MOVIE);}
+        Movie recommandMovie = movieRepository.findByTitle(title).get();
 
 
-        return new AIResponse(ErrorCode.SUCCESS, result.getMovieId(), result.getReason());
+        return new AIResponseV2(ErrorCode.SUCCESS, recommandMovie, result.getReason());
     }
 
 

@@ -22,7 +22,7 @@ public class AIcontroller {
     private final UserRepository userRepository;
 
     @PostMapping("/synopsis")
-    public AIResponse synopsis(@RequestBody AIRequest aiRequest) {
+    public AIResponseV2 synopsis(@RequestBody AIRequest aiRequest) {
         System.out.println(aiRequest.user_id());
         return aiService.synopsis(aiRequest);
     }
