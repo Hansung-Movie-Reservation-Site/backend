@@ -69,7 +69,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         User user = new User().builder()
                 .username(username)
                 .email(email)
-                .myTheatherList(new ArrayList<>())
+                .myTheaterList(new ArrayList<>())
                 .build();
         UserCredentional userCredentional = new UserCredentional().builder()
                 .user(user)

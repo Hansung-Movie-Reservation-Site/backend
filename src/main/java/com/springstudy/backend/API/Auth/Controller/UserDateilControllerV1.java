@@ -3,8 +3,7 @@ package com.springstudy.backend.API.Auth.Controller;
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetail.AddMyTheatherRequest;
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetail.ChangeEmailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.RetrieveRequest;
-import com.springstudy.backend.API.Auth.Model.Response.ChangeResponse.AddTheatherResponse;
-import com.springstudy.backend.API.Auth.Model.Response.Response;
+import com.springstudy.backend.API.Auth.Model.Response.ChangeResponse.AddTheaterResponse;
 import com.springstudy.backend.API.Auth.Model.RetrieveResponse;
 import com.springstudy.backend.API.Auth.Model.RetrieveType;
 import com.springstudy.backend.API.Auth.Service.DetailType;
@@ -15,6 +14,7 @@ import com.springstudy.backend.API.Auth.Model.Response.ChangeResponse.ChangeDeta
 import com.springstudy.backend.API.Auth.Service.DetailService;
 import com.springstudy.backend.API.Auth.Service.EmailService;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
+import com.springstudy.backend.Common.util.LogUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,12 +58,12 @@ public class UserDateilControllerV1 {
         return detailService.retrieve(lookupTicketRequest, RetrieveType.AI);
     }
 
-    @PostMapping("/update/myTheather")
-    public AddTheatherResponse updateMyTheather(AddMyTheatherRequest addMyTheatherRequest) {
-        return detailService.updateTheather(addMyTheatherRequest);
+    @PostMapping("/update/myTheater")
+    public AddTheaterResponse updateMyTheater(AddMyTheatherRequest addMyTheatherRequest) {
+        return detailService.updateTheater(addMyTheatherRequest);
     }
-    @PostMapping("/retrieve/myTheather")
-    public RetrieveResponse addMyTheather(RetrieveRequest retrieveRequest) {
-        return detailService.retrieve(retrieveRequest, RetrieveType.MY_THEATHER);
+    @PostMapping("/retrieve/myTheater")
+    public RetrieveResponse addMyTheater(RetrieveRequest retrieveRequest) {
+        return detailService.retrieve(retrieveRequest, RetrieveType.MY_THEATER);
     }
 }

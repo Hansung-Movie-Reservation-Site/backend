@@ -1,9 +1,6 @@
 package com.springstudy.backend.Security.OAuth;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springstudy.backend.API.Auth.Model.AuthUser;
-import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.LoginResponse;
 import com.springstudy.backend.API.Auth.Model.UserDetailDTO;
 import com.springstudy.backend.API.Repository.Entity.User;
 import com.springstudy.backend.API.Repository.UserRepository;
@@ -76,7 +73,7 @@ public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
                 .email(user.getEmail())
                 .username(user.getUsername())
                 .user_id(id)
-                .myTheatherList(user.getMyTheatherList())
+                .myTheaterList(user.getMyTheaterList())
                 .build();
         response = jsonResponseUtil.success(userDetailDTO);
         return response;

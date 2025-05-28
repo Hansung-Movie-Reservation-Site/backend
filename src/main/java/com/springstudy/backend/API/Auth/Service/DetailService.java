@@ -4,14 +4,15 @@ import com.springstudy.backend.API.Auth.Model.Request.ChangeDetail.AddMyTheather
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetail.ChangeDetailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.ChangeDetail.ChangeEmailRequest;
 import com.springstudy.backend.API.Auth.Model.Request.RetrieveRequest;
-import com.springstudy.backend.API.Auth.Model.Response.ChangeResponse.AddTheatherResponse;
+import com.springstudy.backend.API.Auth.Model.Response.ChangeResponse.AddTheaterResponse;
 import com.springstudy.backend.API.Auth.Model.Response.ChangeResponse.ChangeDetailResponse;
 import com.springstudy.backend.API.Auth.Model.Response.RetrieveResponse.RetrieveAIResponse;
-import com.springstudy.backend.API.Auth.Model.Response.RetrieveResponse.RetrieveMyTheatherResponse;
+import com.springstudy.backend.API.Auth.Model.Response.RetrieveResponse.RetrieveMyTheaterResponse;
 import com.springstudy.backend.API.Auth.Model.Response.RetrieveResponse.RetrieveTicketResponse;
 import com.springstudy.backend.API.Auth.Model.RetrieveResponse;
 import com.springstudy.backend.API.Auth.Model.RetrieveType;
 import com.springstudy.backend.API.Repository.Entity.*;
+import com.springstudy.backend.API.Repository.MyTheaterRepository;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
@@ -34,6 +35,8 @@ public class DetailService {
     private final UserRepository userRepository;
     //private final CheckPasswordService checkPasswordService;
     private final PasswordEncoder passwordEncoder;
+
+    private final MyTheaterRepository myTheaterRepository;
 
     @Transactional
     public ChangeDetailResponse changeDetail(ChangeDetailRequest changeDetailRequest, DetailType detailType) {
@@ -105,36 +108,38 @@ public class DetailService {
                 return new RetrieveTicketResponse(ErrorCode.SUCCESS, ticketList);
             case AI: List<AI> aiList = user.getAiList();
                 return new RetrieveAIResponse(ErrorCode.SUCCESS, aiList);
-            case MY_THEATHER: List<MyTheather> myTheather = user.getMyTheatherList();
-                return new RetrieveMyTheatherResponse(ErrorCode.SUCCESS, myTheather);
+            case MY_THEATER: List<MyTheater> myTheater = user.getMyTheaterList();
+                return new RetrieveMyTheaterResponse(ErrorCode.SUCCESS, myTheater);
             default: throw new CustomException(ErrorCode.ERROR_RETRIEVE_TYPE);
         }
     }
 
 
     @Transactional
-    public AddTheatherResponse updateTheather(AddMyTheatherRequest addTheatherRequest) {
-        Long user_id = addTheatherRequest.user_id();
-        List<Long> user_SpotList = addTheatherRequest.mySpotList();
+    public AddTheaterResponse updateTheater(AddMyTheatherRequest addTheaterRequest) {
+        Long user_id = addTheaterRequest.user_id();
+        List<Long> user_SpotList = addTheaterRequest.mySpotList();
 
         Optional<User> userOptional = userRepository.findById(user_id);
         if(userOptional.isEmpty()){throw new CustomException(ErrorCode.NOT_EXIST_USER);}
         User user = userOptional.get();
 
-        List<MyTheather> myTheatherList = new ArrayList<>();
+        myTheaterRepository.deleteMyTheaterByUser_Id(user_id);
+
+        List<MyTheater> myTheaterList = new ArrayList<>();
         for(Long id: user_SpotList){
-            MyTheather myTheather = MyTheather.builder()
+            MyTheater myTheater = MyTheater.builder()
                     .spot_id(id)
                     .user(user)
                     .build();
-            myTheatherList.add(myTheather);
-            System.out.println(myTheather.getId());
+            myTheaterList.add(myTheater);
+            System.out.println(myTheater.getId());
         }
 
-        user.setMyTheatherList(myTheatherList);
+        user.setMyTheaterList(myTheaterList);
 
         //if(result == null){throw new CustomException(ErrorCode.TRANSACTION_ERROR);}
 
-        return new AddTheatherResponse(ErrorCode.SUCCESS, myTheatherList);
+        return new AddTheaterResponse(ErrorCode.SUCCESS, myTheaterList);
         }
 }
