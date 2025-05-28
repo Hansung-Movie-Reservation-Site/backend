@@ -1,5 +1,6 @@
 package com.springstudy.backend.API.Repository.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,6 +39,7 @@ public class Review {
     @Column(nullable = false)
     private LocalDate reviewDate = LocalDate.now();
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "userid", referencedColumnName = "id", nullable = false,
             foreignKey = @ForeignKey(name = "FK_review_TO_user_1"))
@@ -48,6 +50,7 @@ public class Review {
             foreignKey = @ForeignKey(name = "FK_review_TO_movie_1"))
     private Movie movie;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "likedReviews")
     private Set<User> likedByUsers;
 
