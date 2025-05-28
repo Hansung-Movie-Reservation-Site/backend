@@ -1,4 +1,5 @@
 package com.springstudy.backend.API.Repository.Entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,7 @@ import lombok.NoArgsConstructor;
 public class ReviewLike {
     @Id
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "userid")
     private User user;
 

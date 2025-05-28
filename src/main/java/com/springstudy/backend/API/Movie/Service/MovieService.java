@@ -753,6 +753,7 @@ public class MovieService {
             throw new IllegalArgumentException("❌ id를 입력하세요.");
         }
         Optional<Movie> movieOptional = movieRepository.findById(id);
+        System.out.println("디테일 반환 완료");
 
         return movieOptional.get();
     }
