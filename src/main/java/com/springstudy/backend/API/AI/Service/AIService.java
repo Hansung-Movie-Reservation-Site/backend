@@ -113,21 +113,9 @@ public class AIService {
         AI ai;
         if(aiOptional.isPresent()){
             System.out.println(user.getUsername()+ "님에게 이미 추천한 영화");
-            AI ai2 = aiOptional.get();
-
+            AI recommandedAI = aiOptional.get();
+            return recommandedAI;
         }
-//        if(aiOptional.isPresent()){
-//            AI recommandedMovie = aiOptional.get();
-//            System.out.println("이미 추천된 영화");
-//            ai = AI.builder()
-//                    .user(user)
-//                    .movieId(recommandedMovie.getId())
-//                    .reason(recommandedMovie.getReason())
-//                    .build();
-//            return ai;
-//        }
-//        else{
-//        }
         System.out.println("movieid: "+recommandMovieOptional.get().getId()+" reason: "+reason +" id:" +user);
         ai = AI.builder()
                 .user(user)
