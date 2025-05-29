@@ -58,7 +58,7 @@ public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
         }
         try{
             response.getWriter().write(loginResponse);
-            response.sendRedirect("https://cinemagix-xi.vercel.app"); //sendRedirect 문제
+            response.sendRedirect("https://cinemagix-xi.vercel.app/?social=1"); //sendRedirect 문제 + 일반 로그인과 소셜 로그인을 구분하기 위한 파라미터
         }
         catch(IOException e){
             LogUtil.error(getClass(),"IOException 65Line", e);
