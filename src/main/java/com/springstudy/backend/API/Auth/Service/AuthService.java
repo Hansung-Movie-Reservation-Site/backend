@@ -5,6 +5,7 @@ import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.DeleteAccou
 import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.CreateUserResponse;
 import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.DeleteAccountResponse;
 import com.springstudy.backend.API.Auth.Model.UserDetailDTO;
+import com.springstudy.backend.API.Repository.MyTheaterRepository;
 import com.springstudy.backend.API.Repository.ReviewLikeRepository;
 import com.springstudy.backend.API.Repository.ReviewRepository;
 import com.springstudy.backend.API.Repository.UserRepository;
@@ -29,6 +30,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.springstudy.backend.Security.JWT.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -41,6 +43,7 @@ public class AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisService redisService;
     private final ReviewLikeRepository reviewLikeRepository;
+    private final MyTheaterRepository myTheaterRepository;
 
     public CreateUserResponse createUser(CreateUserRequest request) {
         // 1. 동일 이메일 있나 확인.
@@ -144,6 +147,7 @@ public class AuthService {
         throw new CustomException(ErrorCode.MISMATCH_PASSWORD);
     }
     }
+    @Transactional
     public DeleteAccountResponse deleteAccount(DeleteAccountRequest deleteAccountRequest) {
         String password = deleteAccountRequest.password();
         Optional<User> userOptional = userRepository.findByEmail(deleteAccountRequest.email());
@@ -153,12 +157,10 @@ public class AuthService {
         User user = userOptional.get();
         Hasher.checkPassword(user, password);
 
-        long deleteCount =  reviewLikeRepository.deleteByUserId(user.getId());
-//        if(deleteCount == 0) {
-//            throw new CustomException(ErrorCode.DELETE_FAILED);
-//        }
+        reviewLikeRepository.deleteByUserId(user.getId());
+        myTheaterRepository.deleteByUser_Id(user.getId());
+        //reviewRepository.deleteByUserId(user.getId());    // 추가 FK 관계도 삭제 필요
         userRepository.delete(user);
-
         return new DeleteAccountResponse(ErrorCode.SUCCESS);
 
     }
