@@ -1,6 +1,7 @@
 package com.springstudy.backend.API.Auth.Controller;
 
 import com.springstudy.backend.API.Auth.Model.AuthUser;
+import com.springstudy.backend.API.Auth.Model.PrincipleUser;
 import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.CreateUserRequest;
 import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.DeleteAccountRequest;
 import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.LoginRequest;
@@ -25,7 +26,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,13 +69,19 @@ public class AuthControllerV1 {
         return authService.deleteAccount(deleteAccountRequest);
     }
     @PostMapping("/me")
-    public ResponseEntity myData(@AuthenticationPrincipal PrincipalDetails principal) {
+    public ResponseEntity myData(@AuthenticationPrincipal PrincipleUser principal) {
+        System.out.println("principal: "+principal);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object principal1 = auth.getPrincipal();
+
+        System.out.println("auth: " + auth);
+        System.out.println("principal: " + principal1);
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
 
-        AuthUser authUser = principal.toAuthUser();
-        User user = userRepository.findByEmail(authUser.getEmail()).get();
+        //AuthUser authUser = principal.getUsername();
+        User user = userRepository.findByEmail(principal.getUsername()).get();
         List<MyTheater> myTheater = myTheaterRepository.findByUserId(user.getId());
         UserDetailDTO userDetailDTO = UserDetailDTO.builder()
                 .user_id(user.getId())
