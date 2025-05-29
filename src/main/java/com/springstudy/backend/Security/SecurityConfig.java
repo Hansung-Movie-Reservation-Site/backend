@@ -1,5 +1,6 @@
 package com.springstudy.backend.Security;
 
+import com.springstudy.backend.Security.JWT.JWTFilter;
 import com.springstudy.backend.Security.OAuth.OAuth2FailureHandler;
 import com.springstudy.backend.Security.OAuth.OAuth2SucessHandler;
 import com.springstudy.backend.Security.OAuth.PrincipalOauth2UserService;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -26,6 +28,7 @@ public class SecurityConfig {
     private final PrincipalOauth2UserService userService;
     private final OAuth2SucessHandler oauth2SucessHandler;
     private final OAuth2FailureHandler oauth2FailureHandler;
+    private final JWTFilter jwtFilter;
 
     @Bean
     // SecurityFilterChain라는 객체를 컨테이너에 저장.
@@ -52,6 +55,8 @@ public class SecurityConfig {
                                 .failureHandler(oauth2FailureHandler)
                         // 소셜로그인은 /oauth2/authorization/google에서 진행.
                 );
+        http
+                .addFilterAfter(jwtFilter, SecurityContextPersistenceFilter.class);
 
         return http.build();
         // SecurityFilterChain을 반환.
