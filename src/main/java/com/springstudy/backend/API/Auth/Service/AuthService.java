@@ -44,6 +44,7 @@ public class AuthService {
     private final RedisService redisService;
     private final ReviewLikeRepository reviewLikeRepository;
     private final MyTheaterRepository myTheaterRepository;
+    private final ReviewRepository reviewRepository;
 
     public CreateUserResponse createUser(CreateUserRequest request) {
         // 1. 동일 이메일 있나 확인.
@@ -159,7 +160,7 @@ public class AuthService {
 
         reviewLikeRepository.deleteByUserId(user.getId());
         myTheaterRepository.deleteByUser_Id(user.getId());
-        //reviewRepository.deleteByUserId(user.getId());    // 추가 FK 관계도 삭제 필요
+        reviewRepository.deleteByUserId(user.getId());    // 추가 FK 관계도 삭제 필요
         userRepository.delete(user);
         return new DeleteAccountResponse(ErrorCode.SUCCESS);
 

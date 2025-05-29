@@ -88,10 +88,10 @@ public class User {
 
     @Column(nullable = true)
     @JsonIgnoreProperties("user")
-    @OneToMany(mappedBy= "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy= "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     List<MyTheater> myTheaterList = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.REMOVE)
     @JoinTable(
             name = "review_like",
             joinColumns = @JoinColumn(name = "userid"),

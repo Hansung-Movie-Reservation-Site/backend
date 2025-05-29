@@ -6,6 +6,7 @@ import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.Common.ErrorCode.CustomException;
 import com.springstudy.backend.Common.ErrorCode.ErrorCode;
 import com.springstudy.backend.Common.util.LogUtil;
+import com.springstudy.backend.Security.Password.Hasher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -42,7 +43,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 
             String email = oAuth2UserInfo.getProviderEmail();
             String username = oAuth2UserInfo.getProviderName();
-            String password = passwordEncoder.encode("겟인데어");
+            String password = Hasher.hash("1234");
 
             Optional<User> userOptional = userRepository.findByEmail(email);
 
