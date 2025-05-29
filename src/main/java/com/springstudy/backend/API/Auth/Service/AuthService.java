@@ -154,9 +154,9 @@ public class AuthService {
         Hasher.checkPassword(user, password);
 
         long deleteCount =  reviewLikeRepository.deleteByUserId(user.getId());
-        if(deleteCount == 0) {
-            throw new CustomException(ErrorCode.DELETE_FAILED);
-        }
+//        if(deleteCount == 0) {
+//            throw new CustomException(ErrorCode.DELETE_FAILED);
+//        }
         userRepository.delete(user);
 
         return new DeleteAccountResponse(ErrorCode.SUCCESS);
