@@ -81,7 +81,7 @@ public class AuthControllerV1 {
         }
 
         //AuthUser authUser = principal.getUsername();
-        User user = userRepository.findByEmail(principal.getUsername()).get();
+        User user = userRepository.findByUsername(principal.getUsername()).get();
         List<MyTheater> myTheater = myTheaterRepository.findByUserId(user.getId());
         UserDetailDTO userDetailDTO = UserDetailDTO.builder()
                 .user_id(user.getId())
