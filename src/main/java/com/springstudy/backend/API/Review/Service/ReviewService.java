@@ -3,6 +3,7 @@ package com.springstudy.backend.API.Review.Service;
 import com.springstudy.backend.API.Repository.Entity.ReviewLike;
 import com.springstudy.backend.API.Repository.ReviewLikeRepository;
 import com.springstudy.backend.API.Review.Model.Request.ReviewRequest;
+import com.springstudy.backend.API.Review.Model.Request.ReviewUpdateRequest;
 import com.springstudy.backend.API.Review.Model.Response.ReviewDTO;
 import com.springstudy.backend.API.Review.Model.Response.ReviewLikeResponse;
 import com.springstudy.backend.API.Review.Model.Response.ReviewResponse;
@@ -152,4 +153,37 @@ public class ReviewService {
         return reviewDTOS;
     }
 
+    @Transactional
+    public void updateReview(Long reviewId, Long userId, ReviewUpdateRequest request) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않습니다."));
+
+        // 작성자만 수정 가능하게 체크
+        if (!review.getUser().getId().equals(userId)) {
+            throw new IllegalStateException("본인이 작성한 리뷰만 수정할 수 있습니다.");
+        }
+
+        // 별점, 내용, 스포일러 여부 수정
+        if (request.getRating() != null) review.setRating(request.getRating());
+        if (request.getReview() != null) review.setReview(request.getReview());
+        if (request.getSpoiler() != null) review.setSpoiler(request.getSpoiler());
+    }
+
+    @Transactional
+    public void deleteReview(Long reviewId, Long userId) {
+        // 1. 리뷰 존재 확인
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않습니다."));
+
+        // 2. 본인 리뷰만 삭제 가능
+        if (!review.getUser().getId().equals(userId)) {
+            throw new IllegalStateException("본인이 작성한 리뷰만 삭제할 수 있습니다.");
+        }
+
+        // 3. ReviewLike 먼저 삭제 (좋아요 기록)
+        reviewLikeRepository.deleteAllByReviewId(reviewId);
+
+        // 4. 리뷰 삭제
+        reviewRepository.deleteById(reviewId);
+    }
 }

@@ -65,8 +65,8 @@ public class Review {
         if (review == null || review.trim().isEmpty()) {
             throw new IllegalArgumentException("리뷰 내용을 입력해 주세요.");
         }
-        if (review.length() < 10) { // 최소 10자 이상 입력
-            throw new IllegalArgumentException("리뷰는 최소 10자 이상 입력해야 합니다.");
+        if (review.length() < 5) { // 최소 10자 이상 입력
+            throw new IllegalArgumentException("리뷰는 최소 5자 이상 입력해야 합니다.");
         }
         this.review = review;
     }

@@ -2,6 +2,7 @@ package com.springstudy.backend.API.Review.Controller;
 
 import com.springstudy.backend.API.Repository.Entity.Review;
 import com.springstudy.backend.API.Review.Model.Request.ReviewRequest;
+import com.springstudy.backend.API.Review.Model.Request.ReviewUpdateRequest;
 import com.springstudy.backend.API.Review.Model.Response.ReviewDTO;
 import com.springstudy.backend.API.Review.Model.Response.ReviewLikeResponse;
 import com.springstudy.backend.API.Review.Model.Response.ReviewResponse;
@@ -91,5 +92,24 @@ public class ReviewControllerV1 {
     public ResponseEntity<List<ReviewDTO>> getReviews() {
         List<ReviewDTO> reviews = reviewService.getAllReviews();
         return ResponseEntity.ok(reviews);
+    }
+
+    @PutMapping("reviewUpdate/{reviewId}")
+    public ResponseEntity<String> updateReview(
+            @PathVariable Long reviewId,
+            @RequestParam Long userId,
+            @RequestBody ReviewUpdateRequest request
+    ) {
+        reviewService.updateReview(reviewId, userId, request);
+        return ResponseEntity.ok("리뷰가 수정되었습니다.");
+    }
+
+    @DeleteMapping("deleteReview/{reviewId}")
+    public ResponseEntity<String> deleteReview(
+            @PathVariable Long reviewId,
+            @RequestParam Long userId
+    ) {
+        reviewService.deleteReview(reviewId, userId);
+        return ResponseEntity.ok("리뷰가 삭제되었습니다.");
     }
 }
