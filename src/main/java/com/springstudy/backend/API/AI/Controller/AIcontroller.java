@@ -14,6 +14,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+
+@CrossOrigin(
+        origins = "https://cinemagix-xi.vercel.app", // ✅ 허용할 프론트 주소
+        allowedHeaders = "*",
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE},
+        allowCredentials = "true"
+)
 @RestController
 @RequestMapping("/api/v1/AIRecommand")
 @RequiredArgsConstructor
