@@ -42,7 +42,7 @@ public class Review {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "userid", referencedColumnName = "id", nullable = false,
-            foreignKey = @ForeignKey(name = "FK_review_TO_user_1"))
+            foreignKey = @ForeignKey(name = "FK_review_TO_user_1", foreignKeyDefinition = "FOREIGN KEY (userid) REFERENCES user(id) ON DELETE CASCADE"))
     private User user;
 
     @ManyToOne
