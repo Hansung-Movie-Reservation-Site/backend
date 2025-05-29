@@ -58,12 +58,12 @@ public class OAuth2SucessHandler implements AuthenticationSuccessHandler {
         }
         try{
             response.getWriter().write(loginResponse);
+            response.sendRedirect("https://cinemagix-xi.vercel.app"); //sendRedirect 문제
         }
         catch(IOException e){
             LogUtil.error(getClass(),"IOException 65Line", e);
             throw new CustomException(ErrorCode.IOEXCEPTION);
         }
-        //response.sendRedirect("http://localhost:3000/"); sendRedirect 문제
     }
     public String writeSucessResponse(Long id){
         String response;
