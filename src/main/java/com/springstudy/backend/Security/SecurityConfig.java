@@ -70,7 +70,7 @@ public class SecurityConfig {
                 "http://localhost:8000",
                 "http://43.200.184.143:8080",
                 "http://hs-cinemagix.duckdns.org:8080",
-                "https://hs-cinemagix.duckdns.org"
+                "https://hs-cinemagix.duckdns.org",
                 "https://cinemagix-xi.vercel.app"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
