@@ -5,6 +5,8 @@ import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.DeleteAccou
 import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.CreateUserResponse;
 import com.springstudy.backend.API.Auth.Model.Response.AccountResponse.DeleteAccountResponse;
 import com.springstudy.backend.API.Auth.Model.UserDetailDTO;
+import com.springstudy.backend.API.Repository.ReviewLikeRepository;
+import com.springstudy.backend.API.Repository.ReviewRepository;
 import com.springstudy.backend.API.Repository.UserRepository;
 import com.springstudy.backend.API.Auth.Model.AuthUser;
 import com.springstudy.backend.API.Auth.Model.Request.AccountRequest.LoginRequest;
@@ -38,6 +40,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisService redisService;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     public CreateUserResponse createUser(CreateUserRequest request) {
         // 1. 동일 이메일 있나 확인.
@@ -149,6 +152,11 @@ public class AuthService {
         }
         User user = userOptional.get();
         Hasher.checkPassword(user, password);
+
+        long deleteCount =  reviewLikeRepository.deleteByUserId(user.getId());
+        if(deleteCount == 0) {
+            throw new CustomException(ErrorCode.DELETE_FAILED);
+        }
         userRepository.delete(user);
 
         return new DeleteAccountResponse(ErrorCode.SUCCESS);

@@ -56,7 +56,9 @@ public enum ErrorCode implements CodeInterface{
 
 
 
-    EXIST_MOVIE(-36, "EXIST_MOVIE");
+    EXIST_MOVIE(-36, "EXIST_MOVIE"),
+
+    DELETE_FAILED(-37, "DELETE_FAILED");
 
     private final Integer code;
     private final String message;
