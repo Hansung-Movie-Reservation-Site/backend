@@ -138,6 +138,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 //|| checkURL(request, "/recommended")
                 || checkURL(request, "/getReviews")
                 || checkURL(request, "/searchById")
+                || checkURL(request, "/oauth2")
 
         ) {
             filterChain.doFilter(request, response);
